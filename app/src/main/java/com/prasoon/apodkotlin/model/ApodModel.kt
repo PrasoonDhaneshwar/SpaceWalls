@@ -1,10 +1,12 @@
 package com.prasoon.apodkotlin.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
-
+@Entity
 class ApodModel (
     val date: String,
 
@@ -25,6 +27,8 @@ class ApodModel (
 
     val url: String
 ) {
+    @PrimaryKey(autoGenerate = true) var id: Int = 0    // to identify each item in the table
+
     fun formatDate(): String? {
         // var newdate = "2021-12-29"
         val formatter = SimpleDateFormat("yyyy-MM-dd")

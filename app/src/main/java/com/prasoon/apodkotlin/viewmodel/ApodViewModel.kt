@@ -3,43 +3,80 @@ package com.prasoon.apodkotlin.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.prasoon.apodkotlin.model.ApodModel
+import com.prasoon.apodkotlin.model.ApodService
+import kotlinx.coroutines.*
 
+private const val API_KEY = "XqN37uhbQmRUqsm2nTFk4rsugtM2Ibe0YUS9HDE3"
 class ApodViewModel: ViewModel() {
+    // -----------------Retrofit Setup---------------
+    val apodService = ApodService.getApodFromInterface()
+    var job: Job? = null
+    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        onError("Exception: ${throwable.localizedMessage} ")
+    }
 
     val apodModel = MutableLiveData<ApodModel>()
     val apodLoadError = MutableLiveData<String?>()
     val loading = MutableLiveData<Boolean>()
 
     // Entry point for view
-    fun refresh() {
-        fetchApodByCurrentDate()
-        fetchApodByCurrentDateDummy()
+    fun refresh(date: String) {
+
+        if (date.equals("null")) {
+            fetchApodByCurrentDate()
+        } else {
+            fetchApodByCustomDate(date)
+        }
+
+        //fetchApodByCurrentDateDummy()
     }
 
     private fun fetchApodByCurrentDate() {
         // Loading spinner active. Disabled when information is retrieved.
-        // loading.value = true
-        apodLoadError.value = null
+        loading.value = true
+        // -----------------Retrofit Setup---------------
+        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+            // Get the response from Retrofit api
+            val response = apodService.getApodCurrentDate(API_KEY)
+            // When response is received, post it to the main thread
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful) {
+                    apodModel.value = response.body()
+                    apodLoadError.value = null
+                    loading.value = false
+                } else {
+                    onError("Error: ${response.message()}")
+                }
+            }
+        }
+    }
+
+    private fun fetchApodByCustomDate(date: String) {
+        // Loading spinner active. Disabled when information is retrieved.
+        loading.value = true
+        // -----------------Retrofit Setup---------------
+        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+            // Get the response from Retrofit api
+            val response = apodService.getApodCustomDate(API_KEY, "2021-01-01")
+            // When response is received, post it to the main thread
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful) {
+                    apodModel.value = response.body()
+                    apodLoadError.value = null
+                    loading.value = false
+                } else {
+                    onError("Error: ${response.message()}")
+                }
+            }
+        }
+    }
+
+    private fun onError(message: String) {
+        apodLoadError.value = message
         loading.value = false
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private fun fetchApodByCurrentDateDummy() {
+/*    private fun fetchApodByCurrentDateDummy() {
         val dummydata = generateDummyApod()
         apodModel.value = dummydata
     }
@@ -63,5 +100,5 @@ class ApodViewModel: ViewModel() {
             "Galaxies and the South Celestial Pole",
             "https://apod.nasa.gov/apod/image/2101/2020_12_16_Kujal_Jizni_Pol_1500px-3.jpg")
         return apodmodel
-    }
+    }*/
 }
