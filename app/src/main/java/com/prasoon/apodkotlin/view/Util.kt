@@ -16,9 +16,10 @@ fun ImageView.loadImage(uri: String?) {
         .into(this)
 }
 
-fun VideoView.loadVideo(uri: String?) {
+suspend fun VideoView.loadVideo(uri: String?): VideoView {
     val mediaController = MediaController(this.context)
     mediaController.setAnchorView(this)
     this.setVideoPath(uri)
     this.start()
+    return this
 }

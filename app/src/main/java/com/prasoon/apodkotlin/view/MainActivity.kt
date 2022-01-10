@@ -22,36 +22,8 @@ private const val BASE_URL = "https://api.nasa.gov/"
 private const val API_KEY = "XqN37uhbQmRUqsm2nTFk4rsugtM2Ibe0YUS9HDE3"
 
 class MainActivity : AppCompatActivity() {
-    lateinit var viewModel: ApodViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
-        // Link corresponding ViewModel to View(this)
-        viewModel = ViewModelProviders.of(this).get(ApodViewModel::class.java)
-        //viewModel.refresh("null")
-        viewModel.refresh("2021-01-01")
-
-
-        swipe_refresh_layout.setOnRefreshListener{
-            viewModel.refresh("null")
-            swipe_refresh_layout.isRefreshing = false
-        }
-
-        observeViewModel()
-    }
-
-    private fun observeViewModel() {
-        // Observe apod title from viewModel
-        viewModel.apodModel.observe(this, Observer { apodModel ->
-            apodModel?.let {
-                imageViewResult.loadImage(apodModel.hdurl)
-                textViewTitle.text = apodModel.title
-                textViewMetadataDate.text = apodModel.date
-                textViewExplanation.text = apodModel.explanation
-            }
-        })
     }
 }

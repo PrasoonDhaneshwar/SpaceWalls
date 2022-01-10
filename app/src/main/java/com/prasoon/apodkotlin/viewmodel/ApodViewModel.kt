@@ -57,7 +57,7 @@ class ApodViewModel: ViewModel() {
         // -----------------Retrofit Setup---------------
         job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
             // Get the response from Retrofit api
-            val response = apodService.getApodCustomDate(API_KEY, "2021-01-01")
+            val response = apodService.getApodCustomDate(API_KEY, date)
             // When response is received, post it to the main thread
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful) {
@@ -72,8 +72,8 @@ class ApodViewModel: ViewModel() {
     }
 
     private fun onError(message: String) {
-        apodLoadError.value = message
-        loading.value = false
+        apodLoadError.postValue(message)
+        loading.postValue(false)
     }
 
 /*    private fun fetchApodByCurrentDateDummy() {

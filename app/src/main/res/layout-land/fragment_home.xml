@@ -13,11 +13,27 @@
 
         <ImageView
             android:id="@+id/imageViewResult"
+            android:layout_width="340dp"
+            android:layout_height="300dp"
+            android:scaleType="fitXY"
+            android:gravity="center"
+            android:text="Image"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.088"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.333" />
+
+        <VideoView
+            android:id="@+id/videoViewResult"
             android:layout_width="336dp"
             android:layout_height="303dp"
             android:gravity="center"
             android:text="Image"
             android:textSize="10sp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.088"
@@ -84,22 +100,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.984" />
-
-        <Button
-            android:id="@+id/buttonParse"
-            android:layout_width="82dp"
-            android:layout_height="35dp"
-            android:background="@color/mainBackground"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:gravity="center"
-            android:text="View"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.819"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.914" />
 
         <TextView
             android:layout_width="276dp"
@@ -174,20 +174,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.254" />
-
-        <TextView
-            android:id="@+id/textViewSuggest"
-            android:layout_width="110dp"
-            android:layout_height="24dp"
-            android:gravity="center"
-            android:textColor="@color/textAlt"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.837"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.826" />
 
         <TextView
             android:layout_width="85dp"
