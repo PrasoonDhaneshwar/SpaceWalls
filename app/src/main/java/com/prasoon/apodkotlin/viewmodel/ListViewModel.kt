@@ -1,10 +1,18 @@
 package com.prasoon.apodkotlin.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.room.RoomDatabase
+import com.prasoon.apodkotlin.model.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
+import kotlinx.coroutines.*
 
-class ListViewModel: ViewModel() {
+class ListViewModel(application: Application): AndroidViewModel(application) {
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val db by lazy { ApodDatabase(getApplication()).apodModelDao() }
+
 
     val apodModelList = MutableLiveData<List<ApodModel>>()
     val apodLoadError = MutableLiveData<String?>()
@@ -12,13 +20,18 @@ class ListViewModel: ViewModel() {
 
     // Entry point for view
     fun refresh() {
-        fetchApodByDates()
+        fetchApodFromDB()
     }
 
-    private fun fetchApodByDates() {
+    private fun fetchApodFromDB() {
         // Loading spinner active. Disabled when information is retrieved.
         loading.value = true
-
+        coroutineScope.launch {
+            val apod = db.getAllApods()
+            apodModelList.postValue(apod)
+            withContext(Dispatchers.Main) {
+                loading.value = false
+            }
+        }
     }
-
 }

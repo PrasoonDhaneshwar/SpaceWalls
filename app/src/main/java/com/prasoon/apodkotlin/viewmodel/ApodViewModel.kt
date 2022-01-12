@@ -1,13 +1,45 @@
 package com.prasoon.apodkotlin.viewmodel
 
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.prasoon.apodkotlin.model.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.ApodService
+import com.prasoon.apodkotlin.model.DateInput
 import kotlinx.coroutines.*
 
 private const val API_KEY = "XqN37uhbQmRUqsm2nTFk4rsugtM2Ibe0YUS9HDE3"
-class ApodViewModel: ViewModel() {
+class ApodViewModel(application: Application): AndroidViewModel(application) {
+    // -----------------Room Database Setup---------------
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val db by lazy { ApodDatabase(getApplication()).apodModelDao() }
+
+    val apodDetail = MutableLiveData<ApodModel?>()
+    val apodDetailLoaded = MutableLiveData<Boolean>()
+
+
+    fun getApodDetailFromDb(id: Int) {
+        Log.i("ApodViewModel", "getApodDetailFromDb $id")
+        coroutineScope.launch {
+            val apod = db.getApodModel(id)
+            apodDetail.postValue(apod)
+            withContext(Dispatchers.Main) {
+                apodDetailLoaded.value = true
+            }
+        }
+    }
+
+    fun saveApod(apodModel: ApodModel) {
+        Log.i("ApodViewModel", "saveApod")
+
+        coroutineScope.launch {
+            db.insertApod(apodModel)
+        }
+    }
+
     // -----------------Retrofit Setup---------------
     val apodService = ApodService.getApodFromInterface()
     var job: Job? = null
@@ -53,6 +85,7 @@ class ApodViewModel: ViewModel() {
 
     private fun fetchApodByCustomDate(date: String) {
         // Loading spinner active. Disabled when information is retrieved.
+        // setValue should be called from the main thread
         loading.value = true
         // -----------------Retrofit Setup---------------
         job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
@@ -72,6 +105,7 @@ class ApodViewModel: ViewModel() {
     }
 
     private fun onError(message: String) {
+        // postValue is called from a background thread
         apodLoadError.postValue(message)
         loading.postValue(false)
     }

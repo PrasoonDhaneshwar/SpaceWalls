@@ -35,5 +35,9 @@
         android:id="@+id/detailFragment"
         android:name="com.prasoon.apodkotlin.view.DetailFragment"
         android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail" />
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="apodId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

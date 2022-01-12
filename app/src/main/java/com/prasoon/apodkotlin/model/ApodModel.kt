@@ -7,12 +7,12 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 @Entity
-class ApodModel (
+data class ApodModel (
     val date: String,
 
     val explanation: String,
 
-    val hdurl: String,
+    val hdurl: String?,
 
     // Since member variable needs to be changed, serialized is used
     @SerializedName("media_type")
@@ -27,7 +27,7 @@ class ApodModel (
 
     val url: String
 ) {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0    // to identify each item in the table
+    @PrimaryKey(autoGenerate = true) var id: Int = 0    // to identify each apod item in the table
 
     fun formatDate(): String? {
         // var newdate = "2021-12-29"

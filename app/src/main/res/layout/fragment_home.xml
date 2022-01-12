@@ -15,37 +15,39 @@
             android:id="@+id/imageViewResult"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:minHeight="350dp"
-            android:maxHeight="350dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="20dp"
+            android:adjustViewBounds="true"
             android:gravity="center"
+            android:maxHeight="350dp"
+            android:minHeight="350dp"
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView"
             tools:text="Image" />
 
-        <VideoView
+        <ImageView
             android:id="@+id/videoViewResult"
-            android:layout_width="match_parent"
-            android:layout_height="350dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="8dp"
             android:layout_marginRight="20dp"
+            android:adjustViewBounds="true"
             android:gravity="center"
+            android:maxHeight="350dp"
+            android:minHeight="350dp"
             android:textSize="10sp"
-            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView"
-            tools:text="Image" />
+            tools:text="Video" />
 
 
         <ImageView
-            android:id="@+id/selectSecondActivity"
+            android:id="@+id/selectListFragment"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginEnd="20dp"
@@ -130,13 +132,13 @@
             android:layout_marginTop="4dp"
             android:fontFamily="@font/capriola"
             android:gravity="start|center"
+            android:text="Astronomy Picture of the Day"
             android:textColor="@color/mainText"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.116"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:text="Astronomy Picture of the Day" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textViewDatePicker"
@@ -185,19 +187,19 @@
             android:id="@+id/textViewExplanation"
             android:layout_width="376dp"
             android:layout_height="wrap_content"
-            android:minHeight="200dp"
-            android:maxHeight="350dp"
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
-            android:paddingRight="10dp"
-            android:paddingEnd="10dp"
-            android:scrollbars="none"
-            android:text="Loading..."
             android:hyphenationFrequency="full"
             android:justificationMode="inter_word"
+            android:maxHeight="350dp"
+            android:minHeight="200dp"
+            android:paddingEnd="10dp"
+            android:paddingRight="10dp"
+            android:scrollbars="none"
+            android:text="Loading..."
             android:textColor="@color/textAlt"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -215,7 +217,7 @@
             android:textColor="@color/textAlt"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/selectSecondActivity"
+            app:layout_constraintEnd_toStartOf="@+id/selectListFragment"
             tools:text="Favorites" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

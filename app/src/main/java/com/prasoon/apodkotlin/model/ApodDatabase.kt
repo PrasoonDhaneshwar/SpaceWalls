@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 @Database(entities = [ApodModel::class], version = 1)
 abstract class ApodDatabase : RoomDatabase(){
 
-    abstract fun apodModelDao(): ApodDao
+    abstract fun apodModelDao(): ApodDaoInterface
 
     companion object {
         @Volatile private var instance: ApodDatabase?= null
@@ -20,7 +20,8 @@ abstract class ApodDatabase : RoomDatabase(){
             }
         }
 
-        private fun buildDatabase(context: Context) = Room.databaseBuilder(
+        private fun buildDatabase(context: Context) =
+            Room.databaseBuilder(
             context.applicationContext,
             ApodDatabase::class.java,
             "apod_database"
