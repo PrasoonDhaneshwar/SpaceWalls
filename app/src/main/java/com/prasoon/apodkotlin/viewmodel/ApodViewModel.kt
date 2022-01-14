@@ -4,25 +4,27 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.prasoon.apodkotlin.model.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.ApodService
-import com.prasoon.apodkotlin.model.DateInput
 import kotlinx.coroutines.*
 
 private const val API_KEY = "XqN37uhbQmRUqsm2nTFk4rsugtM2Ibe0YUS9HDE3"
-class ApodViewModel(application: Application): AndroidViewModel(application) {
+
+class ApodViewModel(application: Application) : AndroidViewModel(application) {
+    private val TAG = "ApodViewModel"
+
     // -----------------Room Database Setup---------------
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private val db by lazy { ApodDatabase(getApplication()).apodModelDao() }
 
+    // apodDetail and apodDetailLoaded is for DetailFragment
     val apodDetail = MutableLiveData<ApodModel?>()
     val apodDetailLoaded = MutableLiveData<Boolean>()
 
 
     fun getApodDetailFromDb(id: Int) {
-        Log.i("ApodViewModel", "getApodDetailFromDb $id")
+        Log.i(TAG, "getApodDetailFromDb: $id")
         coroutineScope.launch {
             val apod = db.getApodModel(id)
             apodDetail.postValue(apod)
@@ -33,7 +35,7 @@ class ApodViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun saveApod(apodModel: ApodModel) {
-        Log.i("ApodViewModel", "saveApod")
+        Log.i(TAG, "saveApod")
 
         coroutineScope.launch {
             db.insertApod(apodModel)

@@ -20,6 +20,21 @@
         app:layout_constraintTop_toBottomOf="@+id/detail_text_view_title"
         tools:src="@mipmap/ic_launcher" />
 
+    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+        android:id="@+id/detail_youtube_video_view"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detail_text_view_title"
+        tools:src="@mipmap/ic_launcher"
+        app:autoPlay="false"/>
+
     <TextView
         android:id="@+id/detail_text_view_title"
         android:layout_width="match_parent"

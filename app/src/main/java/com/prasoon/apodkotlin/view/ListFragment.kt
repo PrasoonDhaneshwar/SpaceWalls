@@ -1,6 +1,7 @@
 package com.prasoon.apodkotlin.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +18,9 @@ import kotlinx.android.synthetic.main.fragment_list.*
 import kotlinx.android.synthetic.main.item_apod.*
 
 class ListFragment : Fragment(), ListAction {
+    private val TAG = "ListFragment"
 
-    private val apodListAdapter = ApodListAdapter(arrayListOf(), this)
+    private val apodListAdapter = ApodListAdapter(arrayListOf(), this, lifecycle)
     private lateinit var viewModel: ListViewModel
 
     override fun onCreateView(
@@ -73,6 +75,7 @@ class ListFragment : Fragment(), ListAction {
     }
 
     override fun onItemClickDetail(id: Int) {
+        Log.i(TAG, "onItemClickDetail: $id")
         goToApodModelDetails(id)
     }
 

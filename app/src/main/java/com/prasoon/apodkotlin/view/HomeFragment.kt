@@ -7,25 +7,31 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
-import com.prasoon.apodkotlin.model.DateInput
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 
 class HomeFragment : Fragment() {
-    lateinit var viewModel: ApodViewModel
     private val TAG = "HomeFragment"
+    lateinit var viewModel: ApodViewModel
     lateinit var date: String
     var isDateSet = false
     private lateinit var currentApod: ApodModel
+    private lateinit var youTubePlayerView: YouTubePlayerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +56,8 @@ class HomeFragment : Fragment() {
         // Enable scrolling for explanation
         textViewExplanation.setMovementMethod(ScrollingMovementMethod())
 
+        youTubePlayerView = view.findViewById(R.id.videoViewResult)
+        lifecycle.addObserver(youTubePlayerView)
 
         selectListFragment.setOnClickListener{
             Log.i(TAG, "selectListFragment")
@@ -66,7 +74,7 @@ class HomeFragment : Fragment() {
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, monthOfYear)
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            Log.i(TAG, "calendar $year + $monthOfYear + $dayOfMonth")
+            Log.i(TAG, "calendar: $year + $monthOfYear + $dayOfMonth")
 
             // val myFormat = "dd.MM.yyyy" // mention the format you need
             // val myFormat2 = "dd LLL yyyy HH:mm:ss aaa z" // mention the format you need
@@ -79,7 +87,7 @@ class HomeFragment : Fragment() {
             val dayOfMonthString = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
 
             date = "$year-$monthOfYearString-$dayOfMonthString"
-            Log.i(TAG, "calendar date $date")
+            Log.i(TAG, "calendar date: $date")
             isDateSet = true
             viewModel.refresh(date)
         }
@@ -102,7 +110,20 @@ class HomeFragment : Fragment() {
             viewModel.saveApod(currentApod)
         }
 
+        imageViewResult.visibility = View.GONE
+        videoViewResult.visibility = View.GONE
+
         observeViewModel()
+
+/*        youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+//                val videoId = extractYoutubeId(currentApod.url)
+                Log.i(TAG, "observeViewModel apodDetail videoId: tLC6Sy8f06s")
+
+                youTubePlayer.loadVideo("tLC6Sy8f06s", 0f)
+                youTubePlayer.play()
+            }
+        })*/
     }
 
     private fun observeViewModel() {
@@ -110,13 +131,28 @@ class HomeFragment : Fragment() {
         viewModel.apodModel.observe(viewLifecycleOwner, Observer { apodModel ->
             apodModel?.let {
                 currentApod = apodModel
-                // todo: setup for video view
-                imageViewResult.loadImage(apodModel.hdurl)
-                textViewTitle.text = apodModel.title
-                textViewMetadataDate.text = apodModel.date
-                textViewExplanation.text = apodModel.explanation
+                if (currentApod.mediaType.equals("video")) {
+                    Log.i(TAG, "observeViewModel apodDetail id: ${currentApod.url}")
+                    Log.i(TAG, "observeViewModel apodDetail: $currentApod")
+                    imageViewResult.visibility = View.GONE
+                    videoViewResult.visibility = View.VISIBLE
+                    var videoId = extractYoutubeId(currentApod.url)
+                    loadVideo(videoId)
+
+                } else {
+                    destroyYoutubeVideo()
+                    imageViewResult.visibility = View.VISIBLE
+                    videoViewResult.visibility = View.GONE
+                    imageViewResult.loadImage(apodModel.url)
+                }
+
+                textViewTitle.text = currentApod.title
+                textViewMetadataDate.text = currentApod.date
+                textViewExplanation.text = currentApod.explanation
             }
         })
+
+
 
 /*        viewModel.apodAddedToFavorites.observe(viewLifecycleOwner, Observer { isComplete ->
             Toast.makeText(activity, "Added into favorites", Toast.LENGTH_SHORT).show()
@@ -124,5 +160,35 @@ class HomeFragment : Fragment() {
 
             viewModel.apodAddedToFavorites.value = false
         })*/
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        youTubePlayerView.release()
+    }
+
+    private fun loadVideo(id: String) {
+        runBlocking {
+            youTubePlayerView.initialize(object : AbstractYouTubePlayerListener() {
+                override fun onReady(youTubePlayer: YouTubePlayer) {
+                    Log.i(TAG, "observeViewModel apodDetail videoId: ${id}")
+
+                    youTubePlayer.loadOrCueVideo(lifecycle, id, 0f)
+                    // youTubePlayer.play()
+                }
+            }, true, IFramePlayerOptions.default)
+        }
+
+/*            youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                override fun onReady(youTubePlayer: YouTubePlayer) {
+                Log.i(TAG, "observeViewModel apodDetail videoId: ${id}")
+
+                youTubePlayer.loadOrCueVideo(lifecycle, id, 0f)
+            }
+        })*/
+    }
+
+    private fun destroyYoutubeVideo() {
+         youTubePlayerView.enableAutomaticInitialization = false
     }
 }
