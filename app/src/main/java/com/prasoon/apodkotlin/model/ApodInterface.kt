@@ -14,6 +14,6 @@ interface ApodInterface {
     @GET("/planetary/apod")
     suspend fun getApodCustomDate(
             @Query("api_key") api_key: String,
-            @Query("date") date: String
+            @Query("date") date: String?
     ) : Response<ApodModel>
 }

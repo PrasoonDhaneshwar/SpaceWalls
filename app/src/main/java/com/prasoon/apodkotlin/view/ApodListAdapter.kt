@@ -6,12 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.viewmodel.ListAction
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.item_apod.view.*
 
 //                                                                          2. Extend holder
@@ -22,16 +20,12 @@ class ApodListAdapter(
     val lifecycle: Lifecycle
 ) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
     private val TAG = "ApodListAdapter"
-    private lateinit var youTubePlayerView: YouTubePlayerView
 
     // 3. Override methods
     // todo: view may not be val
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApodViewHolder {
         Log.i("ApodListAdapter", "onCreateViewHolder")
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_apod, parent, false)
-        youTubePlayerView = view.findViewById(R.id.item_apod_video)
-        lifecycle.addObserver(youTubePlayerView)
-
         return ApodViewHolder(view)
     }
 
@@ -60,19 +54,15 @@ class ApodListAdapter(
             if (apodModel.mediaType.equals("video")) {
                 itemImageView.visibility = View.GONE
                 videoImageView.visibility = View.VISIBLE
+                val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apodModel.url)
+                Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                youTubePlayerView.addYouTubePlayerListener(object :
-                    AbstractYouTubePlayerListener() {
-                    override fun onReady(youTubePlayer: YouTubePlayer) {
-                        val videoId = extractYoutubeId(apodModel.url)
-                        youTubePlayer.loadVideo(videoId, 0f)
-                        youTubePlayer.mute()
-                    }
-                })
+                videoImageView.loadImage(thumbnailUrl, true)
+
             } else {
                 itemImageView.visibility = View.VISIBLE
                 videoImageView.visibility = View.GONE
-                itemImageView.loadImage(apodModel.url)
+                itemImageView.loadImage(apodModel.url, true)
             }
 
             itemTitle.text = apodModel.title

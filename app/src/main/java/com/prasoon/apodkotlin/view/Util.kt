@@ -9,9 +9,12 @@ import com.prasoon.apodkotlin.R
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-fun ImageView.loadImage(uri: String?) {
+fun ImageView.loadImage(uri: String?, centerCrop: Boolean) {
     val options = RequestOptions()
         .error(R.mipmap.ic_launcher_round)
+    if (centerCrop){
+        options.centerCrop()
+    }
     Glide.with(this.context)
         .setDefaultRequestOptions(options)
         .load(uri)
@@ -37,4 +40,22 @@ fun extractYoutubeId(url: String) : String {
 
     }
     return "Not a youtube video"
+}
+
+fun getYoutubeThumbnailUrlFromVideoUrl(videoUrl: String): String {
+    return "https://img.youtube.com/vi/" + getYoutubeVideoIdFromUrl(videoUrl).toString() + "/0.jpg"
+}
+
+fun getYoutubeVideoIdFromUrl(inUrl: String): String? {
+    var inUrl = inUrl
+    inUrl = inUrl.replace("&feature=youtu.be", "")
+    if (inUrl.toLowerCase().contains("youtu.be")) {
+        return inUrl.substring(inUrl.lastIndexOf("/") + 1)
+    }
+    val pattern = "(?<=watch\\?v=|/videos/|embed\\/)[^#\\&\\?]*"
+    val compiledPattern = Pattern.compile(pattern)
+    val matcher = compiledPattern.matcher(inUrl)
+    return if (matcher.find()) {
+        matcher.group()
+    } else null
 }

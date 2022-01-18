@@ -1,6 +1,7 @@
 package com.prasoon.apodkotlin.view
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_detail.*
+import kotlinx.android.synthetic.main.fragment_home.*
 
 class DetailFragment : Fragment() {
     private val TAG = "DetailFragment"
@@ -27,7 +26,6 @@ class DetailFragment : Fragment() {
     private lateinit var viewModel: ApodViewModel
     private lateinit var apod: ApodModel
 
-    private lateinit var youTubePlayerView: YouTubePlayerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,10 +47,10 @@ class DetailFragment : Fragment() {
         detail_image_view.visibility = View.GONE
         detail_youtube_video_view.visibility = View.GONE
 
-        observeViewModel()
+        // Enable scrolling for explanation
+        detail_text_view_explanation.setMovementMethod(ScrollingMovementMethod())
 
-        youTubePlayerView = view.findViewById(R.id.detail_youtube_video_view)
-        lifecycle.addObserver(youTubePlayerView)
+        observeViewModel()
     }
 
     private fun observeViewModel() {
@@ -69,17 +67,16 @@ class DetailFragment : Fragment() {
                 if (apod.mediaType.equals("video")) {
                     detail_image_view.visibility = View.GONE
                     detail_youtube_video_view.visibility = View.VISIBLE
-                    youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                        override fun onReady(youTubePlayer: YouTubePlayer) {
-                            val videoId = extractYoutubeId(apod.url)
-                            youTubePlayer.loadVideo(videoId, 0f)
-                        }
-                    })
+                    var thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
+                    Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
+
+                    detail_youtube_video_view.loadImage(thumbnailUrl, false)
+
                 } else {
                     detail_image_view.visibility = View.VISIBLE
                     detail_youtube_video_view.visibility = View.GONE
                     Log.i(TAG, "url: ${apodDetail.url}")
-                    detail_image_view.loadImage(apod.url)
+                    detail_image_view.loadImage(apod.url, false)
                 }
 
                 detail_text_view_title.text = it.title
@@ -87,10 +84,5 @@ class DetailFragment : Fragment() {
                 detail_text_view_date.text = it.date
             }
         })
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        youTubePlayerView.release()
     }
 }

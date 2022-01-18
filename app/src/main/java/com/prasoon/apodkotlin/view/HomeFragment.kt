@@ -11,27 +11,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
+import com.prasoon.apodkotlin.model.DateInput
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 
 class HomeFragment : Fragment() {
     private val TAG = "HomeFragment"
     lateinit var viewModel: ApodViewModel
-    lateinit var date: String
-    var isDateSet = false
     private lateinit var currentApod: ApodModel
-    private lateinit var youTubePlayerView: YouTubePlayerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,18 +37,16 @@ class HomeFragment : Fragment() {
 
         // Link corresponding ViewModel to View(this)
         viewModel = ViewModelProviders.of(this).get(ApodViewModel::class.java)
-        viewModel.refresh("null")
+        viewModel.refresh(DateInput.currentdate)
 
         swipe_refresh_layout.setOnRefreshListener{
-            if (!isDateSet) viewModel.refresh("null") else viewModel.refresh(date)
+            Log.i(TAG, "swipe_refresh_layout date: ${DateInput.currentdate}")
+            viewModel.refresh(DateInput.currentdate)
             swipe_refresh_layout.isRefreshing = false
         }
 
         // Enable scrolling for explanation
         textViewExplanation.setMovementMethod(ScrollingMovementMethod())
-
-        youTubePlayerView = view.findViewById(R.id.videoViewResult)
-        lifecycle.addObserver(youTubePlayerView)
 
         selectListFragment.setOnClickListener{
             Log.i(TAG, "selectListFragment")
@@ -86,22 +75,29 @@ class HomeFragment : Fragment() {
             val monthOfYearString = if (monthOfYear+1 < 10) "0" + (monthOfYear + 1) else (monthOfYear + 1).toString()
             val dayOfMonthString = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
 
-            date = "$year-$monthOfYearString-$dayOfMonthString"
-            Log.i(TAG, "calendar date: $date")
-            isDateSet = true
-            viewModel.refresh(date)
+            DateInput.currentdate = "$year-$monthOfYearString-$dayOfMonthString"
+            Log.i(TAG, "calendar date: ${DateInput.currentdate}")
+            viewModel.refresh(DateInput.currentdate)
         }
 
 
         selectDateButton.setOnClickListener {
             activity?.let { it1 ->
                 val datePickerDialog = DatePickerDialog(
-                    it1, dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)
+                    it1, dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(
+                        Calendar.DAY_OF_MONTH
+                    )
                 )
 
                 // Account for Date Picker to show till today's date.
-                val oneDayBefore = 1 * 24 * 60 * 60 * 1000L
-                datePickerDialog.datePicker.maxDate = System.currentTimeMillis() - oneDayBefore
+                val halfDayBefore = 1 * 12 * 60 * 60 * 1000L
+                val minimumRange = Calendar.getInstance()
+                minimumRange.set(Calendar.YEAR, 1995)
+                minimumRange.set(Calendar.MONTH, 5)
+                minimumRange.set(Calendar.DAY_OF_MONTH, 16)
+                datePickerDialog.datePicker.setMinDate(minimumRange.getTimeInMillis());
+
+                datePickerDialog.datePicker.maxDate = System.currentTimeMillis() - halfDayBefore
                 datePickerDialog.show()
             }
         }
@@ -110,20 +106,8 @@ class HomeFragment : Fragment() {
             viewModel.saveApod(currentApod)
         }
 
-        imageViewResult.visibility = View.GONE
-        videoViewResult.visibility = View.GONE
-
         observeViewModel()
 
-/*        youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-//                val videoId = extractYoutubeId(currentApod.url)
-                Log.i(TAG, "observeViewModel apodDetail videoId: tLC6Sy8f06s")
-
-                youTubePlayer.loadVideo("tLC6Sy8f06s", 0f)
-                youTubePlayer.play()
-            }
-        })*/
     }
 
     private fun observeViewModel() {
@@ -132,18 +116,23 @@ class HomeFragment : Fragment() {
             apodModel?.let {
                 currentApod = apodModel
                 if (currentApod.mediaType.equals("video")) {
+                    videoViewButton.visibility = View.VISIBLE
                     Log.i(TAG, "observeViewModel apodDetail id: ${currentApod.url}")
                     Log.i(TAG, "observeViewModel apodDetail: $currentApod")
                     imageViewResult.visibility = View.GONE
                     videoViewResult.visibility = View.VISIBLE
                     var videoId = extractYoutubeId(currentApod.url)
-                    loadVideo(videoId)
+                    //loadVideo(videoId)
+                    val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
+                    Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
+
+                    videoViewResult.loadImage(thumbnailUrl, false)
 
                 } else {
-                    destroyYoutubeVideo()
                     imageViewResult.visibility = View.VISIBLE
                     videoViewResult.visibility = View.GONE
-                    imageViewResult.loadImage(apodModel.url)
+                    videoViewButton.visibility = View.GONE
+                    imageViewResult.loadImage(currentApod.url, false)
                 }
 
                 textViewTitle.text = currentApod.title
@@ -151,44 +140,5 @@ class HomeFragment : Fragment() {
                 textViewExplanation.text = currentApod.explanation
             }
         })
-
-
-
-/*        viewModel.apodAddedToFavorites.observe(viewLifecycleOwner, Observer { isComplete ->
-            Toast.makeText(activity, "Added into favorites", Toast.LENGTH_SHORT).show()
-            Log.i(TAG, "Added into favorites")
-
-            viewModel.apodAddedToFavorites.value = false
-        })*/
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        youTubePlayerView.release()
-    }
-
-    private fun loadVideo(id: String) {
-        runBlocking {
-            youTubePlayerView.initialize(object : AbstractYouTubePlayerListener() {
-                override fun onReady(youTubePlayer: YouTubePlayer) {
-                    Log.i(TAG, "observeViewModel apodDetail videoId: ${id}")
-
-                    youTubePlayer.loadOrCueVideo(lifecycle, id, 0f)
-                    // youTubePlayer.play()
-                }
-            }, true, IFramePlayerOptions.default)
-        }
-
-/*            youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                override fun onReady(youTubePlayer: YouTubePlayer) {
-                Log.i(TAG, "observeViewModel apodDetail videoId: ${id}")
-
-                youTubePlayer.loadOrCueVideo(lifecycle, id, 0f)
-            }
-        })*/
-    }
-
-    private fun destroyYoutubeVideo() {
-         youTubePlayerView.enableAutomaticInitialization = false
     }
 }

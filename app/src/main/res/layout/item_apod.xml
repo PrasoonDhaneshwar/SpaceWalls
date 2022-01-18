@@ -14,17 +14,13 @@
         android:padding="8dp"
         tools:src="@mipmap/ic_launcher" />
 
-    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+    <ImageView
         android:id="@+id/item_apod_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_weight="1"
         android:padding="8dp"
-        app:showSeekBar="false"
-        app:showFullScreenButton="false"
-        app:showVideoCurrentTime="false"
-        app:showVideoDuration="false"
         tools:src="@drawable/ic_dark_mode" />
 
     <TextView

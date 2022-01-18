@@ -54,7 +54,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
     val loading = MutableLiveData<Boolean>()
 
     // Entry point for view
-    fun refresh(date: String) {
+    fun refresh(date: String?) {
 
         if (date.equals("null")) {
             fetchApodByCurrentDate()
@@ -85,7 +85,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun fetchApodByCustomDate(date: String) {
+    private fun fetchApodByCustomDate(date: String?) {
         // Loading spinner active. Disabled when information is retrieved.
         // setValue should be called from the main thread
         loading.value = true

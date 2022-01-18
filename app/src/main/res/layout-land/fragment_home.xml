@@ -26,7 +26,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.333" />
 
-        <VideoView
+        <ImageView
             android:id="@+id/videoViewResult"
             android:layout_width="336dp"
             android:layout_height="303dp"
@@ -39,6 +39,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.333" />
+
+        <ImageButton
+            android:id="@+id/videoViewButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_play"
+            app:layout_constraintBottom_toBottomOf="@+id/videoViewResult"
+            app:layout_constraintEnd_toEndOf="@+id/videoViewResult"
+            app:layout_constraintStart_toStartOf="@+id/videoViewResult"
+            app:layout_constraintTop_toTopOf="@+id/videoViewResult" />
 
         <ImageView
             android:id="@+id/selectListFragment"
