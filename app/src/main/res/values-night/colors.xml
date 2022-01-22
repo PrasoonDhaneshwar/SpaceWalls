@@ -9,10 +9,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#DA2929</color>
 
-    <color name="mainText">#000000</color>
-    <color name="textAlt">#4A4949</color>
-    <color name="darkModeIcon">#4A4949</color>
+    <color name="mainText">#FFFFFF</color>
+    <color name="textAlt">#E6E6E6</color>
+    <color name="darkModeIcon">#E6E6E6</color>
 
-    <color name="mainBackground">#FFFFFF</color>
+    <color name="mainBackground">#000000</color>
     <color name="buttonForeground">#3F51B5</color>
 </resources>

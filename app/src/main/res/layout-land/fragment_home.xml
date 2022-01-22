@@ -76,19 +76,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.979" />
 
-        <Button
+        <ImageView
             android:id="@+id/selectDateButton"
-            android:layout_width="98dp"
-            android:layout_height="31dp"
-            android:backgroundTint="@color/buttonForeground"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:gravity="center"
-            android:text="Select Date"
-            android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.622"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_calendar"
             app:layout_constraintVertical_bias="0.915" />
 
         <TextView
@@ -178,6 +176,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.901" />
+
+        <ImageView
+            android:id="@+id/darkMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_dark_mode"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

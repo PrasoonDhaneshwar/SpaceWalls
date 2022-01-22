@@ -39,7 +39,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView"
-            tools:layout_height="320dp" />
+            tools:layout_height="320dp"
+            tools:src="@mipmap/ic_launcher"/>
 
         <ImageButton
             android:id="@+id/videoViewButton"
@@ -75,24 +76,13 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-
         <ImageView
             android:id="@+id/darkMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_dark_mode"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />
-
-        <ImageView
-            android:id="@+id/lightMode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="56dp"
-            android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_light_mode"
+            tools:src="@drawable/ic_dark_mode"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />
 
@@ -175,9 +165,9 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="Select Date to get today's picture!" />
+            android:text="Select Date to get today's picture!" />
 
-        <Button
+<!--        <Button
             android:id="@+id/selectDateButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -191,6 +181,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/selectListFragment"
             app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />-->
+
+        <ImageView
+            android:id="@+id/selectDateButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:src="@drawable/ic_calendar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/selectListFragment"
             app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />
 
         <TextView

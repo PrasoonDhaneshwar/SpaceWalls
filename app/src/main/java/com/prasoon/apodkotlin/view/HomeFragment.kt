@@ -1,12 +1,15 @@
 package com.prasoon.apodkotlin.view
 
 import android.app.DatePickerDialog
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -16,6 +19,7 @@ import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.DateInput
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
+import java.lang.NullPointerException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -23,6 +27,9 @@ class HomeFragment : Fragment() {
     private val TAG = "HomeFragment"
     lateinit var viewModel: ApodViewModel
     private lateinit var currentApod: ApodModel
+
+    // Night Mode preferences
+    val NIGHT_MODE = "nightMode"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +62,31 @@ class HomeFragment : Fragment() {
             // Avoid below for compile time safety
             // findNavController().navigate(R.id.action_homeFragment_to_listFragment)
             findNavController().navigate(action)
+        }
+
+        val appSettingsPrefs: SharedPreferences =
+            context?.getSharedPreferences(NIGHT_MODE, MODE_PRIVATE) ?: throw NullPointerException("context expected")
+        val sharedPreferencesEditor: SharedPreferences.Editor = appSettingsPrefs.edit()
+        val isNightMode: Boolean = appSettingsPrefs.getBoolean(NIGHT_MODE, false)
+
+        if (isNightMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            // Change images
+            darkMode.setImageDrawable(resources.getDrawable(R.drawable.ic_light_mode))
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            darkMode.setImageDrawable(resources.getDrawable(R.drawable.ic_dark_mode))
+        }
+        // Night Mode preferences
+        darkMode.setOnClickListener {
+            if (isNightMode) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                sharedPreferencesEditor.putBoolean(NIGHT_MODE, false)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                sharedPreferencesEditor.putBoolean(NIGHT_MODE, true)
+            }
+            sharedPreferencesEditor.apply()
         }
 
         val cal = Calendar.getInstance()

@@ -15,7 +15,6 @@ import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_detail.*
-import kotlinx.android.synthetic.main.fragment_home.*
 
 class DetailFragment : Fragment() {
     private val TAG = "DetailFragment"
@@ -45,7 +44,7 @@ class DetailFragment : Fragment() {
         }
 
         detail_image_view.visibility = View.GONE
-        detail_youtube_video_view.visibility = View.GONE
+        detail_video_view.visibility = View.GONE
 
         // Enable scrolling for explanation
         detail_text_view_explanation.setMovementMethod(ScrollingMovementMethod())
@@ -66,15 +65,15 @@ class DetailFragment : Fragment() {
 
                 if (apod.mediaType.equals("video")) {
                     detail_image_view.visibility = View.GONE
-                    detail_youtube_video_view.visibility = View.VISIBLE
+                    detail_video_view.visibility = View.VISIBLE
                     var thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
                     Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                    detail_youtube_video_view.loadImage(thumbnailUrl, false)
+                    detail_video_view.loadImage(thumbnailUrl, false)
 
                 } else {
                     detail_image_view.visibility = View.VISIBLE
-                    detail_youtube_video_view.visibility = View.GONE
+                    detail_video_view.visibility = View.GONE
                     Log.i(TAG, "url: ${apodDetail.url}")
                     detail_image_view.loadImage(apod.url, false)
                 }

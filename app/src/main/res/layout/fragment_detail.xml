@@ -21,7 +21,7 @@
         tools:src="@mipmap/ic_launcher" />
 
     <ImageView
-        android:id="@+id/detail_youtube_video_view"
+        android:id="@+id/detail_video_view"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_marginLeft="20dp"
