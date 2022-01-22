@@ -1,5 +1,7 @@
 package com.prasoon.apodkotlin.view
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -25,7 +27,6 @@ class DetailFragment : Fragment() {
     private lateinit var viewModel: ApodViewModel
     private lateinit var apod: ApodModel
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,6 +50,15 @@ class DetailFragment : Fragment() {
         // Enable scrolling for explanation
         detail_text_view_explanation.setMovementMethod(ScrollingMovementMethod())
 
+        video_view_button.setOnClickListener {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(apod.url)
+                )
+            )
+        }
+
         observeViewModel()
     }
 
@@ -60,13 +70,14 @@ class DetailFragment : Fragment() {
         viewModel.apodDetail.observe(viewLifecycleOwner, Observer { apodDetail ->
             apodDetail?.let {
                 apod = it
-                Log.i(TAG, "observeViewModel apodDetail id: ${apodDetail.id}")
                 Log.i(TAG, "observeViewModel apodDetail: $apodDetail")
+                Log.i(TAG, "observeViewModel apodDetail id: ${apod.id}")
 
                 if (apod.mediaType.equals("video")) {
                     detail_image_view.visibility = View.GONE
                     detail_video_view.visibility = View.VISIBLE
-                    var thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
+                    video_view_button.visibility = View.VISIBLE
+                    val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
                     Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
                     detail_video_view.loadImage(thumbnailUrl, false)
@@ -74,7 +85,8 @@ class DetailFragment : Fragment() {
                 } else {
                     detail_image_view.visibility = View.VISIBLE
                     detail_video_view.visibility = View.GONE
-                    Log.i(TAG, "url: ${apodDetail.url}")
+                    video_view_button.visibility = View.GONE
+                    Log.i(TAG, "url: ${apod.url}")
                     detail_image_view.loadImage(apod.url, false)
                 }
 

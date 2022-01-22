@@ -80,11 +80,11 @@
             android:id="@+id/darkMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginBottom="8dp"
-            tools:src="@drawable/ic_dark_mode"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_dark_mode" />
 
         <TextView
             android:id="@+id/textView"
@@ -119,7 +119,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="5dp"
             android:fontFamily="sans-serif-medium"
             android:gravity="center_vertical|end"
             android:paddingStart="10dp"
@@ -127,7 +126,7 @@
             android:paddingRight="10dp"
             android:textColor="@color/mainText"
             android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@+id/textViewExplanation"
+            app:layout_constraintBaseline_toBaselineOf="@+id/textViewTitle"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="Dec 29, 2022" />
 
@@ -158,30 +157,12 @@
             android:id="@+id/textViewDatePicker"
             android:layout_width="130dp"
             android:layout_height="40dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginBottom="52dp"
             android:gravity="center"
             android:textColor="@color/textAlt"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="Select Date to get today's picture!" />
-
-<!--        <Button
-            android:id="@+id/selectDateButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/buttonForeground"
-            android:gravity="center"
-            android:text="Select Date"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/selectListFragment"
-            app:layout_constraintHorizontal_bias="0.49"
-            app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />-->
+            app:layout_constraintBottom_toTopOf="@+id/selectDateButton"
+            app:layout_constraintEnd_toEndOf="@+id/selectDateButton"
+            app:layout_constraintStart_toStartOf="@+id/selectDateButton" />
 
         <ImageView
             android:id="@+id/selectDateButton"

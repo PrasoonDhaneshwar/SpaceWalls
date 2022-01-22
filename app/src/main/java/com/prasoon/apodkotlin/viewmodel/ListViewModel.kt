@@ -34,4 +34,10 @@ class ListViewModel(application: Application): AndroidViewModel(application) {
             }
         }
     }
+
+    fun deleteApodModel(apodModel: ApodModel) {
+        coroutineScope.launch {
+            val apod = db.delete(apodModel)
+        }
+    }
 }

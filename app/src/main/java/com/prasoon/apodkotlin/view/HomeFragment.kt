@@ -2,7 +2,9 @@ package com.prasoon.apodkotlin.view
 
 import android.app.DatePickerDialog
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -10,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -19,9 +22,9 @@ import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.DateInput
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
-import java.lang.NullPointerException
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class HomeFragment : Fragment() {
     private val TAG = "HomeFragment"
@@ -52,6 +55,11 @@ class HomeFragment : Fragment() {
             swipe_refresh_layout.isRefreshing = false
         }
 
+        if (DateInput.simpleDateFormat != null)
+            textViewDatePicker.text = DateInput.simpleDateFormat
+        else
+        textViewDatePicker.text = "Select Date to get today's picture!"
+
         // Enable scrolling for explanation
         textViewExplanation.setMovementMethod(ScrollingMovementMethod())
 
@@ -64,18 +72,31 @@ class HomeFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        val appSettingsPrefs: SharedPreferences =
-            context?.getSharedPreferences(NIGHT_MODE, MODE_PRIVATE) ?: throw NullPointerException("context expected")
+        val appSettingsPrefs: SharedPreferences = requireContext().getSharedPreferences(
+            NIGHT_MODE,
+            MODE_PRIVATE
+        )
         val sharedPreferencesEditor: SharedPreferences.Editor = appSettingsPrefs.edit()
         val isNightMode: Boolean = appSettingsPrefs.getBoolean(NIGHT_MODE, false)
 
         if (isNightMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             // Change images
-            darkMode.setImageDrawable(resources.getDrawable(R.drawable.ic_light_mode))
+            darkMode.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_light_mode
+                )
+            )
+
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            darkMode.setImageDrawable(resources.getDrawable(R.drawable.ic_dark_mode))
+            darkMode.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_dark_mode
+                )
+            )
         }
         // Night Mode preferences
         darkMode.setOnClickListener {
@@ -95,14 +116,16 @@ class HomeFragment : Fragment() {
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, monthOfYear)
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            Log.i(TAG, "calendar: $year + $monthOfYear + $dayOfMonth")
+            Log.i(TAG, "calendar default format: YEAR: $year MONTH: $monthOfYear DAY: $dayOfMonth")
 
             // val myFormat = "dd.MM.yyyy" // mention the format you need
             // val myFormat2 = "dd LLL yyyy HH:mm:ss aaa z" // mention the format you need
             val format = "LLL d, yyyy" // mention the format you need
 
             val simpleDateFormat = SimpleDateFormat(format, Locale.US)
-            textViewDatePicker.text = simpleDateFormat.format(cal.time)
+            DateInput.simpleDateFormat = simpleDateFormat.format(cal.time)
+            textViewDatePicker.text = DateInput.simpleDateFormat
+            Log.i(TAG, "calendar simpleDateFormat: ${DateInput.simpleDateFormat}")
 
             val monthOfYearString = if (monthOfYear+1 < 10) "0" + (monthOfYear + 1) else (monthOfYear + 1).toString()
             val dayOfMonthString = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
@@ -111,7 +134,6 @@ class HomeFragment : Fragment() {
             Log.i(TAG, "calendar date: ${DateInput.currentdate}")
             viewModel.refresh(DateInput.currentdate)
         }
-
 
         selectDateButton.setOnClickListener {
             activity?.let { it1 ->
@@ -134,12 +156,20 @@ class HomeFragment : Fragment() {
             }
         }
 
+        videoViewButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(currentApod.url)
+                )
+            )
+        }
+
         addIntoFavorites.setOnClickListener{
             viewModel.saveApod(currentApod)
         }
 
         observeViewModel()
-
     }
 
     private fun observeViewModel() {
@@ -149,12 +179,12 @@ class HomeFragment : Fragment() {
                 currentApod = apodModel
                 if (currentApod.mediaType.equals("video")) {
                     videoViewButton.visibility = View.VISIBLE
-                    Log.i(TAG, "observeViewModel apodDetail id: ${currentApod.url}")
                     Log.i(TAG, "observeViewModel apodDetail: $currentApod")
+                    Log.i(TAG, "observeViewModel apodDetail url: ${currentApod.url}")
                     imageViewResult.visibility = View.GONE
                     videoViewResult.visibility = View.VISIBLE
-                    var videoId = extractYoutubeId(currentApod.url)
-                    //loadVideo(videoId)
+                    // var videoId = extractYoutubeId(currentApod.url)
+                    // loadVideo(videoId)
                     val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                     Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 

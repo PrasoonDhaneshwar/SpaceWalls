@@ -43,6 +43,7 @@ class ApodListAdapter(
         private val videoImageView = view.item_apod_video
         private val itemTitle = view.item_title
         private val itemDate = view.item_date
+        private val itemDelete = view.item_delete
         private val layout = view.item_layout
 
 
@@ -71,6 +72,11 @@ class ApodListAdapter(
             layout.setOnClickListener {
                 Log.i(TAG, "layout clicked for: ${apodModel.id}")
                 actions.onItemClickDetail(apodModel.id)
+            }
+
+            itemDelete.setOnClickListener {
+                Log.i(TAG, "delete clicked for: ${apodModel}")
+                actions.onItemClickDeleted(apodModel)
             }
         }
     }

@@ -1,21 +1,21 @@
 package com.prasoon.apodkotlin.view
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListView
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.prasoon.apodkotlin.R
+import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.viewmodel.ListAction
 import com.prasoon.apodkotlin.viewmodel.ListViewModel
 import kotlinx.android.synthetic.main.fragment_list.*
-import kotlinx.android.synthetic.main.item_apod.*
 
 class ListFragment : Fragment(), ListAction {
     private val TAG = "ListFragment"
@@ -45,20 +45,7 @@ class ListFragment : Fragment(), ListAction {
         }
 
         viewModel = ViewModelProviders.of(this).get(ListViewModel::class.java)
-
         observeViewModel()
-
-        //item_layout.setOnClickListener{ goToApodModelDetails() }
-
-        // Long click listener example
-        /*
-        selectSecondActivity.setOnLongClickListener{
-            val action = HomeFragmentDirections.actionHomeFragmentToListFragment()
-            // Avoid below for compile time safety
-            // findNavController().navigate(R.id.action_homeFragment_to_listFragment)
-            findNavController().navigate(action)
-            true
-        }*/
     }
 
     private fun observeViewModel() {
@@ -77,6 +64,22 @@ class ListFragment : Fragment(), ListAction {
     override fun onItemClickDetail(id: Int) {
         Log.i(TAG, "onItemClickDetail: $id")
         goToApodModelDetails(id)
+    }
+
+    override fun onItemClickDeleted(apodModel: ApodModel) {
+        activity?.let {
+            AlertDialog.Builder(it)
+                .setTitle("Deleting this item...")
+                .setMessage("Are you sure?")
+                .setPositiveButton("Yes") {p0,p1->
+                    Log.i(TAG, "onItemClickDeleted: ${apodModel.id}")
+                    viewModel.deleteApodModel(apodModel)
+                    viewModel.refresh()
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show()
+        }
     }
 
     override fun onResume() {
