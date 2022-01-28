@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_list.*
 class ListFragment : Fragment(), ListAction {
     private val TAG = "ListFragment"
 
-    private val apodListAdapter = ApodListAdapter(arrayListOf(), this, lifecycle)
+    private val apodListAdapter = ApodListAdapter(arrayListOf(), this)
     private lateinit var viewModel: ListViewModel
 
     override fun onCreateView(
@@ -66,20 +66,24 @@ class ListFragment : Fragment(), ListAction {
         goToApodModelDetails(id)
     }
 
-    override fun onItemClickDeleted(apodModel: ApodModel) {
+    override fun onItemClickDeleted(apodModel: ApodModel, position: Int): Boolean {
+        var isDeleted = false
         activity?.let {
             AlertDialog.Builder(it)
                 .setTitle("Deleting this item...")
                 .setMessage("Are you sure?")
                 .setPositiveButton("Yes") {p0,p1->
                     Log.i(TAG, "onItemClickDeleted: ${apodModel.id}")
+                    isDeleted = true
+                    apodListAdapter.deleteApods(position)
                     viewModel.deleteApodModel(apodModel)
-                    viewModel.refresh()
+                    Log.i(TAG, "isDeleted: $isDeleted")
                 }
                 .setNegativeButton("Cancel", null)
                 .create()
                 .show()
         }
+        return isDeleted
     }
 
     override fun onResume() {

@@ -4,12 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.prasoon.apodkotlin.BuildConfig
 import com.prasoon.apodkotlin.model.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.ApodService
 import kotlinx.coroutines.*
 
-private const val API_KEY = "XqN37uhbQmRUqsm2nTFk4rsugtM2Ibe0YUS9HDE3"
 
 class ApodViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = "ApodViewModel"
@@ -71,7 +71,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
         // -----------------Retrofit Setup---------------
         job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
             // Get the response from Retrofit api
-            val response = apodService.getApodCurrentDate(API_KEY)
+            val response = apodService.getApodCurrentDate(BuildConfig.APOD_API_KEY)
             // When response is received, post it to the main thread
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful) {
@@ -92,7 +92,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
         // -----------------Retrofit Setup---------------
         job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
             // Get the response from Retrofit api
-            val response = apodService.getApodCustomDate(API_KEY, date)
+            val response = apodService.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
             // When response is received, post it to the main thread
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful) {

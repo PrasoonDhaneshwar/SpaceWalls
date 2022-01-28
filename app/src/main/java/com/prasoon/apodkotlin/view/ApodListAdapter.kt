@@ -9,16 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.viewmodel.ListAction
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.item_apod.view.*
 
-//                                                                          2. Extend holder
+//                                                                                        2. Extend holder
 //                      4. Populate objects
-class ApodListAdapter(
-    var apodModels: ArrayList<ApodModel>,
-    val actions: ListAction,
-    val lifecycle: Lifecycle
-) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
+class ApodListAdapter(var apodModelList: ArrayList<ApodModel>, val actions: ListAction) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
     private val TAG = "ApodListAdapter"
 
     // 3. Override methods
@@ -31,10 +26,10 @@ class ApodListAdapter(
 
     override fun onBindViewHolder(holder: ApodViewHolder, position: Int) {
         Log.i("ApodListAdapter", "onBindViewHolder")
-        holder.bind(apodModels[position])
+        holder.bind(apodModelList[position], position)
     }
 
-    override fun getItemCount() = apodModels.size
+    override fun getItemCount() = apodModelList.size
 
     // 1. Create Holder
     // make it inner to access ListAction
@@ -48,8 +43,8 @@ class ApodListAdapter(
 
 
         // ***Binding between view and data
-        fun bind(apodModel: ApodModel) {
-            Log.i(TAG, "bind: $apodModel")
+        fun bind(apodModel: ApodModel, position: Int) {
+            Log.i(TAG, "bind id: ${apodModel.id}")
             Log.i(TAG, "bind url: ${apodModel.url}")
 
             if (apodModel.mediaType.equals("video")) {
@@ -75,8 +70,11 @@ class ApodListAdapter(
             }
 
             itemDelete.setOnClickListener {
-                Log.i(TAG, "delete clicked for: ${apodModel}")
-                actions.onItemClickDeleted(apodModel)
+                Log.i(TAG, "delete clicked for: ${apodModel.id}")
+                val isDeleted = actions.onItemClickDeleted(apodModel, position)
+                if (isDeleted) {
+                    deleteApods(position)
+                }
             }
         }
     }
@@ -84,8 +82,16 @@ class ApodListAdapter(
     // 4. update apod list when new information is invoked
     fun updateApods(newApods: List<ApodModel>) {
         Log.i(TAG, "updateApods")
-        apodModels.clear()
-        apodModels.addAll(newApods)
+        apodModelList.clear()
+        apodModelList.addAll(newApods)
         notifyDataSetChanged()
+    }
+
+    fun deleteApods(position: Int) {
+        apodModelList.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemCount)
+        // notifyDataSetChanged()
+        Log.i(TAG, "delete item size: ${apodModelList.size}")
     }
 }
