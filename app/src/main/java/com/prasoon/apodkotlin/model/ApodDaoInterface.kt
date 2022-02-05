@@ -22,4 +22,7 @@ interface ApodDaoInterface {
 
     @Query("SELECT * FROM apodmodel")
     suspend fun getAllApods(): List<ApodModel>
+
+    @Query("SELECT date FROM apodmodel")
+    suspend fun getAllApodDates(): List<String>
 }

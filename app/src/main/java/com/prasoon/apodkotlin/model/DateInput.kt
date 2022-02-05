@@ -1,13 +1,15 @@
 package com.prasoon.apodkotlin.model
 
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.HashMap
-
 object DateInput {
-    var apod:ApodModel? = null
-    var currentdate: String? = null
-    var simpleDateFormat : String? = null
-    var apodAddedToFavorites = false
-    var map : HashMap<String, Boolean> = HashMap<String, Boolean>()
+    var currentDate: String = String()
+    var simpleDateFormat: String? = null
+
+    fun convertDateToInteger(date: String): Int {
+        val values = date.split("-")
+        val year = values[0].toInt()
+        val month = values[1].toInt()
+        val day = values[2].toInt()
+
+        return year * 10000 + month * 100 + day
+    }
 }

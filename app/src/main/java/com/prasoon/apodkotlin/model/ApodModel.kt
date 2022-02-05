@@ -29,7 +29,7 @@ data class ApodModel(
     val url: String
 ) {
     @PrimaryKey(autoGenerate = true)
-    var id: Int = convertDateToInteger(date)   // to identify each apod item in the table
+    var id: Int = 0 // to identify each apod item in the table
 
     fun formatDate(): String? {
         // var newdate = "2021-12-29"
@@ -39,14 +39,5 @@ data class ApodModel(
 
     override fun toString(): String {
         return "ApodModel(date='$date', explanation='$explanation', hdurl='$hdurl', mediaType='$mediaType', serviceVersion='$serviceVersion', title='$title', url='$url')"
-    }
-
-    fun convertDateToInteger(date: String): Int {
-        val values = date.split("-")
-        val year = values[0].toInt()
-        val month = values[1].toInt()
-        val day = values[2].toInt()
-
-        return year * 10000 + month * 100 + day
     }
 }

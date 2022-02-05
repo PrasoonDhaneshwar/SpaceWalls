@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId "com.prasoon.apodkotlin"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"

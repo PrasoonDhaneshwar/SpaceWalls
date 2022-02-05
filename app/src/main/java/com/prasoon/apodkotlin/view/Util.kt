@@ -2,8 +2,10 @@ package com.prasoon.apodkotlin.view
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -12,9 +14,12 @@ import android.widget.ImageView
 import android.widget.MediaController
 import android.widget.Toast
 import android.widget.VideoView
+import androidx.core.content.ContextCompat.startActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.prasoon.apodkotlin.R
+import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_SEND
+import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_VIEW
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -79,6 +84,7 @@ fun saveImage(context: Context, url: String, date: String) {
     val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         throwable.localizedMessage
     }
+    Toast.makeText(context, "Starting download...", Toast.LENGTH_SHORT).show()
     val imageName = "APOD_" + date.replace("-", "")
 
     CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
@@ -117,6 +123,19 @@ fun saveImage(context: Context, url: String, date: String) {
                 "Saved as $imageName.jpg in $storageDirectoryPath",
                 Toast.LENGTH_SHORT
             ).show()
+        }
+    }
+}
+
+fun performActionIntent(context: Context, url: String, type: Int) {
+    when (type) {
+        INTENT_ACTION_VIEW -> startActivity(context, Intent(Intent.ACTION_VIEW, Uri.parse(url)), null)
+        INTENT_ACTION_SEND -> {
+            val shareIntent= Intent()
+            shareIntent.action=Intent.ACTION_SEND
+            shareIntent.putExtra(Intent.EXTRA_TEXT, url)
+            shareIntent.type="text/plain"
+            startActivity(context, Intent.createChooser(shareIntent,"Share To:"), null)
         }
     }
 }

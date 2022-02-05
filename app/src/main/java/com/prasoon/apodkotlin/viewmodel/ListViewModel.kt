@@ -3,8 +3,6 @@ package com.prasoon.apodkotlin.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.room.RoomDatabase
 import com.prasoon.apodkotlin.model.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
 import kotlinx.coroutines.*

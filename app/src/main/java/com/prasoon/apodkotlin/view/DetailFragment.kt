@@ -1,7 +1,5 @@
 package com.prasoon.apodkotlin.view
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -15,6 +13,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
+import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_SEND
+import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_VIEW
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_detail.*
 
@@ -51,12 +51,11 @@ class DetailFragment : Fragment() {
         detail_text_view_explanation.setMovementMethod(ScrollingMovementMethod())
 
         video_view_button.setOnClickListener {
-            startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(apod.url)
-                )
-            )
+            performActionIntent(requireContext(), apod.url, INTENT_ACTION_VIEW)
+        }
+
+        share_item.setOnClickListener {
+            performActionIntent(requireContext(), apod.url, INTENT_ACTION_SEND)
         }
 
         observeViewModel()

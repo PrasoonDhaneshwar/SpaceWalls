@@ -36,7 +36,6 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveApod(apodModel: ApodModel) {
         Log.i(TAG, "saveApod")
-
         coroutineScope.launch {
             db.insertApod(apodModel)
         }
@@ -51,18 +50,21 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
 
     val apodModel = MutableLiveData<ApodModel>()
     val apodLoadError = MutableLiveData<String?>()
+    val apodDateList = MutableLiveData<List<String>>()
     val loading = MutableLiveData<Boolean>()
 
     // Entry point for view
     fun refresh(date: String?) {
-
-        if (date.equals("null")) {
-            fetchApodByCurrentDate()
-        } else {
-            fetchApodByCustomDate(date)
-        }
-
+        getApodDatesFromDb()
+        fetchApodByCustomDate(date)
         //fetchApodByCurrentDateDummy()
+    }
+
+    fun getApodDatesFromDb() {
+        Log.i(TAG, "getApodDatesFromDb")
+        coroutineScope.launch {
+            apodDateList.postValue(db.getAllApodDates())
+        }
     }
 
     private fun fetchApodByCurrentDate() {
