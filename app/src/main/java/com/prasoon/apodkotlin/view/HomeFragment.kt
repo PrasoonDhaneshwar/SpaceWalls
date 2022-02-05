@@ -1,10 +1,12 @@
 package com.prasoon.apodkotlin.view
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Resources
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -14,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -27,7 +30,6 @@ import kotlinx.android.synthetic.main.fragment_home.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class HomeFragment : Fragment() {
     private val TAG = "HomeFragment"
     lateinit var viewModel: ApodViewModel
@@ -35,6 +37,8 @@ class HomeFragment : Fragment() {
 
     // Night Mode preferences
     val NIGHT_MODE = "nightMode"
+
+    val STORAGE_PERMISSION_CODE = 1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -168,6 +172,9 @@ class HomeFragment : Fragment() {
         }
 
         // todo: when apod is fully loaded, then enable the buttons, using loading from viewmodel
+/*        if (!this::currentApod.isInitialized) {
+            addIntoFavorites.isEnabled = false
+        } else addIntoFavorites.isEnabled = true*/
         addIntoFavorites.setOnClickListener{
             addIntoFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorAddToFavorites))
             viewModel.saveApod(currentApod)
@@ -180,10 +187,39 @@ class HomeFragment : Fragment() {
             Toast.makeText(activity, "Added to Favorites!", Toast.LENGTH_SHORT).show()
         }
 
+        // Request Permission
+        downloadImage.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                // Permissions already granted
+                // start to download file and save in external storage
+                if (!currentApod.mediaType.equals("video")) {
+                    context?.let { it1 -> saveImage(it1, currentApod.url, currentApod.date) }
+                    Toast.makeText(activity, "Starting download...", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                activity?.let { fragmentActivity -> requestStoragePermission(fragmentActivity) }
+                // start to download file and save in external storage
+                if (!currentApod.mediaType.equals("video")) {
+                    context?.let { it1 -> saveImage(it1, currentApod.url, currentApod.date) }
+                    Toast.makeText(activity, "Starting download...", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         observeViewModel()
     }
 
     private fun observeViewModel() {
+        // Observe when loading is successful
+        viewModel.loading.observe(viewLifecycleOwner, { isLoading ->
+            isLoading?.let {
+                progressImageView.visibility = if (it) View.VISIBLE else View.GONE
+                progressVideoView.visibility = if (it) View.VISIBLE else View.GONE
+                /* todo: isLoading should be changed to integer, and each value should account for errors received.
+                    For ex: 503 server error, Image loading failed.*/
+            }
+        })
+
         // Observe apod title from viewModel
         viewModel.apodModel.observe(viewLifecycleOwner, Observer { apodModel ->
             apodModel?.let {
@@ -192,6 +228,7 @@ class HomeFragment : Fragment() {
                     videoViewButton.visibility = View.VISIBLE
                     Log.i(TAG, "observeViewModel apodDetail: $currentApod")
                     Log.i(TAG, "observeViewModel apodDetail url: ${currentApod.url}")
+                    downloadImage.visibility = View.GONE
                     imageViewResult.visibility = View.GONE
                     videoViewResult.visibility = View.VISIBLE
                     // var videoId = extractYoutubeId(currentApod.url)
@@ -212,6 +249,7 @@ class HomeFragment : Fragment() {
                     }
 
                 } else {
+                    downloadImage.visibility = View.VISIBLE
                     imageViewResult.visibility = View.VISIBLE
                     videoViewResult.visibility = View.GONE
                     videoViewButton.visibility = View.GONE
@@ -223,5 +261,42 @@ class HomeFragment : Fragment() {
                 textViewExplanation.text = currentApod.explanation
             }
         })
+    }
+
+    private fun requestStoragePermission(activity: Activity) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            // Add rational for requesting permission
+            AlertDialog.Builder(requireContext())
+                .setTitle("Permission needed... ")
+                .setMessage("Grant Storage Permissions to Save Image")
+                .setPositiveButton("Okay") {p0,p1->
+                    Log.i(TAG, "requestStoragePermission: ")
+                    requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+                    // todo: write download functions here
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show()
+        } else {
+            requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.i(TAG, "onRequestPermissionsResult: granted")
+
+                Toast.makeText(activity, "Permission granted!", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.i(TAG, "onRequestPermissionsResult: denied")
+                Toast.makeText(activity, "Permission denied!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
