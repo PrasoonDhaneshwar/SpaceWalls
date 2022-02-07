@@ -42,7 +42,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        return inflater.inflate(R.layout.fragment_home_old, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -208,7 +208,6 @@ class HomeFragment : Fragment() {
         viewModel.loading.observe(viewLifecycleOwner, { isLoading ->
             isLoading?.let {
                 progressImageView.visibility = if (it) View.VISIBLE else View.GONE
-                progressVideoView.visibility = if (it) View.VISIBLE else View.GONE
                 /* todo: isLoading should be changed to integer, and each value should account for errors received.
                     For ex: 503 server error, Image loading failed.*/
             }
@@ -221,7 +220,7 @@ class HomeFragment : Fragment() {
                 Log.i(TAG, "apodDateList from live data: ${currentApod.date}")
                 addIntoFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorAddToFavorites))
             } else {
-                addIntoFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black))
+                addIntoFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
             }
         })
 
@@ -234,16 +233,15 @@ class HomeFragment : Fragment() {
                     videoViewButton.visibility = View.VISIBLE
                     Log.i(TAG, "observeViewModel apodDetail: $currentApod")
                     Log.i(TAG, "observeViewModel apodDetail url: ${currentApod.url}")
-                    downloadImage.visibility = View.GONE
-                    imageViewResult.visibility = View.GONE
-                    videoViewResult.visibility = View.VISIBLE
+                    downloadImage.visibility = View.INVISIBLE
                     // var videoId = extractYoutubeId(currentApod.url)
                     // loadVideo(videoId)
                     if (currentApod.url.contains("youtube")) {
                         val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                         Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
-                        videoViewResult.loadImage(thumbnailUrl, false)
+                        imageViewResult.loadImage(thumbnailUrl, false)
                     } else {
+                        addIntoFavorites.visibility = View.INVISIBLE
                         // Handling for Apods which are not image or a YouTube video.
                         // Open links with browser
                         performActionIntent(
@@ -251,13 +249,13 @@ class HomeFragment : Fragment() {
                             currentApod.url,
                             Constants.INTENT_ACTION_VIEW
                         )
+                        imageViewResult.setImageResource(R.drawable.handle_another_app)
                     }
 
                 } else {
                     downloadImage.visibility = View.VISIBLE
                     imageViewResult.visibility = View.VISIBLE
-                    videoViewResult.visibility = View.GONE
-                    videoViewButton.visibility = View.GONE
+                    videoViewButton.visibility = View.INVISIBLE
                     imageViewResult.loadImage(currentApod.url, false)
                 }
 

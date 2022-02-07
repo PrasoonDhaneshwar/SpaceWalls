@@ -20,30 +20,16 @@
         app:layout_constraintTop_toBottomOf="@+id/detail_text_view_title"
         tools:src="@mipmap/ic_launcher" />
 
-    <ImageView
-        android:id="@+id/detail_video_view"
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_text_view_title"
-        tools:src="@mipmap/ic_launcher" />
-
     <ImageButton
         android:id="@+id/video_view_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_media_play"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/detail_video_view"
-        app:layout_constraintEnd_toEndOf="@+id/detail_video_view"
-        app:layout_constraintStart_toStartOf="@+id/detail_video_view"
-        app:layout_constraintTop_toTopOf="@+id/detail_video_view"
+        app:layout_constraintBottom_toBottomOf="@+id/detail_image_view"
+        app:layout_constraintEnd_toEndOf="@+id/detail_image_view"
+        app:layout_constraintStart_toStartOf="@+id/detail_image_view"
+        app:layout_constraintTop_toTopOf="@+id/detail_image_view"
         tools:visibility="visible" />
 
     <TextView

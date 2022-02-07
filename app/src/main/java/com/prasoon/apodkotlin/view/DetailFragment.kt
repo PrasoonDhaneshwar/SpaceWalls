@@ -44,9 +44,6 @@ class DetailFragment : Fragment() {
             viewModel.getApodDetailFromDb(apodIdDetail)
         }
 
-        detail_image_view.visibility = View.GONE
-        detail_video_view.visibility = View.GONE
-
         // Enable scrolling for explanation
         detail_text_view_explanation.setMovementMethod(ScrollingMovementMethod())
 
@@ -73,18 +70,14 @@ class DetailFragment : Fragment() {
                 Log.i(TAG, "observeViewModel apodDetail id: ${apod.id}")
 
                 if (apod.mediaType.equals("video")) {
-                    detail_image_view.visibility = View.GONE
-                    detail_video_view.visibility = View.VISIBLE
                     video_view_button.visibility = View.VISIBLE
                     val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
                     Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                    detail_video_view.loadImage(thumbnailUrl, false)
+                    detail_image_view.loadImage(thumbnailUrl, false)
 
                 } else {
                     detail_image_view.visibility = View.VISIBLE
-                    detail_video_view.visibility = View.GONE
-                    video_view_button.visibility = View.GONE
                     Log.i(TAG, "url: ${apod.url}")
                     detail_image_view.loadImage(apod.url, false)
                 }

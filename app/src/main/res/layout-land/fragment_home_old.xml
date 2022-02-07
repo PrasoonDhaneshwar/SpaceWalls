@@ -24,19 +24,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewApod" />
 
-        <ImageView
-            android:id="@+id/videoViewResult"
-            android:layout_width="340dp"
-            android:layout_height="300dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:scaleType="fitXY"
-            android:text="Image"
-            android:textSize="10sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewApod" />
-
         <ProgressBar
             android:id="@+id/progressImageView"
             android:layout_width="wrap_content"
@@ -46,24 +33,16 @@
             app:layout_constraintStart_toStartOf="@+id/imageViewResult"
             app:layout_constraintTop_toTopOf="@+id/imageViewResult" />
 
-        <ProgressBar
-            android:id="@+id/progressVideoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/imageViewResult"
-            app:layout_constraintEnd_toEndOf="@+id/imageViewResult"
-            app:layout_constraintStart_toStartOf="@+id/imageViewResult"
-            app:layout_constraintTop_toTopOf="@+id/imageViewResult" />
 
         <ImageButton
             android:id="@+id/videoViewButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_media_play"
-            app:layout_constraintBottom_toBottomOf="@+id/videoViewResult"
-            app:layout_constraintEnd_toEndOf="@+id/videoViewResult"
-            app:layout_constraintStart_toStartOf="@+id/videoViewResult"
-            app:layout_constraintTop_toTopOf="@+id/videoViewResult" />
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewResult"
+            app:layout_constraintEnd_toEndOf="@+id/imageViewResult"
+            app:layout_constraintStart_toStartOf="@+id/imageViewResult"
+            app:layout_constraintTop_toTopOf="@+id/imageViewResult" />
 
         <ImageView
             android:id="@+id/selectListFragment"
@@ -94,7 +73,42 @@
             android:layout_marginBottom="16dp"
             android:src="@drawable/ic_download"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/shareItem"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/addIntoFavorites" />
+
+        <ImageView
+            android:id="@+id/openApodPage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_open_in_browser"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/setWallpaper"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/selectDateButton" />
+
+        <ImageView
+            android:id="@+id/shareItem"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_share"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/selectDateButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/downloadImage" />
+
+        <ImageView
+            android:id="@+id/setWallpaper"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_wallpaper"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/selectListFragment"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/openApodPage" />
 
         <ImageView
             android:id="@+id/selectDateButton"

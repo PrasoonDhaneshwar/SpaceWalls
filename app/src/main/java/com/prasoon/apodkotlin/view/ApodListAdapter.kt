@@ -35,12 +35,10 @@ class ApodListAdapter(var apodModelList: ArrayList<ApodModel>, val actions: List
     // make it inner to access ListAction
     inner class ApodViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val itemImageView = view.item_apod_image
-        private val videoImageView = view.item_apod_video
         private val itemTitle = view.item_title
         private val itemDate = view.item_date
         private val itemDelete = view.item_delete
         private val layout = view.item_layout
-
 
         // ***Binding between view and data
         fun bind(apodModel: ApodModel, position: Int) {
@@ -48,16 +46,12 @@ class ApodListAdapter(var apodModelList: ArrayList<ApodModel>, val actions: List
             Log.i(TAG, "bind url: ${apodModel.url}")
 
             if (apodModel.mediaType.equals("video")) {
-                itemImageView.visibility = View.GONE
-                videoImageView.visibility = View.VISIBLE
                 val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apodModel.url)
                 Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                videoImageView.loadImage(thumbnailUrl, true)
-
+                itemImageView.loadImage(thumbnailUrl, true)
             } else {
                 itemImageView.visibility = View.VISIBLE
-                videoImageView.visibility = View.GONE
                 itemImageView.loadImage(apodModel.url, true)
             }
 
