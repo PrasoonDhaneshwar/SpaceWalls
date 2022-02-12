@@ -1,5 +1,6 @@
 package com.prasoon.apodkotlin.view
 
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -80,7 +81,8 @@ fun getYoutubeVideoIdFromUrl(inUrl: String): String? {
     } else null
 }
 
-fun saveImage(context: Context, url: String, date: String) {
+// todo: perform this method in a service
+fun saveImage(context: Context, url: String, hdurl: String, date: String) {
     val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         throwable.localizedMessage
     }
@@ -89,7 +91,8 @@ fun saveImage(context: Context, url: String, date: String) {
 
     CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
 
-        val imageUrl = URL(url)
+        val imageUrl = if (hdurl.isNullOrEmpty()) URL(url) else URL(hdurl)
+
         val bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
         val storageDirectoryPath: String
 
@@ -129,13 +132,19 @@ fun saveImage(context: Context, url: String, date: String) {
 
 fun performActionIntent(context: Context, url: String, type: Int) {
     when (type) {
-        INTENT_ACTION_VIEW -> startActivity(context, Intent(Intent.ACTION_VIEW, Uri.parse(url)), null)
+        INTENT_ACTION_VIEW -> startActivity(context as Activity, Intent(Intent.ACTION_VIEW, Uri.parse(url)), null)
         INTENT_ACTION_SEND -> {
             val shareIntent= Intent()
             shareIntent.action=Intent.ACTION_SEND
             shareIntent.putExtra(Intent.EXTRA_TEXT, url)
             shareIntent.type="text/plain"
-            startActivity(context, Intent.createChooser(shareIntent,"Share To:"), null)
+            startActivity(context as Activity, Intent.createChooser(shareIntent,"Share To:"), null)
         }
     }
+}
+
+fun createApodUrl(date: String): String {
+    val values = date.split("-")
+    val packedDate = values[0].substring(2) + values[1] + values[2]
+    return "https://apod.nasa.gov/apod/ap$packedDate.html"
 }

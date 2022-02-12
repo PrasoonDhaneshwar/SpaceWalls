@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:gravity="bottom"
+    android:padding="16dp"
+    android:background="@color/menuColor"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher_round"
+        android:layout_gravity="bottom|left"/>
+
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/cabin_semibold_italic"
+        android:gravity="center_vertical"
+        android:textColor="@color/mainText"
+        android:textSize="14sp"
+        style="@style/Title"
+        android:text="Astronomy Picture Of The Day" />
+
+</LinearLayout>

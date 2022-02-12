@@ -12,7 +12,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -37,16 +39,23 @@ class HomeFragment : Fragment() {
     private var currentApod: ApodModel = ApodModel("", "", "", "", "", "", "")
     var apodDateListDb: List<String> = listOf()
 
+    lateinit var toggle: ActionBarDrawerToggle
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_old, container, false)
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        toggle = ActionBarDrawerToggle(activity, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
         Log.i(TAG, "apodDateListDb: $apodDateListDb")
 
         // Link corresponding ViewModel to View(this)
@@ -193,7 +202,7 @@ class HomeFragment : Fragment() {
                 // Permissions already granted
                 // start to download file and save in external storage
                 if (!currentApod.mediaType.equals("video")) {
-                    context?.let { it1 -> saveImage(it1, currentApod.url, DateInput.currentDate) }
+                    context?.let { it1 -> saveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate) }
                 }
             } else {
                 requestStoragePermission(context as Activity)
@@ -205,13 +214,13 @@ class HomeFragment : Fragment() {
 
     private fun observeViewModel() {
         // Observe when loading is successful
-        viewModel.loading.observe(viewLifecycleOwner, { isLoading ->
+        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
             isLoading?.let {
                 progressImageView.visibility = if (it) View.VISIBLE else View.GONE
                 /* todo: isLoading should be changed to integer, and each value should account for errors received.
                     For ex: 503 server error, Image loading failed.*/
             }
-        })
+        }
 
         viewModel.apodDateList.observe(viewLifecycleOwner, {
             apodDateListDb = it
@@ -229,19 +238,25 @@ class HomeFragment : Fragment() {
             apodModel?.let {
                 currentApod = apodModel
                 DateInput.currentDate = apodModel.date
+                Log.i(TAG, "observeViewModel apodDetail: $currentApod")
+                Log.i(TAG, "observeViewModel apodDetail url: ${currentApod.url}")
+                Log.i(TAG, "observeViewModel apodDetail modified: ${createApodUrl(currentApod.date)}")
                 if (currentApod.mediaType.equals("video")) {
+                    // Fit center for maintaining YouTube video's aspect ratio
+                    imageViewResult.scaleType = ImageView.ScaleType.FIT_CENTER
+
                     videoViewButton.visibility = View.VISIBLE
-                    Log.i(TAG, "observeViewModel apodDetail: $currentApod")
-                    Log.i(TAG, "observeViewModel apodDetail url: ${currentApod.url}")
                     downloadImage.visibility = View.INVISIBLE
+                    addIntoFavorites.visibility = View.INVISIBLE
+
                     // var videoId = extractYoutubeId(currentApod.url)
                     // loadVideo(videoId)
                     if (currentApod.url.contains("youtube")) {
+                        addIntoFavorites.visibility = View.VISIBLE
                         val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                         Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
                         imageViewResult.loadImage(thumbnailUrl, false)
                     } else {
-                        addIntoFavorites.visibility = View.INVISIBLE
                         // Handling for Apods which are not image or a YouTube video.
                         // Open links with browser
                         performActionIntent(
@@ -253,9 +268,12 @@ class HomeFragment : Fragment() {
                     }
 
                 } else {
+                    // Fit center crop to fit aspect ratio of imageview
+                    imageViewResult.scaleType = ImageView.ScaleType.CENTER_CROP
                     downloadImage.visibility = View.VISIBLE
                     imageViewResult.visibility = View.VISIBLE
                     videoViewButton.visibility = View.INVISIBLE
+                    addIntoFavorites.visibility = View.VISIBLE
                     imageViewResult.loadImage(currentApod.url, false)
                 }
 
@@ -307,7 +325,7 @@ class HomeFragment : Fragment() {
 
                 // start to download file and save in external storage
                 if (!currentApod.mediaType.equals("video")) {
-                    context?.let { it1 -> saveImage(it1, currentApod.url, DateInput.currentDate) }
+                    context?.let { it1 -> saveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate) }
                 }
             } else {
                 Log.i(TAG, "onRequestPermissionsResult: denied")

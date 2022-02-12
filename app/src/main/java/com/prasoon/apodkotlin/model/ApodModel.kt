@@ -13,7 +13,7 @@ data class ApodModel(
     val explanation: String,
 
     // Can be null, when video is received
-    val hdurl: String?,
+    val hdurl: String,
 
     // Since member variable needs to be changed, serialized is used
     @SerializedName("media_type")

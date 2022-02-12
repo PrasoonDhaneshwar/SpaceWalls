@@ -13,6 +13,7 @@
     <color name="mainText">#000000</color>
     <color name="textAlt">#4A4949</color>
     <color name="darkModeIcon">#4A4949</color>
+    <color name="menuColor">#C4C5C6</color>
 
     <color name="mainBackground">#FFFFFF</color>
     <color name="buttonForeground">#3F51B5</color>
