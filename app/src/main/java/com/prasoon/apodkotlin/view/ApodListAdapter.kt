@@ -39,20 +39,21 @@ class ApodListAdapter(var apodModelList: ArrayList<ApodModel>, val actions: List
         private val itemDate = view.item_date
         private val itemDelete = view.item_delete
         private val layout = view.item_layout
+        private val progress = view.item_progress_image_view
 
         // ***Binding between view and data
         fun bind(apodModel: ApodModel, position: Int) {
             Log.i(TAG, "bind id: ${apodModel.id}")
             Log.i(TAG, "bind url: ${apodModel.url}")
 
-            if (apodModel.mediaType.equals("video")) {
+            if (apodModel.mediaType == "video") {
                 val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apodModel.url)
                 Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                itemImageView.loadImage(thumbnailUrl, true)
+                itemImageView.loadImage(thumbnailUrl, true, progress)
             } else {
                 itemImageView.visibility = View.VISIBLE
-                itemImageView.loadImage(apodModel.url, true)
+                itemImageView.loadImage(apodModel.url, true, progress)
             }
 
             itemTitle.text = apodModel.title

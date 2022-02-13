@@ -92,12 +92,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ProgressBar
+        android:id="@+id/progress_image_view"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/darkModeIcon"
+        android:indeterminateTintMode="src_atop"
+        app:layout_constraintBottom_toBottomOf="@+id/detail_image_view"
+        app:layout_constraintEnd_toEndOf="@+id/detail_image_view"
+        app:layout_constraintStart_toStartOf="@+id/detail_image_view"
+        app:layout_constraintTop_toTopOf="@+id/detail_image_view" />
+
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="video_view_button,detail_video_view,detail_image_view"
+        app:constraint_referenced_ids="video_view_button,detail_image_view"
         tools:layout_editor_absoluteY="796dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

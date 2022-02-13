@@ -70,4 +70,16 @@
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/ic_baseline_delete_outline" />
 
+    <ProgressBar
+        android:id="@+id/item_progress_image_view"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/darkModeIcon"
+        android:indeterminateTintMode="src_atop"
+        app:layout_constraintBottom_toBottomOf="@+id/item_apod_image"
+        app:layout_constraintEnd_toEndOf="@+id/item_apod_image"
+        app:layout_constraintStart_toStartOf="@+id/item_apod_image"
+        app:layout_constraintTop_toTopOf="@+id/item_apod_image" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

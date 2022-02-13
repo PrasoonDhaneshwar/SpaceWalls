@@ -6,21 +6,25 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.ImageView
-import android.widget.MediaController
-import android.widget.Toast
-import android.widget.VideoView
+import android.widget.*
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_SEND
 import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_VIEW
+import kotlinx.android.synthetic.main.fragment_view.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -30,15 +34,43 @@ import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-fun ImageView.loadImage(uri: String?, centerCrop: Boolean) {
+fun ImageView.loadImage(uri: String?, centerCrop: Boolean, viewProgressBar: ProgressBar) {
     val options = RequestOptions()
         .error(R.mipmap.ic_launcher_round)
     if (centerCrop) {
+        // fit aspect ratio of view
         options.centerCrop()
+        // maintain aspect ratio
+        //options.fitCenter()
     }
+    // Start loading the image again
+    viewProgressBar.isVisible = true
     Glide.with(this.context)
         .setDefaultRequestOptions(options)
         .load(uri)
+        .listener(object : RequestListener<Drawable> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Drawable>?,
+                isFirstResource: Boolean
+            ): Boolean {
+                viewProgressBar.isVisible = false
+                return false
+            }
+
+            override fun onResourceReady(
+                resource: Drawable?,
+                model: Any?,
+                target: Target<Drawable>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                viewProgressBar.isVisible = false
+                return false
+            }
+
+        })
         .into(this)
 }
 

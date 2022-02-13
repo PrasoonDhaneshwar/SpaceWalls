@@ -69,17 +69,17 @@ class DetailFragment : Fragment() {
                 Log.i(TAG, "observeViewModel apodDetail: $apodDetail")
                 Log.i(TAG, "observeViewModel apodDetail id: ${apod.id}")
 
-                if (apod.mediaType.equals("video")) {
+                if (apod.mediaType == "video") {
                     video_view_button.visibility = View.VISIBLE
                     val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
                     Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                    detail_image_view.loadImage(thumbnailUrl, false)
+                    detail_image_view.loadImage(thumbnailUrl, false, progress_image_view)
 
                 } else {
                     detail_image_view.visibility = View.VISIBLE
                     Log.i(TAG, "url: ${apod.url}")
-                    detail_image_view.loadImage(apod.url, false)
+                    detail_image_view.loadImage(apod.url, false, progress_image_view)
                 }
 
                 detail_text_view_title.text = it.title

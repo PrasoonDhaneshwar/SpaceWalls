@@ -209,6 +209,14 @@ class HomeFragment : Fragment() {
             }
         }
 
+        imageViewResult.setOnClickListener {
+            Log.i(TAG, "imageViewResult")
+            if (currentApod.mediaType == "image"){
+                val action = HomeFragmentDirections.actionHomeFragmentToViewFragment(currentApod.hdurl)
+                findNavController().navigate(action)
+            }
+        }
+
         observeViewModel()
     }
 
@@ -216,22 +224,31 @@ class HomeFragment : Fragment() {
         // Observe when loading is successful
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
             isLoading?.let {
-                progressImageView.visibility = if (it) View.VISIBLE else View.GONE
                 /* todo: isLoading should be changed to integer, and each value should account for errors received.
                     For ex: 503 server error, Image loading failed.*/
             }
         }
 
-        viewModel.apodDateList.observe(viewLifecycleOwner, {
+        viewModel.apodDateList.observe(viewLifecycleOwner) {
             apodDateListDb = it
             Log.i(TAG, "apodDateList from live data: $it")
             if (it.contains(DateInput.currentDate)) {
                 Log.i(TAG, "apodDateList from live data: ${currentApod.date}")
-                addIntoFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorAddToFavorites))
+                addIntoFavorites.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorAddToFavorites
+                    )
+                )
             } else {
-                addIntoFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
+                addIntoFavorites.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.gray
+                    )
+                )
             }
-        })
+        }
 
         // Observe apod title from viewModel
         viewModel.apodModel.observe(viewLifecycleOwner, Observer { apodModel ->
@@ -241,7 +258,7 @@ class HomeFragment : Fragment() {
                 Log.i(TAG, "observeViewModel apodDetail: $currentApod")
                 Log.i(TAG, "observeViewModel apodDetail url: ${currentApod.url}")
                 Log.i(TAG, "observeViewModel apodDetail modified: ${createApodUrl(currentApod.date)}")
-                if (currentApod.mediaType.equals("video")) {
+                if (currentApod.mediaType == "video") {
                     // Fit center for maintaining YouTube video's aspect ratio
                     imageViewResult.scaleType = ImageView.ScaleType.FIT_CENTER
 
@@ -255,7 +272,7 @@ class HomeFragment : Fragment() {
                         addIntoFavorites.visibility = View.VISIBLE
                         val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                         Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
-                        imageViewResult.loadImage(thumbnailUrl, false)
+                        imageViewResult.loadImage(thumbnailUrl, false, progressImageView)
                     } else {
                         // Handling for Apods which are not image or a YouTube video.
                         // Open links with browser
@@ -274,7 +291,7 @@ class HomeFragment : Fragment() {
                     imageViewResult.visibility = View.VISIBLE
                     videoViewButton.visibility = View.INVISIBLE
                     addIntoFavorites.visibility = View.VISIBLE
-                    imageViewResult.loadImage(currentApod.url, false)
+                    imageViewResult.loadImage(currentApod.url, false, progressImageView)
                 }
 
                 textViewTitle.text = currentApod.title
