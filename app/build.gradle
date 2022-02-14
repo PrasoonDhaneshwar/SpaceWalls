@@ -77,7 +77,6 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-    // For playing YouTube videos
-    // Don't change the version, since compiled with kotlin-1.4.0
-    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
+    // PhotoView for easy zooming of images
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
 }

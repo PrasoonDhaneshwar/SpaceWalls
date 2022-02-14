@@ -24,7 +24,6 @@ import com.bumptech.glide.request.target.Target
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_SEND
 import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_VIEW
-import kotlinx.android.synthetic.main.fragment_view.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -39,7 +38,8 @@ fun ImageView.loadImage(uri: String?, centerCrop: Boolean, viewProgressBar: Prog
         .error(R.mipmap.ic_launcher_round)
     if (centerCrop) {
         // fit aspect ratio of view
-        options.centerCrop()
+        //options.centerCrop()
+        options.centerInside()
         // maintain aspect ratio
         //options.fitCenter()
     }

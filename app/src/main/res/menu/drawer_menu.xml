@@ -5,7 +5,7 @@
     <!--Clickable, will be highlighted-->
     <group android:checkableBehavior="single">
         <item android:id="@+id/schedule_wallpaper"
-            android:icon="@drawable/ic_wallpaper_schedule"
+            android:icon="@drawable/ic_schedule_wallpaper"
             android:title="Schedule Wallpaper"/>
 
         <item android:id="@+id/dark_mode"

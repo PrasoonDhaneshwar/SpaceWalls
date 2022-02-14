@@ -223,7 +223,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginBottom="10dp"
-                    android:src="@drawable/ic_wallpaper_schedule"
+                    android:src="@drawable/ic_schedule_wallpaper"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/setWallpaper"
                     app:layout_constraintHorizontal_bias="0.5"

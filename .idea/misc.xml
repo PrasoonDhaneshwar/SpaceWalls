@@ -3,11 +3,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_baseline_rotate_right_24.xml" value="0.507" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_baseline_schedule_24.xml" value="0.507" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_wallpaper.xml" value="0.536" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_wallpaper_schedule.xml" value="0.3235" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout-land/fragment_home_old.xml" value="0.34839357429718876" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout-v26/fragment_view_test.xml" value="0.406640625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/activity_main.xml" value="0.31319444444444444" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_detail.xml" value="0.20902777777777778" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_home.xml" value="0.406640625" />
-        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_view.xml" value="0.406640625" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_home_old.xml" value="0.406640625" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_view.xml" value="0.23125" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_view_test.xml" value="0.28515625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/item_apod.xml" value="0.36168032786885246" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/nav_header.xml" value="0.406640625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/menu/drawer_menu.xml" value="0.403125" />
