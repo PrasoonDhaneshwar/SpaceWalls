@@ -4,7 +4,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface ApodInterface {
+interface ApodAPI {
     @GET("/planetary/apod")
     suspend fun getApodCurrentDate(
         @Query("api_key") api_key: String

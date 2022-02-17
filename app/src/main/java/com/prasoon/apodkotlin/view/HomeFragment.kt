@@ -3,6 +3,7 @@ package com.prasoon.apodkotlin.view
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -22,16 +23,24 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.work.*
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.Constants
+import com.prasoon.apodkotlin.model.Constants.CURRENT_DATE
+import com.prasoon.apodkotlin.model.Constants.IMAGE_HD_URL
+import com.prasoon.apodkotlin.model.Constants.IMAGE_NAME
+import com.prasoon.apodkotlin.model.Constants.IMAGE_URL
 import com.prasoon.apodkotlin.model.Constants.NIGHT_MODE
+import com.prasoon.apodkotlin.model.Constants.STORAGE_DIRECTORY_PATH
 import com.prasoon.apodkotlin.model.Constants.STORAGE_PERMISSION_CODE
 import com.prasoon.apodkotlin.model.DateInput
+import com.prasoon.apodkotlin.services.*
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
     private val TAG = "HomeFragment"
@@ -202,7 +211,44 @@ class HomeFragment : Fragment() {
                 // Permissions already granted
                 // start to download file and save in external storage
                 if (!currentApod.mediaType.equals("video")) {
-                    context?.let { it1 -> saveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate) }
+                    context?.let {
+                            it1 -> //saveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate)
+
+                        ///////// Work Manager
+                        val passDataToWorker = Data.Builder()
+                            .putString(IMAGE_URL, currentApod.url)
+                            .putString(IMAGE_HD_URL, currentApod.hdurl)
+                            .putString(CURRENT_DATE, DateInput.currentDate)
+                            .build()
+
+                        // todo: disable the download button to avoid multiple attempts
+
+                        // Constraints
+                        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
+                        val imageDownloaderWorkRequest = OneTimeWorkRequestBuilder<ImageDownloadWorker>()
+                            .setConstraints(constraints)
+                            .setInputData(passDataToWorker) // Pass data to worker
+                            .build()
+                        // Start the worker with enqueue
+                        WorkManager.getInstance(it1).enqueue(imageDownloaderWorkRequest)
+                        Toast.makeText(context, "Starting download...", Toast.LENGTH_SHORT).show()
+
+                        WorkManager.getInstance(it1).getWorkInfoByIdLiveData(imageDownloaderWorkRequest.id).observe(viewLifecycleOwner) {
+                            if (it.state == WorkInfo.State.SUCCEEDED) {
+                                // Get data from worker
+                                val imageName = it.outputData.getString(IMAGE_NAME)
+                                val storageDirectoryPath = it.outputData.getString(STORAGE_DIRECTORY_PATH)
+                                Log.i(TAG, "doWork result: \n File name: $imageName \n File path: $storageDirectoryPath")
+                                Toast.makeText(context,"Saved as $imageName.jpg in $storageDirectoryPath",Toast.LENGTH_SHORT).show()                            }
+                        }
+
+                        val wallpaperScheduleWorkRequest = PeriodicWorkRequest.Builder(ImageDownloadWorker::class.java, 10 , TimeUnit.HOURS)
+                            .setConstraints(constraints)
+                            .setInputData(passDataToWorker) // Pass data to worker
+                            .build()
+
+                    }
                 }
             } else {
                 requestStoragePermission(context as Activity)
@@ -354,5 +400,10 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.getApodDatesFromDb()
+    }
+
+    // Cancel any work if needed
+    fun cancelWork(context: Context, workRequest: WorkRequest) {
+        WorkManager.getInstance(context).cancelWorkById(workRequest.id)
     }
 }

@@ -1,4 +1,4 @@
-package com.prasoon.apodkotlin.viewmodel
+package com.prasoon.apodkotlin.view
 
 import com.prasoon.apodkotlin.model.ApodModel
 

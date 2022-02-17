@@ -1,28 +1,28 @@
-package com.prasoon.apodkotlin.model
+package com.prasoon.apodkotlin.model.db
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
+import com.prasoon.apodkotlin.model.ApodModel
 
 @Dao
-interface ApodDaoInterface {
+interface ApodDao {
 /*    @Query("SELECT * FROM apodmodel")
     fun getAllApodsFlow(): Flow<List<ApodModel>>*/
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertApod(apodModel: ApodModel)
 
-    @Query("SELECT * FROM apodmodel WHERE id = :id")
+    @Query("SELECT * FROM apodModel WHERE id = :id")
     suspend fun getApodModel(id: Int): ApodModel?
 
     @Delete
     suspend fun delete(apodModel: ApodModel)
 
-    @Query("DELETE FROM apodmodel")
+    @Query("DELETE FROM apodModel")
     suspend fun deleteAllApods()
 
-    @Query("SELECT * FROM apodmodel")
+    @Query("SELECT * FROM apodModel")
     suspend fun getAllApods(): List<ApodModel>
 
-    @Query("SELECT date FROM apodmodel")
+    @Query("SELECT date FROM apodModel")
     suspend fun getAllApodDates(): List<String>
 }

@@ -4,8 +4,9 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.prasoon.apodkotlin.BuildConfig
-import com.prasoon.apodkotlin.model.ApodDatabase
+import com.prasoon.apodkotlin.model.db.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.ApodService
 import kotlinx.coroutines.*
@@ -32,6 +33,12 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
                 apodDetailLoaded.value = true
             }
         }
+    }
+
+    // To cancel coroutineScope when component moves away from the viewmodel
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.coroutineContext.cancelChildren()
     }
 
     fun saveApod(apodModel: ApodModel) {

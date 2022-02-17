@@ -4,11 +4,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
-import com.prasoon.apodkotlin.viewmodel.ListAction
 import kotlinx.android.synthetic.main.item_apod.view.*
 
 //                                                                                        2. Extend holder

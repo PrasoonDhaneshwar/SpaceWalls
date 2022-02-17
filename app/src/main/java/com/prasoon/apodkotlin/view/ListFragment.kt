@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
-import com.prasoon.apodkotlin.viewmodel.ListAction
 import com.prasoon.apodkotlin.viewmodel.ListViewModel
 import kotlinx.android.synthetic.main.fragment_list.*
 

@@ -79,4 +79,7 @@ dependencies {
 
     // PhotoView for easy zooming of images
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+
+    // WorkManager Api with Kotlin + coroutines
+    implementation("androidx.work:work-runtime-ktx:$work_version")
 }
