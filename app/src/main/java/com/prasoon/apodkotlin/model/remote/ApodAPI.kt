@@ -1,5 +1,6 @@
-package com.prasoon.apodkotlin.model
+package com.prasoon.apodkotlin.model.remote
 
+import com.prasoon.apodkotlin.model.ApodModel
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

@@ -1,4 +1,4 @@
-package com.prasoon.apodkotlin.model
+package com.prasoon.apodkotlin.utils
 
 object DateInput {
     var currentDate: String = String()

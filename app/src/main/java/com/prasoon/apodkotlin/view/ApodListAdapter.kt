@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
+import com.prasoon.apodkotlin.utils.loadImage
 import kotlinx.android.synthetic.main.item_apod.view.*
 
 //                                                                                        2. Extend holder

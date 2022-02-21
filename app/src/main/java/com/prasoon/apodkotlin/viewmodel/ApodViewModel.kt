@@ -2,22 +2,31 @@ package com.prasoon.apodkotlin.viewmodel
 
 import android.app.Application
 import android.util.Log
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.prasoon.apodkotlin.BuildConfig
-import com.prasoon.apodkotlin.model.db.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
-import com.prasoon.apodkotlin.model.ApodService
+import com.prasoon.apodkotlin.model.db.ApodDao
+import com.prasoon.apodkotlin.model.remote.ApodAPI
 import kotlinx.coroutines.*
 
 
-class ApodViewModel(application: Application) : AndroidViewModel(application) {
+class ApodViewModel @ViewModelInject constructor(
+    val db: ApodDao,
+    val apodService: ApodAPI,
+    application: Application
+) : AndroidViewModel(application) {
+
     private val TAG = "ApodViewModel"
 
+    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        onError("Exception: ${throwable.localizedMessage} ")
+    }
+
     // -----------------Room Database Setup---------------
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private val db by lazy { ApodDatabase(getApplication()).apodModelDao() }
+    private val coroutineScopeForDatabase = CoroutineScope(Dispatchers.IO + exceptionHandler)
 
     // apodDetail and apodDetailLoaded is for DetailFragment
     val apodDetail = MutableLiveData<ApodModel?>()
@@ -26,7 +35,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getApodDetailFromDb(id: Int) {
         Log.i(TAG, "getApodDetailFromDb: $id")
-        coroutineScope.launch {
+        coroutineScopeForDatabase.launch {
             val apod = db.getApodModel(id)
             apodDetail.postValue(apod)
             withContext(Dispatchers.Main) {
@@ -35,25 +44,19 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // To cancel coroutineScope when component moves away from the viewmodel
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.coroutineContext.cancelChildren()
-    }
-
     fun saveApod(apodModel: ApodModel) {
         Log.i(TAG, "saveApod")
-        coroutineScope.launch {
+        coroutineScopeForDatabase.launch {
             db.insertApod(apodModel)
         }
     }
 
     // -----------------Retrofit Setup---------------
-    val apodService = ApodService.getApodFromInterface()
+    // val apodService = ApodService.getApodFromInterface()
+
     var job: Job? = null
-    val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
-        onError("Exception: ${throwable.localizedMessage} ")
-    }
+
+    val coroutineScopeForNetwork = CoroutineScope(Dispatchers.IO + exceptionHandler)
 
     val apodModel = MutableLiveData<ApodModel>()
     val apodLoadError = MutableLiveData<String?>()
@@ -69,7 +72,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getApodDatesFromDb() {
         Log.i(TAG, "getApodDatesFromDb")
-        coroutineScope.launch {
+        coroutineScopeForDatabase.launch {
             apodDateList.postValue(db.getAllApodDates())
         }
     }
@@ -78,7 +81,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
         // Loading spinner active. Disabled when information is retrieved.
         loading.value = true
         // -----------------Retrofit Setup---------------
-        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+        job = coroutineScopeForNetwork.launch {
             // Get the response from Retrofit api
             val response = apodService.getApodCurrentDate(BuildConfig.APOD_API_KEY)
             // When response is received, post it to the main thread
@@ -99,7 +102,7 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
         // setValue should be called from the main thread
         loading.value = true
         // -----------------Retrofit Setup---------------
-        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+        job = coroutineScopeForNetwork.launch {
             // Get the response from Retrofit api
             val response = apodService.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
             // When response is received, post it to the main thread
@@ -119,6 +122,12 @@ class ApodViewModel(application: Application) : AndroidViewModel(application) {
         // postValue is called from a background thread
         apodLoadError.postValue(message)
         loading.postValue(false)
+    }
+
+    // To cancel coroutineScope when component moves away from the viewmodel
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.coroutineContext.cancelChildren()
     }
 
 /*    private fun fetchApodByCurrentDateDummy() {

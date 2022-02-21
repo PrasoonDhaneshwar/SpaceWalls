@@ -8,23 +8,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
-import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_SEND
-import com.prasoon.apodkotlin.model.Constants.INTENT_ACTION_VIEW
+import com.prasoon.apodkotlin.utils.Constants.INTENT_ACTION_SEND
+import com.prasoon.apodkotlin.utils.Constants.INTENT_ACTION_VIEW
+import com.prasoon.apodkotlin.utils.loadImage
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_detail.*
 
+@AndroidEntryPoint
 class DetailFragment : Fragment() {
     private val TAG = "DetailFragment"
 
     // Get arguments back from the nav graph
     private val args: DetailFragmentArgs by navArgs()
     var apodIdDetail = 0
-    private lateinit var viewModel: ApodViewModel
+    private val viewModel: ApodViewModel by viewModels()
     private lateinit var apod: ApodModel
 
     override fun onCreateView(
@@ -37,7 +40,6 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(ApodViewModel::class.java)
         apodIdDetail = args.apodId
 
         if (apodIdDetail != 0) {

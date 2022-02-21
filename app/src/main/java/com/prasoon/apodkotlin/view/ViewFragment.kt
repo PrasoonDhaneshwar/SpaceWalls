@@ -6,6 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.prasoon.apodkotlin.R
+import com.prasoon.apodkotlin.utils.loadImage
 import kotlinx.android.synthetic.main.fragment_view.*
 
 class ViewFragment : Fragment(R.layout.fragment_view) {

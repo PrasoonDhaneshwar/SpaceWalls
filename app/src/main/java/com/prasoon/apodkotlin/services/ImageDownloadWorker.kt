@@ -1,8 +1,5 @@
 package com.prasoon.apodkotlin.services
 
-import android.R
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -11,18 +8,15 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.prasoon.apodkotlin.model.Constants.CURRENT_DATE
-import com.prasoon.apodkotlin.model.Constants.IMAGE_HD_URL
-import com.prasoon.apodkotlin.model.Constants.IMAGE_NAME
-import com.prasoon.apodkotlin.model.Constants.IMAGE_URL
-import com.prasoon.apodkotlin.model.Constants.MESSAGE_CHANNEL
-import com.prasoon.apodkotlin.model.Constants.MESSAGE_ID
-import com.prasoon.apodkotlin.model.Constants.STORAGE_DIRECTORY_PATH
-import com.prasoon.apodkotlin.model.Constants.TASK_NOTIFICATION
+import com.prasoon.apodkotlin.utils.Constants.CURRENT_DATE
+import com.prasoon.apodkotlin.utils.Constants.IMAGE_HD_URL
+import com.prasoon.apodkotlin.utils.Constants.IMAGE_NAME
+import com.prasoon.apodkotlin.utils.Constants.IMAGE_URL
+import com.prasoon.apodkotlin.utils.Constants.STORAGE_DIRECTORY_PATH
+import com.prasoon.apodkotlin.utils.NotificationUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -31,7 +25,6 @@ import java.util.*
 
 private val TAG = "ImageDownloadWorker"
 class ImageDownloadWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
-    lateinit var notificationManager: NotificationManager
 
     override fun doWork(): Result {
         Log.i(TAG, "doWork executed")
@@ -50,8 +43,8 @@ class ImageDownloadWorker(context: Context, parameters: WorkerParameters) : Work
 
     private fun saveImage(context: Context, url: String, hdUrl: String, date: String): Data {
         val imageName = "APOD_" + date.replace("-", "")
-        val imageUrl = if (hdUrl.isNullOrEmpty()) URL(url) else URL(hdUrl)
-        displayNotification("Downloading APOD", date)
+        val imageUrl = if (hdUrl.isEmpty()) URL(url) else URL(hdUrl)
+        NotificationUtils.displayNotification(context, "Downloading APOD", date)
 
         val bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
         val storageDirectoryPath: String
@@ -78,7 +71,7 @@ class ImageDownloadWorker(context: Context, parameters: WorkerParameters) : Work
         }
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
         Objects.requireNonNull(fos)?.close()
-        finishNotification("Downloading APOD finished", date)
+        NotificationUtils.cancelNotification(context, "Downloading APOD finished", date)
 
         return Data.Builder()
             .putString(IMAGE_NAME, imageName)
@@ -86,32 +79,5 @@ class ImageDownloadWorker(context: Context, parameters: WorkerParameters) : Work
             .build()
     }
 
-    private fun displayNotification(title: String, message: String) {
-        notificationManager =
-            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // 1. Create channel
-            val channel = NotificationChannel(
-                MESSAGE_CHANNEL,
-                TASK_NOTIFICATION,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
 
-        // 2. Create notification UI
-        val notification: NotificationCompat.Builder = NotificationCompat.Builder(
-            applicationContext,
-            MESSAGE_CHANNEL
-        ).setContentTitle(title)
-            .setContentText(message)
-            .setSmallIcon(R.drawable.star_on)
-
-        // 3. Notify
-        notificationManager.notify(MESSAGE_ID, notification.build())
-    }
-
-    private fun finishNotification(title: String, message: String) {
-        notificationManager.cancel(MESSAGE_ID)
-    }
 }

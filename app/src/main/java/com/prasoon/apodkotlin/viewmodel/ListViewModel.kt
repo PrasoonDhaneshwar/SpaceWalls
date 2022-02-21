@@ -1,15 +1,18 @@
 package com.prasoon.apodkotlin.viewmodel
 
 import android.app.Application
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.prasoon.apodkotlin.model.db.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
+import com.prasoon.apodkotlin.model.db.ApodDao
 import kotlinx.coroutines.*
 
-class ListViewModel(application: Application): AndroidViewModel(application) {
+class ListViewModel @ViewModelInject constructor(
+    val db: ApodDao,
+    application: Application): AndroidViewModel(application) {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private val db by lazy { ApodDatabase(getApplication()).apodModelDao() }
 
 
     val apodModelList = MutableLiveData<List<ApodModel>>()

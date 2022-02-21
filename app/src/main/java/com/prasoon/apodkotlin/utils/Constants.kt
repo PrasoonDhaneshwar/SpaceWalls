@@ -1,4 +1,4 @@
-package com.prasoon.apodkotlin.model
+package com.prasoon.apodkotlin.utils
 
 object Constants {
     val APOD_DATABASE_NAME = "apod_database"

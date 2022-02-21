@@ -7,20 +7,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
+import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import com.prasoon.apodkotlin.viewmodel.ListViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_list.*
 
+@AndroidEntryPoint
 class ListFragment : Fragment(), ListAction {
     private val TAG = "ListFragment"
 
     private val apodListAdapter = ApodListAdapter(arrayListOf(), this)
-    private lateinit var viewModel: ListViewModel
+    private val viewModel: ListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +47,6 @@ class ListFragment : Fragment(), ListAction {
             adapter = apodListAdapter
         }
 
-        viewModel = ViewModelProviders.of(this).get(ListViewModel::class.java)
         observeViewModel()
     }
 
