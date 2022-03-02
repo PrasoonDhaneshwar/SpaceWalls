@@ -21,7 +21,7 @@
         tools:src="@mipmap/ic_launcher" />
 
     <ImageButton
-        android:id="@+id/video_view_button"
+        android:id="@+id/detail_video_view_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_media_play"
@@ -80,11 +80,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.55"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/barrier"
+        app:layout_constraintTop_toBottomOf="@+id/detail_barrier"
         tools:text="Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras." />
 
     <ImageView
-        android:id="@+id/share_item"
+        android:id="@+id/detail_share_item"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginEnd="20dp"
@@ -93,7 +93,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
-        android:id="@+id/progress_image_view"
+        android:id="@+id/detail_progress_image_view"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,11 +106,11 @@
 
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier"
+        android:id="@+id/detail_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="video_view_button,detail_image_view"
+        app:constraint_referenced_ids="detail_video_view_button,detail_image_view"
         tools:layout_editor_absoluteY="796dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -49,11 +49,11 @@ class DetailFragment : Fragment() {
         // Enable scrolling for explanation
         detail_text_view_explanation.setMovementMethod(ScrollingMovementMethod())
 
-        video_view_button.setOnClickListener {
+        detail_video_view_button.setOnClickListener {
             performActionIntent(requireContext(), apod.url, INTENT_ACTION_VIEW)
         }
 
-        share_item.setOnClickListener {
+        detail_share_item.setOnClickListener {
             performActionIntent(requireContext(), apod.url, INTENT_ACTION_SEND)
         }
 
@@ -72,16 +72,16 @@ class DetailFragment : Fragment() {
                 Log.i(TAG, "observeViewModel apodDetail id: ${apod.id}")
 
                 if (apod.mediaType == "video") {
-                    video_view_button.visibility = View.VISIBLE
+                    detail_video_view_button.visibility = View.VISIBLE
                     val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
                     Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                    detail_image_view.loadImage(thumbnailUrl, false, progress_image_view)
+                    detail_image_view.loadImage(thumbnailUrl, false, detail_progress_image_view)
 
                 } else {
                     detail_image_view.visibility = View.VISIBLE
                     Log.i(TAG, "url: ${apod.url}")
-                    detail_image_view.loadImage(apod.url, false, progress_image_view)
+                    detail_image_view.loadImage(apod.url, false, detail_progress_image_view)
                 }
 
                 detail_text_view_title.text = it.title

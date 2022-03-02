@@ -3,7 +3,7 @@ plugins {
     id 'kotlin-android'
     // Extra added for Resources discovery in Activity
     id 'kotlin-android-extensions'
-    // for kapt
+    // for kotlin annotations
     id 'kotlin-kapt'
     // Passing data between fragments in a compile type safe way
     id "androidx.navigation.safeargs.kotlin"
@@ -47,31 +47,33 @@ android {
 
 dependencies {
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    // Extra added for coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0'
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
 
-    implementation "androidx.recyclerview:recyclerview:1.1.0"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    // Recycler View
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+    // Swipe Refresh Layout
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
+    // Glide
     implementation 'com.github.bumptech.glide:glide:4.12.0'
 
+    // Retrofit
     implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
-
+    // Room
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
@@ -86,13 +88,21 @@ dependencies {
     // WorkManager Api with Kotlin + coroutines
     implementation("androidx.work:work-runtime-ktx:$work_version")
 
-    //Dagger - Hilt
-    implementation "com.google.dagger:hilt-android:2.28-alpha"
-    kapt "com.google.dagger:hilt-android-compiler:2.28-alpha"
+    // Dagger-Hilt
+    implementation 'com.google.dagger:hilt-android:2.41'
 
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01"
-    kapt "androidx.hilt:hilt-compiler:1.0.0-alpha01"
+    // Annotations necessary for AppModule and entry point in Hilt
+    kapt "com.google.dagger:hilt-android-compiler:2.41"
+    annotationProcessor 'com.google.dagger:hilt-compiler:2.41'
 
-    // Use AndroidX Preference Library for Settings Fragment
+    // AndroidX Preference Library for Settings Fragment
     implementation "androidx.preference:preference-ktx:1.2.0"
+
+    // For instrumentation tests
+    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.41'
+    androidTestAnnotationProcessor 'com.google.dagger:hilt-compiler:2.41'
+
+    // For local unit tests
+    testImplementation 'com.google.dagger:hilt-android-testing:2.41'
+    testAnnotationProcessor 'com.google.dagger:hilt-compiler:2.41'
 }

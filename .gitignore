@@ -19,3 +19,5 @@ local.properties
 .idea/compiler.xml
 .idea/gradle.xml
 /.idea
+.idea/misc.xml
+.idea/jarRepositories.xml

@@ -30,7 +30,6 @@ import com.google.android.material.navigation.NavigationView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.services.ImageDownloadWorker
-import com.prasoon.apodkotlin.services.WorkScheduler
 import com.prasoon.apodkotlin.utils.Constants
 import com.prasoon.apodkotlin.utils.Constants.CURRENT_DATE
 import com.prasoon.apodkotlin.utils.Constants.IMAGE_HD_URL
@@ -45,7 +44,6 @@ import com.prasoon.apodkotlin.utils.loadImage
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -77,7 +75,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
         toggle = ActionBarDrawerToggle(
             activity,
             drawer_layout,
-            toolbar,
+            home_toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
@@ -93,21 +91,21 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
         //viewModel = ViewModelProviders.of(this).get(ApodViewModel::class.java)
         viewModel.refresh(DateInput.currentDate)
 
-        swipe_refresh_layout.setOnRefreshListener {
+        home_swipe_refresh_layout.setOnRefreshListener {
             Log.i(TAG, "swipe_refresh_layout date: ${DateInput.currentDate}")
             viewModel.refresh(DateInput.currentDate)
-            swipe_refresh_layout.isRefreshing = false
+            home_swipe_refresh_layout.isRefreshing = false
         }
 
         if (DateInput.simpleDateFormat != null)
-            textViewDatePicker.text = DateInput.simpleDateFormat
+            home_text_view_date_picker.text = DateInput.simpleDateFormat
         else
-            textViewDatePicker.text = "Select Date to get today's picture!"
+            home_text_view_date_picker.text = "Select Date to get today's picture!"
 
         // Enable scrolling for explanation
-        textViewExplanation.setMovementMethod(ScrollingMovementMethod())
+        home_text_view_explanation.setMovementMethod(ScrollingMovementMethod())
 
-        selectListFragment.setOnClickListener {
+        home_select_list_fragment.setOnClickListener {
             Log.i(TAG, "selectListFragment")
 
             val action = HomeFragmentDirections.actionHomeFragmentToListFragment()
@@ -126,7 +124,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
         if (isNightMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             // Change images
-            darkMode.setImageDrawable(
+            home_dark_mode.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
                     R.drawable.ic_light_mode
@@ -135,7 +133,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
 
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            darkMode.setImageDrawable(
+            home_dark_mode.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
                     R.drawable.ic_dark_mode
@@ -143,7 +141,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
             )
         }
         // Night Mode preferences
-        darkMode.setOnClickListener {
+        home_dark_mode.setOnClickListener {
             if (isNightMode) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 sharedPreferencesEditor.putBoolean(NIGHT_MODE, false)
@@ -172,7 +170,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
 
                 val simpleDateFormat = SimpleDateFormat(format, Locale.US)
                 DateInput.simpleDateFormat = simpleDateFormat.format(cal.time)
-                textViewDatePicker.text = DateInput.simpleDateFormat
+                home_text_view_date_picker.text = DateInput.simpleDateFormat
                 Log.i(TAG, "calendar simpleDateFormat: ${DateInput.simpleDateFormat}")
 
                 val monthOfYearString =
@@ -185,7 +183,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
                 viewModel.refresh(DateInput.currentDate)
             }
 
-        selectDateButton.setOnClickListener {
+        home_select_date_button.setOnClickListener {
             activity?.let { it1 ->
                 val datePickerDialog = DatePickerDialog(
                     it1, dateSetListener, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(
@@ -206,19 +204,19 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
             }
         }
 
-        videoViewButton.setOnClickListener {
+        home_video_view_button.setOnClickListener {
             performActionIntent(requireContext(), currentApod.url, Constants.INTENT_ACTION_VIEW)
         }
 
         // todo: when apod is fully loaded, then enable the buttons, using loading from viewmodel
-        addIntoFavorites.setOnClickListener {
+        home_add_to_favorites.setOnClickListener {
             Log.i(TAG, "apodDateListDb: addIntoFavorites $apodDateListDb")
             if (apodDateListDb.contains(DateInput.currentDate)) {
                 Toast.makeText(activity, "Already saved in DB!", Toast.LENGTH_SHORT).show()
             } else {
                 viewModel.saveApod(currentApod)
                 Toast.makeText(activity, "Added to Favorites!", Toast.LENGTH_SHORT).show()
-                addIntoFavorites.setColorFilter(
+                home_add_to_favorites.setColorFilter(
                     ContextCompat.getColor(
                         requireContext(),
                         R.color.colorAddToFavorites
@@ -229,7 +227,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
         }
 
         // Request Permission
-        downloadImage.setOnClickListener {
+        home_download_image.setOnClickListener {
             if (ContextCompat.checkSelfPermission(
                     requireContext(),
                     android.Manifest.permission.READ_EXTERNAL_STORAGE
@@ -303,7 +301,7 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
             }
         }
 
-        imageViewResult.setOnClickListener {
+        home_image_view_result.setOnClickListener {
             Log.i(TAG, "imageViewResult")
             if (currentApod.mediaType == "image") {
                 val action = HomeFragmentDirections.actionHomeFragmentToViewFragment(currentApod.hdurl)
@@ -328,14 +326,14 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
             Log.i(TAG, "apodDateList from live data: $it")
             if (it.contains(DateInput.currentDate)) {
                 Log.i(TAG, "apodDateList from live data: ${currentApod.date}")
-                addIntoFavorites.setColorFilter(
+                home_add_to_favorites.setColorFilter(
                     ContextCompat.getColor(
                         requireContext(),
                         R.color.colorAddToFavorites
                     )
                 )
             } else {
-                addIntoFavorites.setColorFilter(
+                home_add_to_favorites.setColorFilter(
                     ContextCompat.getColor(
                         requireContext(),
                         R.color.gray
@@ -357,19 +355,19 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
                 )
                 if (currentApod.mediaType == "video") {
                     // Fit center for maintaining YouTube video's aspect ratio
-                    imageViewResult.scaleType = ImageView.ScaleType.FIT_CENTER
+                    home_image_view_result.scaleType = ImageView.ScaleType.FIT_CENTER
 
-                    videoViewButton.visibility = View.VISIBLE
-                    downloadImage.visibility = View.INVISIBLE
-                    addIntoFavorites.visibility = View.INVISIBLE
+                    home_video_view_button.visibility = View.VISIBLE
+                    home_download_image.visibility = View.INVISIBLE
+                    home_add_to_favorites.visibility = View.INVISIBLE
 
                     // var videoId = extractYoutubeId(currentApod.url)
                     // loadVideo(videoId)
                     if (currentApod.url.contains("youtube")) {
-                        addIntoFavorites.visibility = View.VISIBLE
+                        home_add_to_favorites.visibility = View.VISIBLE
                         val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                         Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
-                        imageViewResult.loadImage(thumbnailUrl, false, progressImageView)
+                        home_image_view_result.loadImage(thumbnailUrl, false, home_progress_image_view)
                     } else {
                         // Handling for Apods which are not image or a YouTube video.
                         // Open links with browser
@@ -378,22 +376,22 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
                             currentApod.url,
                             Constants.INTENT_ACTION_VIEW
                         )
-                        imageViewResult.setImageResource(R.drawable.handle_another_app)
+                        home_image_view_result.setImageResource(R.drawable.handle_another_app)
                     }
 
                 } else {
                     // Fit center crop to fit aspect ratio of imageview
-                    imageViewResult.scaleType = ImageView.ScaleType.CENTER_CROP
-                    downloadImage.visibility = View.VISIBLE
-                    imageViewResult.visibility = View.VISIBLE
-                    videoViewButton.visibility = View.INVISIBLE
-                    addIntoFavorites.visibility = View.VISIBLE
-                    imageViewResult.loadImage(currentApod.url, false, progressImageView)
+                    home_image_view_result.scaleType = ImageView.ScaleType.CENTER_CROP
+                    home_download_image.visibility = View.VISIBLE
+                    home_image_view_result.visibility = View.VISIBLE
+                    home_video_view_button.visibility = View.INVISIBLE
+                    home_add_to_favorites.visibility = View.VISIBLE
+                    home_image_view_result.loadImage(currentApod.url, false, home_progress_image_view)
                 }
 
-                textViewTitle.text = currentApod.title
-                textViewMetadataDate.text = currentApod.date
-                textViewExplanation.text = currentApod.explanation
+                home_text_view_title.text = currentApod.title
+                home_text_view_metadata_date.text = currentApod.date
+                home_text_view_explanation.text = currentApod.explanation
             }
         })
     }

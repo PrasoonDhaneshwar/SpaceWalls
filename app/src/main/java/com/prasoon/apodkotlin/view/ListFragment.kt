@@ -9,12 +9,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
-import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import com.prasoon.apodkotlin.viewmodel.ListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_list.*
@@ -36,13 +34,13 @@ class ListFragment : Fragment(), ListAction {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loading_view.visibility = View.GONE
+        list_progress.visibility = View.GONE
         list_swipe_refresh_layout.setOnRefreshListener{
 
             list_swipe_refresh_layout.isRefreshing = false
         }
 
-        apod_list.apply {
+        list_apod.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = apodListAdapter
         }
@@ -52,8 +50,8 @@ class ListFragment : Fragment(), ListAction {
 
     private fun observeViewModel() {
         viewModel.apodModelList.observe(viewLifecycleOwner, Observer {apodList ->
-            loading_view.visibility = View.GONE
-            apod_list.visibility = View.VISIBLE
+            list_progress.visibility = View.GONE
+            list_apod.visibility = View.VISIBLE
             apodListAdapter.updateApods(apodList.sortedByDescending{ it.id})
         })
     }

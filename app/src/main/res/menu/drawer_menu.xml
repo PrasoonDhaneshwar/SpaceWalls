@@ -20,7 +20,7 @@
     <!--Will trigger an action. For ex: an intent-->
     <item android:title="Share">
         <menu>
-            <item android:id="@+id/share_item"
+            <item android:id="@+id/detail_share_item"
                 android:icon="@drawable/ic_share"
                 android:title="Share Image/Video"/>
 

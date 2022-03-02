@@ -2,7 +2,6 @@ package com.prasoon.apodkotlin.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -10,10 +9,12 @@ import com.prasoon.apodkotlin.BuildConfig
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.db.ApodDao
 import com.prasoon.apodkotlin.model.remote.ApodAPI
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-
-class ApodViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ApodViewModel @Inject constructor(
     val db: ApodDao,
     val apodService: ApodAPI,
     application: Application

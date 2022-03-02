@@ -45,11 +45,11 @@
         android:maxLines="1"
         android:textColor="#fff"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/view2"
+        app:layout_constraintEnd_toEndOf="@+id/item_view_gradient"
         tools:text="Date taken on " />
 
     <View
-        android:id="@+id/view2"
+        android:id="@+id/item_view_gradient"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_alignBottom="@+id/item_apod_image"
