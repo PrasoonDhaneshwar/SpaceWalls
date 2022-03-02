@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.prasoon.apodkotlin.model.db.ApodDatabase
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.model.db.ApodDao
@@ -40,5 +41,11 @@ class ListViewModel @ViewModelInject constructor(
         coroutineScope.launch {
             val apod = db.delete(apodModel)
         }
+    }
+
+    // To cancel coroutineScope when component moves away from the viewmodel
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.coroutineContext.cancelChildren()
     }
 }

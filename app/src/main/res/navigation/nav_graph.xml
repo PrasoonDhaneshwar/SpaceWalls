@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_homeFragment_to_viewFragment"
             app:destination="@id/viewFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/listFragment"
@@ -52,4 +55,8 @@
             android:name="imageUrl"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.prasoon.apodkotlin.view.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

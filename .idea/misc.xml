@@ -14,11 +14,13 @@
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_home.xml" value="0.26334519572953735" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_home_old.xml" value="0.2803030303030303" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_list.xml" value="0.2234375" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_settings.xml" value="0.406640625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_view.xml" value="0.23125" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_view_test.xml" value="0.28515625" />
-        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/item_apod.xml" value="0.36168032786885246" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/item_apod.xml" value="0.266015625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/nav_header.xml" value="0.406640625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/menu/drawer_menu.xml" value="0.403125" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/xml/settings_preference.xml" value="0.406640625" />
       </map>
     </option>
   </component>

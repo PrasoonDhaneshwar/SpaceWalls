@@ -79,5 +79,4 @@ class ImageDownloadWorker(context: Context, parameters: WorkerParameters) : Work
             .build()
     }
 
-
 }

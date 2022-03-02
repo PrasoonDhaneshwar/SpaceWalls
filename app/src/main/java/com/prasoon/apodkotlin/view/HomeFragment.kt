@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -19,14 +20,17 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.work.*
+import com.google.android.material.navigation.NavigationView
 import com.prasoon.apodkotlin.R
 import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.services.ImageDownloadWorker
+import com.prasoon.apodkotlin.services.WorkScheduler
 import com.prasoon.apodkotlin.utils.Constants
 import com.prasoon.apodkotlin.utils.Constants.CURRENT_DATE
 import com.prasoon.apodkotlin.utils.Constants.IMAGE_HD_URL
@@ -41,15 +45,20 @@ import com.prasoon.apodkotlin.utils.loadImage
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener {
     private val TAG = "HomeFragment"
     private val viewModel: ApodViewModel by viewModels()
-    private var currentApod: ApodModel = ApodModel("", "", "", "", "", "", "")
+
+    @Inject
+    lateinit var currentApod: ApodModel
+    //private var currentApod: ApodModel = ApodModel("", "", "", "", "", "", "")
     var apodDateListDb: List<String> = listOf()
 
     lateinit var toggle: ActionBarDrawerToggle
@@ -65,9 +74,18 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        toggle = ActionBarDrawerToggle(activity, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        toggle = ActionBarDrawerToggle(
+            activity,
+            drawer_layout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+
+        nav_view.setNavigationItemSelectedListener(this)
+        nav_view.bringToFront()     // Needed for buttons to be clickable
 
         Log.i(TAG, "apodDateListDb: $apodDateListDb")
 
@@ -200,7 +218,12 @@ class HomeFragment : Fragment() {
             } else {
                 viewModel.saveApod(currentApod)
                 Toast.makeText(activity, "Added to Favorites!", Toast.LENGTH_SHORT).show()
-                addIntoFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorAddToFavorites))
+                addIntoFavorites.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorAddToFavorites
+                    )
+                )
             }
             /*addIntoFavorites.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_fill))*/
         }
@@ -215,9 +238,11 @@ class HomeFragment : Fragment() {
                 // Permissions already granted
                 // start to download file and save in external storage
                 if (!currentApod.mediaType.equals("video")) {
-                    context?.let {
-                            it1 -> //saveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate)
-
+                    context?.let { it1 -> //saveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate)
+/*                        runBlocking {
+                            WorkScheduler.scheduleWorkToSaveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate)
+                        }
+                        WorkScheduler.getWorkInfoAfterSaveImage(it1, viewLifecycleOwner)*/
                         ///////// Work Manager
                         val passDataToWorker = Data.Builder()
                             .putString(IMAGE_URL, currentApod.url)
@@ -225,29 +250,48 @@ class HomeFragment : Fragment() {
                             .putString(CURRENT_DATE, DateInput.currentDate)
                             .build()
 
+                        // todo: context should be made private
                         // todo: disable the download button to avoid multiple attempts
 
                         // Constraints
-                        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+                        val constraints =
+                            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build()
 
-                        val imageDownloaderWorkRequest = OneTimeWorkRequestBuilder<ImageDownloadWorker>()
-                            .setConstraints(constraints)
-                            .setInputData(passDataToWorker) // Pass data to worker
-                            .build()
+                        val imageDownloaderWorkRequest =
+                            OneTimeWorkRequestBuilder<ImageDownloadWorker>()
+                                .setConstraints(constraints)
+                                .setInputData(passDataToWorker) // Pass data to worker
+                                .build()
                         // Start the worker with enqueue
                         WorkManager.getInstance(it1).enqueue(imageDownloaderWorkRequest)
                         Toast.makeText(context, "Starting download...", Toast.LENGTH_SHORT).show()
 
-                        WorkManager.getInstance(it1).getWorkInfoByIdLiveData(imageDownloaderWorkRequest.id).observe(viewLifecycleOwner) {
-                            if (it.state == WorkInfo.State.SUCCEEDED) {
-                                // Get data from worker
-                                val imageName = it.outputData.getString(IMAGE_NAME)
-                                val storageDirectoryPath = it.outputData.getString(STORAGE_DIRECTORY_PATH)
-                                Log.i(TAG, "doWork result: \n File name: $imageName \n File path: $storageDirectoryPath")
-                                Toast.makeText(context,"Saved as $imageName.jpg in $storageDirectoryPath",Toast.LENGTH_SHORT).show()                            }
-                        }
+                        WorkManager.getInstance(it1)
+                            .getWorkInfoByIdLiveData(imageDownloaderWorkRequest.id)
+                            .observe(viewLifecycleOwner) {
+                                if (it.state == WorkInfo.State.SUCCEEDED) {
+                                    // Get data from worker
+                                    val imageName = it.outputData.getString(IMAGE_NAME)
+                                    val storageDirectoryPath =
+                                        it.outputData.getString(STORAGE_DIRECTORY_PATH)
+                                    Log.i(
+                                        TAG,
+                                        "doWork result: \n File name: $imageName \n File path: $storageDirectoryPath"
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "Saved as $imageName.jpg in $storageDirectoryPath",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
 
-                        val wallpaperScheduleWorkRequest = PeriodicWorkRequest.Builder(ImageDownloadWorker::class.java, 10 , TimeUnit.HOURS)
+                        val wallpaperScheduleWorkRequest = PeriodicWorkRequest.Builder(
+                            ImageDownloadWorker::class.java,
+                            10,
+                            TimeUnit.HOURS
+                        )
                             .setConstraints(constraints)
                             .setInputData(passDataToWorker) // Pass data to worker
                             .build()
@@ -261,7 +305,7 @@ class HomeFragment : Fragment() {
 
         imageViewResult.setOnClickListener {
             Log.i(TAG, "imageViewResult")
-            if (currentApod.mediaType == "image"){
+            if (currentApod.mediaType == "image") {
                 val action = HomeFragmentDirections.actionHomeFragmentToViewFragment(currentApod.hdurl)
                 findNavController().navigate(action)
             }
@@ -307,7 +351,10 @@ class HomeFragment : Fragment() {
                 DateInput.currentDate = apodModel.date
                 Log.i(TAG, "observeViewModel apodDetail: $currentApod")
                 Log.i(TAG, "observeViewModel apodDetail url: ${currentApod.url}")
-                Log.i(TAG, "observeViewModel apodDetail modified: ${createApodUrl(currentApod.date)}")
+                Log.i(
+                    TAG,
+                    "observeViewModel apodDetail modified: ${createApodUrl(currentApod.date)}"
+                )
                 if (currentApod.mediaType == "video") {
                     // Fit center for maintaining YouTube video's aspect ratio
                     imageViewResult.scaleType = ImageView.ScaleType.FIT_CENTER
@@ -392,7 +439,14 @@ class HomeFragment : Fragment() {
 
                 // start to download file and save in external storage
                 if (!currentApod.mediaType.equals("video")) {
-                    context?.let { it1 -> saveImage(it1, currentApod.url, currentApod.hdurl, DateInput.currentDate) }
+                    context?.let { it1 ->
+                        saveImage(
+                            it1,
+                            currentApod.url,
+                            currentApod.hdurl,
+                            DateInput.currentDate
+                        )
+                    }
                 }
             } else {
                 Log.i(TAG, "onRequestPermissionsResult: denied")
@@ -409,5 +463,17 @@ class HomeFragment : Fragment() {
     // Cancel any work if needed
     fun cancelWork(context: Context, workRequest: WorkRequest) {
         WorkManager.getInstance(context).cancelWorkById(workRequest.id)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.settings -> {
+                Toast.makeText(activity, "settings clicked!", Toast.LENGTH_SHORT).show()
+                val action = HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
+                findNavController().navigate(action)
+            }
+        }
+        drawer_layout.closeDrawer(GravityCompat.START)
+        return true
     }
 }

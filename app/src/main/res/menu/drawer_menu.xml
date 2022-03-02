@@ -11,6 +11,10 @@
         <item android:id="@+id/dark_mode"
             android:icon="@drawable/ic_dark_mode"
             android:title="Select Theme"/>
+
+        <item android:id="@+id/settings"
+            android:icon="@drawable/ic_settings"
+            android:title="Settings"/>
     </group>
 
     <!--Will trigger an action. For ex: an intent-->

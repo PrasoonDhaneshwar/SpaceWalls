@@ -2,6 +2,7 @@ package com.prasoon.apodkotlin.di
 
 import android.content.Context
 import androidx.room.Room
+import com.prasoon.apodkotlin.model.ApodModel
 import com.prasoon.apodkotlin.utils.Constants
 import com.prasoon.apodkotlin.utils.Constants.APOD_DATABASE_NAME
 import com.prasoon.apodkotlin.model.db.ApodDatabase
@@ -29,6 +30,10 @@ object AppModule {
     @Provides
     @Named("String2")
     fun provideTestString2() = "This is a string we will inject 2nd time"
+
+    @Singleton
+    @Provides
+    fun provideApod() = ApodModel("", "", "", "", "", "", "")
 
     @Provides
     @Singleton
