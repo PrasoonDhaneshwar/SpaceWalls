@@ -3,15 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/drawable_text_color_favorite.xml" value="0.3505" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_baseline_delete_outline.xml" value="0.3505" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_baseline_rotate_right_24.xml" value="0.507" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_baseline_schedule_24.xml" value="0.507" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_open_in_browser.xml" value="0.3505" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_share.xml" value="0.3505" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_wallpaper.xml" value="0.536" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/drawable/ic_wallpaper_schedule.xml" value="0.3235" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout-land/fragment_home_old.xml" value="0.34839357429718876" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout-v26/fragment_view_test.xml" value="0.406640625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/activity_main.xml" value="0.31319444444444444" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_detail.xml" value="0.20902777777777778" />
-        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_home.xml" value="0.406640625" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_home.xml" value="0.266015625" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_home_old.xml" value="0.2803030303030303" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_list.xml" value="0.2234375" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlin/app/src/main/res/layout/fragment_settings.xml" value="0.406640625" />

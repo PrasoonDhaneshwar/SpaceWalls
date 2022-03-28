@@ -12,8 +12,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -44,11 +47,31 @@ object AppModule {
     fun providesRoomDao(db: ApodDatabase) = db.apodModelDao()
 
     @Provides
-    fun providesApodApi() : ApodAPI {
+    fun providesApodApi(okHttpClient: OkHttpClient) : ApodAPI {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
             .build()
             .create(ApodAPI::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesOkHttpClient(cache: Cache): OkHttpClient {
+        val client = OkHttpClient.Builder()
+            .cache(cache)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+
+        return client.build()
+    }
+
+    @Provides
+    @Singleton
+    fun providesOkhttpCache(@ApplicationContext context: Context): Cache {
+        val cacheSize = 10 * 1024 * 1024 // 10 MB
+        return Cache(context.cacheDir, cacheSize.toLong())
     }
 }

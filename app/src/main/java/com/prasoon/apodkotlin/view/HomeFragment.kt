@@ -3,10 +3,13 @@ package com.prasoon.apodkotlin.view
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.WallpaperManager
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -44,6 +47,7 @@ import com.prasoon.apodkotlin.utils.loadImage
 import com.prasoon.apodkotlin.viewmodel.ApodViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -112,6 +116,31 @@ class HomeFragment : Fragment(), NavigationView.OnNavigationItemSelectedListener
             // Avoid below for compile time safety
             // findNavController().navigate(R.id.action_homeFragment_to_listFragment)
             findNavController().navigate(action)
+        }
+
+
+        // Wallpaper
+        val wallpaperManager = WallpaperManager.getInstance(context)
+        home_set_wallpaper.setOnClickListener {
+            Log.i(TAG, "set Wallpaper")
+            //val bitmap = home_image_view_result.buildDrawingCache()
+            val bitmap = (home_image_view_result.drawable as BitmapDrawable).bitmap
+            val bmpImg = (home_image_view_result.getDrawable() as BitmapDrawable).bitmap
+
+
+            try {
+                // Set on Home screen
+                wallpaperManager.setBitmap(bitmap)
+                // Set on Lock Screen
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
+                } else {
+                    Toast.makeText(requireContext(), "Wallpaper can't be set on devices running below Nougat!", Toast.LENGTH_SHORT).show()
+                }
+                Toast.makeText(requireContext(), "Wallpaper Set Successfully!!", Toast.LENGTH_SHORT).show()
+            } catch (e: IOException) {
+                Toast.makeText(requireContext(), "Setting WallPaper Failed!!", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val appSettingsPrefs: SharedPreferences = requireContext().getSharedPreferences(

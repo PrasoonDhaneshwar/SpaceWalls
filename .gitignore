@@ -21,3 +21,4 @@ local.properties
 /.idea
 .idea/misc.xml
 .idea/jarRepositories.xml
+.idea/

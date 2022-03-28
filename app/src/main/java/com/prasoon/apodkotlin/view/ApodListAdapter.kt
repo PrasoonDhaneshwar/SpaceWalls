@@ -78,7 +78,11 @@ class ApodListAdapter(var apodModelList: ArrayList<ApodModel>, val actions: List
         Log.i(TAG, "updateApods")
         apodModelList.clear()
         apodModelList.addAll(newApods)
-        notifyDataSetChanged()
+        // Alternative for notifyDataSetChanged()
+        val start = 0
+        val end = newApods.size - 1;
+        notifyItemRangeInserted(start, end)
+        //notifyDataSetChanged()
     }
 
     fun deleteApods(position: Int) {
