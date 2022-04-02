@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <!--Clickable, will be highlighted-->
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/schedule_wallpaper"
+            android:icon="@drawable/ic_schedule_wallpaper"
+            android:title="Schedule Wallpaper"/>
+
+        <item android:id="@+id/dark_mode"
+            android:icon="@drawable/ic_dark_mode"
+            android:title="Select Theme"/>
+
+        <item android:id="@+id/settings"
+            android:icon="@drawable/ic_settings"
+            android:title="Settings"/>
+    </group>
+
+    <!--Will trigger an action. For ex: an intent-->
+    <item android:title="Share">
+        <menu>
+            <item android:id="@+id/detail_share_item"
+                android:icon="@drawable/ic_share"
+                android:title="Share Image/Video"/>
+
+            <item android:id="@+id/open_apod_page"
+                android:icon="@drawable/ic_open_in_browser"
+                android:title="Open NASA's page"/>
+        </menu>
+    </item>
+
+    <item android:title="About">
+        <menu>
+            <item android:id="@+id/app_info"
+                android:icon="@drawable/ic_share"
+                android:title="Application Info"/>
+        </menu>
+    </item>
+</menu>

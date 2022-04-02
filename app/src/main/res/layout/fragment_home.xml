@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:openDrawer="right"
+    tools:context=".presentation.apod_detail.HomeFragment">
+
+    <com.google.android.material.navigation.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:id="@+id/nav_view"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu"/>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/home_swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/home_toolbar"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@android:color/transparent"
+                    android:elevation="4dp"
+                    android:gravity="center_horizontal"
+                    android:theme="@style/Theme.ApodKotlinRefactored"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/home_guideline_image_boundary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.65" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/home_guideline_text_boundary_below"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toStartOf="@+id/home_text_view_explanation"
+                    app:layout_constraintGuide_percent="0.9"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/home_guideline_text_boundary_above"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.72"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/home_text_view_title"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/cabin_semibold_italic"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/mainText"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toTopOf="@+id/home_guideline_text_boundary_above"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/home_guideline_image_boundary"
+                    tools:text="Some huge title will come here and take the space" />
+
+                <TextView
+                    android:id="@+id/home_text_view_metadata_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center_vertical|end"
+                    android:textColor="@color/mainText"
+                    android:textSize="12sp"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/home_text_view_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="Dec 29, 2022" />
+
+                <TextView
+                    android:id="@+id/home_text_view_explanation"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:hyphenationFrequency="full"
+                    android:justificationMode="inter_word"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/textAlt"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_max="wrap"
+                    app:layout_constraintHeight_percent="0.16"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/home_guideline_text_boundary_above"
+                    tools:text="Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras." />
+
+                <ImageView
+                    android:id="@+id/home_image_view_result"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/home_guideline_image_boundary"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.496"
+                    tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+                <ProgressBar
+                    android:id="@+id/home_progress_image_view"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTint="@color/darkModeIcon"
+                    android:indeterminateTintMode="src_atop"
+                    app:layout_constraintBottom_toBottomOf="@+id/home_image_view_result"
+                    app:layout_constraintEnd_toEndOf="@+id/home_image_view_result"
+                    app:layout_constraintStart_toStartOf="@+id/home_image_view_result"
+                    app:layout_constraintTop_toTopOf="@+id/home_image_view_result" />
+
+                <ImageButton
+                    android:id="@+id/home_video_view_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_media_play"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@+id/home_image_view_result"
+                    app:layout_constraintEnd_toEndOf="@+id/home_image_view_result"
+                    app:layout_constraintStart_toStartOf="@+id/home_image_view_result"
+                    app:layout_constraintTop_toTopOf="@+id/home_image_view_result"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/home_select_date_button"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:src="@drawable/ic_calendar"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/home_text_view_date_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/mainText"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toTopOf="@+id/home_select_date_button"
+                    app:layout_constraintEnd_toEndOf="@+id/home_select_date_button"
+                    app:layout_constraintStart_toStartOf="@+id/home_select_date_button"
+                    tools:text="Select Date to get today's picture!" />
+
+                <ImageView
+                    android:id="@+id/home_add_to_favorites"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/ic_baseline_favorite_border"
+                    android:textColor="@drawable/drawable_text_color_favorite"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/home_download_image"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/ic_download"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/home_share_item"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/home_add_to_favorites" />
+
+                <ImageView
+                    android:id="@+id/home_share_item"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/ic_share"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/home_select_date_button"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/home_download_image" />
+
+                <ImageView
+                    android:id="@+id/home_set_wallpaper"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/ic_wallpaper"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/home_select_list_fragment"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/home_schedule_wallpaper" />
+
+                <ImageView
+                    android:id="@+id/home_schedule_wallpaper"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/ic_schedule_wallpaper"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/home_set_wallpaper"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/home_select_date_button" />
+
+                <ImageView
+                    android:id="@+id/home_select_list_fragment"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/ic_baseline_view_list"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView
+                    android:id="@+id/home_dark_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="2dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@drawable/ic_dark_mode" />
+
+                <TextView
+                    android:id="@+id/home_text_view_apod"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:fontFamily="@font/capriola"
+                    android:gravity="start|center"
+                    android:text="Astronomy Picture of the Day"
+                    android:textColor="@color/mainText"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+</androidx.drawerlayout.widget.DrawerLayout>
