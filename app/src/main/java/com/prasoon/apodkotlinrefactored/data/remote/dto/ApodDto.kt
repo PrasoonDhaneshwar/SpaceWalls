@@ -1,6 +1,7 @@
 package com.prasoon.apodkotlinrefactored.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodEntity
 
 data class ApodDto(
@@ -19,7 +20,8 @@ data class ApodDto(
 ) { // Step 1.4: REMOTE:  Create a mapper to translate useful information from the whole DTO. Use it to store in database in "data" layer.
     fun toApodEntity(): ApodEntity {
         return ApodEntity(
-            date = date,
+            dateInt = date.toIntDate(),
+            dateString = date,
             explanation = explanation,
             title = title,
             url = url,

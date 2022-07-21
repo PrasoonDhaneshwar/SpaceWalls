@@ -3,7 +3,7 @@
     <style name="Theme.ApodKotlinRefactored" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:windowLightStatusBar">true</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -19,8 +20,29 @@
         <item name="android:textStyle">bold</item>
     </style>
     <color name="colorAddToFavorites">@color/red</color>
+    <color name="colorRemovedFromFavorites">#5B6A7B</color>
 
     <style name="Text">
         <item name="android:textSize">14sp</item>
     </style>
+
+    <!-- Custom Splash screen theme. -->
+    <style name="splashScreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_image</item>
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+
+    <style name="Theme.ApodKotlinRefactored.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor"> @android:color/transparent</item>
+    </style>
+
+    <!--Change theme of BottomNavigationView from All black to white-->
+    <style name="Theme.ApodKotlinRefactored.BottomNavigation" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@android:color/darker_gray</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+
 </resources>

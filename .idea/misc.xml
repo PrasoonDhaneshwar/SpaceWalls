@@ -4,11 +4,31 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/drawable_text_color_favorite.xml" value="0.5215" />
-        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/activity_main.xml" value="0.5421875" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/gradient.xml" value="0.328" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_baseline_delete_outline.xml" value="0.328" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_baseline_favorite_border.xml" value="0.328" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_baseline_view_list.xml" value="0.328" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_calendar.xml" value="0.4045" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_dark_mode.xml" value="0.328" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_download.xml" value="0.4045" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_favorite_fill.xml" value="0.328" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_home.xml" value="0.1815" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_photo_library.xml" value="0.175" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_settings.xml" value="0.48" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/ic_share.xml" value="0.302" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/drawable/splash_image.xml" value="0.2735" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/activity_main.xml" value="0.5019230769230769" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/activity_main2.xml" value="0.34074074074074073" />
-        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/fragment_home.xml" value="0.42592592592592593" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/fragment_detail.xml" value="0.5421875" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/fragment_home.xml" value="0.1" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/fragment_home_new.xml" value="0.5067934782608695" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/fragment_list.xml" value="0.5421875" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/fragment_view.xml" value="0.387037037037037" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/item_apod.xml" value="0.5421875" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/layout/nav_header.xml" value="0.5421875" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/menu/drawer_bottom_nav_menu.xml" value="0.271875" />
         <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/menu/drawer_menu.xml" value="0.5421875" />
+        <entry key="..\:/AndroidStudioProjects/ApodKotlinRefactored/app/src/main/res/xml/settings_preference.xml" value="0.5421875" />
       </map>
     </option>
   </component>

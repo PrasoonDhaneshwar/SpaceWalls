@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:openDrawer="right"
-    tools:context=".presentation.apod_detail.HomeFragment">
+    tools:context=".presentation.apod_home.HomeFragment">
 
     <com.google.android.material.navigation.NavigationView
         android:layout_width="wrap_content"
@@ -126,17 +126,25 @@
                     app:layout_constraintVertical_bias="0.496"
                     tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-                <ProgressBar
+                <com.mackhartley.roundedprogressbar.RoundedProgressBar
                     android:id="@+id/home_progress_image_view"
-                    style="?android:attr/progressBarStyleLarge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminateTint="@color/darkModeIcon"
-                    android:indeterminateTintMode="src_atop"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
                     app:layout_constraintBottom_toBottomOf="@+id/home_image_view_result"
                     app:layout_constraintEnd_toEndOf="@+id/home_image_view_result"
                     app:layout_constraintStart_toStartOf="@+id/home_image_view_result"
-                    app:layout_constraintTop_toTopOf="@+id/home_image_view_result" />
+                    app:rpbBackgroundColor="#DFD8D8"
+                    app:rpbBackgroundTextColor="#070600"
+                    app:rpbCornerRadiusBottomLeft="6dp"
+                    app:rpbCornerRadiusBottomRight="20dp"
+                    app:rpbCornerRadiusTopLeft="20dp"
+                    app:rpbCornerRadiusTopRight="6dp"
+                    app:rpbIsRadiusRestricted="false"
+                    app:rpbProgressColor="#5B6A7B"
+                    app:rpbProgressTextColor="#000000"
+                    app:rpbTextPadding="12dp" />
 
                 <ImageButton
                     android:id="@+id/home_video_view_button"

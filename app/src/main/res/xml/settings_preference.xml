@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Wallpaper Settings"
+        android:textColor="@android:color/black"
+        android:icon="@drawable/ic_wallpaper">
+
+        <CheckBoxPreference
+            android:key="schedule_wallpaper_checkbox_preference"
+            android:title="Schedule Daily Wallpaper"
+            android:defaultValue="true"
+            android:icon="@drawable/ic_schedule_wallpaper"/>
+
+        <Preference
+            android:key="wallpaper_fit_preference"
+            android:title="Wallpaper Fit"
+            android:summary="Change the way wallpaper should fit on screen"
+            android:dialogTitle="First section"
+            android:dependency="schedule_wallpaper_checkbox_preference" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Second Section">
+
+        <Preference
+            android:title="Clickable Link">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="http://codepath.com/" />
+        </Preference>
+
+    </PreferenceCategory>
+</PreferenceScreen>

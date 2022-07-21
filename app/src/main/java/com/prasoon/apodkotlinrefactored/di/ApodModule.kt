@@ -3,7 +3,6 @@ package com.prasoon.apodkotlinrefactored.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import com.prasoon.apodkotlinrefactored.data.ApodDao
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
 import com.prasoon.apodkotlinrefactored.data.repository.ApodRepositoryImpl
@@ -16,12 +15,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -78,9 +77,10 @@ object ApodModule {
     */
     @Provides
     @Singleton
-    fun providesOkHttpClient(cache: Cache): OkHttpClient {
+    fun providesOkHttpClient(cache: Cache, interceptor: Interceptor): OkHttpClient {
         val client = OkHttpClient.Builder()
             .cache(cache)
+            .addNetworkInterceptor(interceptor)
             .connectTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
@@ -93,6 +93,26 @@ object ApodModule {
     fun providesOkhttpCache(@ApplicationContext context: Context): Cache {
         val cacheSize = 10 * 1024 * 1024 // 10 MB
         return Cache(context.cacheDir, cacheSize.toLong())
+    }
+
+    @Provides
+    @Singleton
+    fun providesInterceptor(): Interceptor {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY) // Set level to NONE in production code
+
+        val interceptor2 = object : Interceptor {
+            override fun intercept(chain: Interceptor.Chain): Response {
+                val request = chain.request()
+                val response = chain.proceed(request)
+
+                val requestLength = request.body?.contentLength()
+                return response
+            }
+
+        }
+        //interceptor2.setLevel(HttpLoggingInterceptor.Level.BODY)
+        return interceptor
     }
 
     @Provides

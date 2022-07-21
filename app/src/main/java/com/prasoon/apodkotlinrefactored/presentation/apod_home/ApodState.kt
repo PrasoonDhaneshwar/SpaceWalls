@@ -1,4 +1,4 @@
-package com.prasoon.apodkotlinrefactored.presentation.apod_detail
+package com.prasoon.apodkotlinrefactored.presentation.apod_home
 
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 
@@ -6,5 +6,6 @@ import com.prasoon.apodkotlinrefactored.domain.model.Apod
 data class ApodState(
     val apod: Apod = Apod("", "", "",
         "", "", "", ""), // Default action
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val message: String? = null
 )

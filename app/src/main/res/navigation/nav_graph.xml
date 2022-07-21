@@ -7,7 +7,63 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_detail.HomeFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_viewFragment"
+            app:destination="@id/viewFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_homeTestFragment"
+            app:destination="@id/homeTestFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.settings.SettingsFragment"
+        android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/listFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_list.ListFragment"
+        android:label="fragment_list"
+        tools:layout="@layout/fragment_list" >
+        <action
+            android:id="@+id/action_listFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.view.ViewFragment"
+        android:label="fragment_view"
+        tools:layout="@layout/fragment_view" >
+        <argument
+            android:name="imageUrl"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_detail.DetailFragment"
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="apodDate"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeTestFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_home.HomeTestFragment"
+        android:label="fragment_home_new"
+        tools:layout="@layout/fragment_home_new" >
+        <action
+            android:id="@+id/action_homeTestFragment_to_viewFragment"
+            app:destination="@id/viewFragment" />
+        <action
+            android:id="@+id/action_homeTestFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
 </navigation>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".presentation.apod_home.HomeTestFragment"
+    android:theme="@style/Theme.ApodKotlinRefactored.NoActionBar"
+    tools:openDrawer="right">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                app:contentScrim="@color/teal_200"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:collapsedTitleGravity="left"
+                app:scrimAnimationDuration="@integer/material_motion_duration_short_1"
+                app:statusBarScrim="@color/teal_200"
+                app:toolbarId="@id/home_toolbar">
+
+                <ImageView
+                    android:id="@+id/home_image_view_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/handle_another_app" />
+
+                <ImageButton
+                    android:id="@+id/home_video_view_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_media_play"
+                    android:visibility="visible"
+                    android:layout_gravity="center"
+                    app:layout_constraintBottom_toBottomOf="@+id/home_image_view_result"
+                    app:layout_constraintEnd_toEndOf="@+id/home_image_view_result"
+                    app:layout_constraintStart_toStartOf="@+id/home_image_view_result"
+                    app:layout_constraintTop_toTopOf="@+id/home_image_view_result"
+                    tools:visibility="visible" />
+
+                <com.mackhartley.roundedprogressbar.RoundedProgressBar
+                    android:id="@+id/home_progress_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/home_image_view_result"
+                    app:layout_constraintEnd_toEndOf="@+id/home_image_view_result"
+                    app:rpbBackgroundColor="#DFD8D8"
+                    app:rpbBackgroundTextColor="#070600"
+                    app:rpbCornerRadiusBottomLeft="6dp"
+                    app:rpbCornerRadiusBottomRight="20dp"
+                    app:rpbCornerRadiusTopLeft="20dp"
+                    app:rpbCornerRadiusTopRight="6dp"
+                    app:rpbIsRadiusRestricted="false"
+                    app:rpbProgressColor="#5B6A7B"
+                    app:rpbProgressTextColor="#000000"
+                    app:rpbTextPadding="12dp" />
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/home_toolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    tools:title="My Title" />
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <TextView
+                android:id="@+id/home_text_view_explanation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text= "Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras."
+                tools:visibility="visible"/>
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/home_text_view_date_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/mainText"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/home_select_date_button"
+                app:layout_constraintEnd_toEndOf="@+id/home_select_date_button"
+                app:layout_constraintStart_toStartOf="@+id/home_select_date_button"
+                tools:text="Select Date to get today's picture!" />
+
+            <ImageView
+                android:id="@+id/home_select_date_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:src="@drawable/ic_calendar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/home_add_to_favorites"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_baseline_favorite_border"
+                android:textColor="@drawable/drawable_text_color_favorite"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/home_download_image"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_download"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/home_share_item"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/home_add_to_favorites" />
+
+            <ImageView
+                android:id="@+id/home_share_item"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_share"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/home_select_date_button"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/home_download_image" />
+
+            <ImageView
+                android:id="@+id/home_set_wallpaper"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_wallpaper"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/home_select_list_fragment"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/home_schedule_wallpaper" />
+
+            <ImageView
+                android:id="@+id/home_schedule_wallpaper"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_schedule_wallpaper"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/home_set_wallpaper"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/home_select_date_button" />
+
+            <ImageView
+                android:id="@+id/home_select_list_fragment"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_baseline_view_list"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:id="@+id/attachment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/overview_floating_action_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_calendar"
+            app:layout_anchor="@id/attachment_layout"
+            app:layout_anchorGravity="bottom|center"
+            android:elevation="8dp"
+            app:fabCustomSize="50dp"
+            app:maxImageSize="40dp"
+            app:fabSize="normal"
+            android:focusable="true"
+            app:backgroundTint="@color/white"
+            app:rippleColor="@android:color/holo_orange_light"
+            tools:ignore="ContentDescription" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>
