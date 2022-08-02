@@ -40,12 +40,12 @@ class ApodViewModel @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun refresh(date: String?) {
+        Log.i(TAG, "refresh for date: $date")
         getApod(date)
     }
 
     // Fill each case of apod received
-    fun getApod(date: String?) {
-        var size: Long?
+    private fun getApod(date: String?) {
 
         coroutineScope.launch {
             getApod.invoke(date = date)
@@ -55,7 +55,7 @@ class ApodViewModel @Inject constructor(
                             apodState =
                                 ApodState(apod = result.data ?: apodState.apod, isLoading = false)
                             apodStateLiveData.postValue(apodState)
-                            if (!apodState.apod.hdUrl.isNullOrEmpty()) size = getFileSizeOfUrlCoroutines(apodState.apod.hdUrl!!)
+                            //if (!apodState.apod.hdUrl.isNullOrEmpty()) size = getFileSizeOfUrlCoroutines(apodState.apod.hdUrl!!)
                         }
                         is Resource.Error -> {
                             apodState =
@@ -63,14 +63,16 @@ class ApodViewModel @Inject constructor(
                             apodStateLiveData.postValue(apodState)
                         }
                         is Resource.Loading -> {
-                            apodState = ApodState(isLoading = true, message = "Unknown error occurred")
+                            apodState = ApodState(isLoading = true)
                             apodStateLiveData.postValue(apodState)
                             UIEvent.ShowSnackbar(result.message ?: "Unknown error occurred")
                         }
                     }
                 }.launchIn(viewModelScope)      // Launch coroutine in a viewModelScope
         }
-/*        coroutineScope.launch {
+
+        /*var size: Long?
+        coroutineScope.launch {
             size = getFileSizeOfUrl("https://apod.nasa.gov/apod/image/2206/V838Mon_Hubble_2238.jpg")
             withContext(Dispatchers.Main) {
                 Log.i("ApodRepositoryImpl", "size of image:  ${size!! /1024} kB")
@@ -84,15 +86,6 @@ class ApodViewModel @Inject constructor(
         coroutineScope.launch {
             db.dao.addIntoDB(apod.toApodEntity(processFavoriteDB))
         }
-    }
-
-    fun isAlreadyAddedToFavorites(apod: Apod): Boolean {
-        var count = 0
-        coroutineScope.launch {
-            count = db.dao.count(apod.date)
-            Log.i(TAG, "isAlreadyAddedToFavorites count: $count")
-        }
-        return (count == 1)
     }
 
     sealed class UIEvent {

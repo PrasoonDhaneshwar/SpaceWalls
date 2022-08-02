@@ -4,6 +4,8 @@ object Constants {
     val APOD_DATABASE_NAME = "apod_database"
     val BASE_URL = "https://api.nasa.gov/"
 
+    val LOAD_APOD_ARCHIVE_FACTOR = 10
+
     val SELECTED_SIMPLE_DATE_FORMAT = "SELECTED_SIMPLE_DATE_FORMAT"
     val CURRENT_DATE_FOR_API = "CURRENT_DATE_FOR_API"
 

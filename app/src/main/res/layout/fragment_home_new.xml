@@ -26,12 +26,17 @@
                 android:id="@+id/collapsing_toolbar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="500dp"
-                app:contentScrim="@color/teal_200"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                android:minHeight="100dp"
                 app:collapsedTitleGravity="left"
+                app:collapsedTitleTextAppearance="@style/MyCollapsedTitle"
+                app:contentScrim="@color/mainBackground"
+                app:expandedTitleTextAppearance="@style/MyExpandedTitle"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:maxLines="3"
                 app:scrimAnimationDuration="@integer/material_motion_duration_short_1"
-                app:statusBarScrim="@color/teal_200"
-                app:toolbarId="@id/home_toolbar">
+                app:statusBarScrim="@color/mainBackground"
+                app:toolbarId="@id/home_toolbar"
+                tools:layout_height="500dp">
 
                 <ImageView
                     android:id="@+id/home_image_view_result"
@@ -39,15 +44,15 @@
                     android:layout_height="match_parent"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/handle_another_app" />
+                    tools:src="@drawable/handle_another_app" />
 
                 <ImageButton
                     android:id="@+id/home_video_view_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_media_play"
-                    android:visibility="visible"
                     android:layout_gravity="center"
+                    android:src="@android:drawable/ic_media_play"
+                    android:visibility="invisible"
                     app:layout_constraintBottom_toBottomOf="@+id/home_image_view_result"
                     app:layout_constraintEnd_toEndOf="@+id/home_image_view_result"
                     app:layout_constraintStart_toStartOf="@+id/home_image_view_result"
@@ -87,7 +92,7 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
@@ -100,33 +105,40 @@
         </androidx.core.widget.NestedScrollView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/home_constraint_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:background="@color/mainBackground"
+            app:layout_anchor="@+id/attachment_layout"
+            app:layout_anchorGravity="bottom|center">
 
             <TextView
                 android:id="@+id/home_text_view_date_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/mainText"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toTopOf="@+id/home_select_date_button"
-                app:layout_constraintEnd_toEndOf="@+id/home_select_date_button"
-                app:layout_constraintStart_toStartOf="@+id/home_select_date_button"
-                tools:text="Select Date to get today's picture!" />
-
-            <ImageView
-                android:id="@+id/home_select_date_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
                 android:layout_alignParentBottom="true"
                 android:layout_centerInParent="true"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
-                android:src="@drawable/ic_calendar"
+                android:gravity="center|end"
+                android:textColor="@color/mainText"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                tools:text="Select Date to get today's picture!" />
+
+            <!--            <ImageView
+                            android:id="@+id/home_select_date_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerInParent="true"
+                            android:layout_marginBottom="10dp"
+                            android:gravity="center"
+                            android:src="@drawable/ic_calendar"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />-->
 
             <ImageView
                 android:id="@+id/home_add_to_favorites"
@@ -144,10 +156,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
                 android:src="@drawable/ic_download"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/home_share_item"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/home_add_to_favorites" />
 
             <ImageView
@@ -155,10 +166,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
                 android:src="@drawable/ic_share"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/home_select_date_button"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/home_download_image" />
 
             <ImageView
@@ -166,32 +176,31 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
                 android:src="@drawable/ic_wallpaper"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/home_select_list_fragment"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/home_schedule_wallpaper" />
+                app:layout_constraintStart_toEndOf="@+id/home_share_item" />
 
-            <ImageView
-                android:id="@+id/home_schedule_wallpaper"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/ic_schedule_wallpaper"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/home_set_wallpaper"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/home_select_date_button" />
+            <!--            <ImageView
+                            android:id="@+id/home_schedule_wallpaper"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginBottom="10dp"
+                            android:src="@drawable/ic_schedule_wallpaper"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/home_set_wallpaper"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/home_text_view_date_picker" />-->
 
-            <ImageView
-                android:id="@+id/home_select_list_fragment"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/ic_baseline_view_list"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+            <!--            <ImageView
+                            android:id="@+id/home_select_list_fragment"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginBottom="10dp"
+                            android:src="@drawable/ic_baseline_view_list"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -204,19 +213,21 @@
             android:id="@+id/overview_floating_action_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginEnd="16dp"
             android:clickable="true"
             app:srcCompat="@drawable/ic_calendar"
             app:layout_anchor="@id/attachment_layout"
-            app:layout_anchorGravity="bottom|center"
+            app:layout_anchorGravity="bottom|right"
             android:elevation="8dp"
             app:fabCustomSize="50dp"
             app:maxImageSize="40dp"
             app:fabSize="normal"
             android:focusable="true"
-            app:backgroundTint="@color/white"
+            app:backgroundTint="@color/floatingActionColor"
             app:rippleColor="@android:color/holo_orange_light"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            android:visibility="visible"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

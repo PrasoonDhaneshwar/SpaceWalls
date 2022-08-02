@@ -6,12 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".presentation.view.ViewFragment">
 
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/view_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:fitsSystemWindows="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
     <com.mackhartley.roundedprogressbar.RoundedProgressBar
         android:id="@+id/fragment_view_progress"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:rpbBackgroundColor="#D3CECE"
         app:rpbBackgroundTextColor="#FFFFFF"
         app:rpbCornerRadiusBottomLeft="6dp"
@@ -21,11 +34,7 @@
         app:rpbIsRadiusRestricted="false"
         app:rpbProgressColor="#5B6A7B"
         app:rpbProgressTextColor="#000000"
-        app:rpbTextPadding="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:rpbTextPadding="12dp" />
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/fragment_image_view"

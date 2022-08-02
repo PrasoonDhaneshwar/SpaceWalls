@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.ApodKotlinRefactored" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
@@ -19,8 +19,30 @@
         <item name="android:textStyle">bold</item>
     </style>
     <color name="colorAddToFavorites">@color/red</color>
+    <color name="colorRemovedFromFavorites">#5B6A7B</color>
 
     <style name="Text">
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Custom Splash screen theme. -->
+    <style name="splashScreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_image</item>
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+
+    <style name="Theme.ApodKotlinRefactored.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor"> @android:color/transparent</item>
+    </style>
+
+
+    <style name="MyExpandedTitle" parent="@style/TextAppearance.Design.CollapsingToolbar.Expanded">
+        <item name="android:textColor">@color/mainText</item>
+    </style>
+
+    <style name="MyCollapsedTitle" parent="@style/TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@android:color/white</item>
     </style>
 </resources>

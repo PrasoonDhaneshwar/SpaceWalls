@@ -7,11 +7,8 @@ import com.prasoon.apodkotlinrefactored.domain.model.Apod
 // Step 2.1: DATABASE: Create Entity
 @Entity
 data class ApodEntity(
-    //@PrimaryKey val id: Int? = null,
-
-    // todo: change access of primary key to Int
-    val dateInt: Int,
     @PrimaryKey
+    val dateInt: Int,
     val dateString: String,
     val explanation: String,
     val hdUrl: String?,

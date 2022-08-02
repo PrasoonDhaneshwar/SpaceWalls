@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/homeTestFragment">
 
     <fragment
         android:id="@+id/homeFragment"
@@ -66,4 +66,9 @@
             android:id="@+id/action_homeTestFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/apodArchivesFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_archives.ApodArchivesFragment"
+        android:label="fragment_archives"
+        tools:layout="@layout/fragment_archives" />
 </navigation>

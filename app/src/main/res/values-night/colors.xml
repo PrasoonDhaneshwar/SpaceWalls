@@ -17,4 +17,5 @@
 
     <color name="mainBackground">#000000</color>
     <color name="buttonForeground">#3F51B5</color>
+    <color name="floatingActionColor">#5B6A7B</color>
 </resources>

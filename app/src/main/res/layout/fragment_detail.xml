@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".presentation.apod_detail.DetailFragment">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/detail_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        tools:title="My title" />
+
     <ImageView
         android:id="@+id/detail_image_view"
         android:layout_width="match_parent"
@@ -36,16 +45,16 @@
         android:id="@+id/detail_text_view_title"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="60dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="60dp"
         android:fontFamily="@font/capriola"
         android:gravity="start"
         android:hyphenationFrequency="none"
         android:textColor="@color/mainText"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.088"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Some huge title will come here and take the space" />

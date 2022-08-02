@@ -22,8 +22,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="3dp"
+        app:backgroundTint="@color/mainBackground"
         app:elevation="8dp"
-        android:theme="@style/Theme.ApodKotlinRefactored.BottomNavigation"
         app:menu="@menu/drawer_bottom_nav_menu" />
 
 </RelativeLayout>

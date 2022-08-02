@@ -10,7 +10,7 @@ class GetApod(
     private val repository: ApodRepository
 ) {
 
-    // Initialize the Use case with word
+    // Initialize the Use case with apod
     operator fun invoke(date: String?): Flow<Resource<Apod>> {
         return repository.getApodCustomDate(date)
     }

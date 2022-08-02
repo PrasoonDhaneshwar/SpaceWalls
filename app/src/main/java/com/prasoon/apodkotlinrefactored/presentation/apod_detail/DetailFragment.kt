@@ -7,17 +7,22 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils.getYoutubeThumbnailUrlFromVideoUrl
-import com.prasoon.apodkotlinrefactored.databinding.FragmentDetailBinding
+import com.prasoon.apodkotlinrefactored.databinding.FragmentDetailNewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
-class DetailFragment : Fragment(R.layout.fragment_detail) {
+class DetailFragment : Fragment(R.layout.fragment_detail_new) {
     private val TAG = "DetailFragment"
-    private lateinit var binding: FragmentDetailBinding
+    private lateinit var binding: FragmentDetailNewBinding
 
     private val viewModel: ApodDetailViewModel by viewModels()
 
@@ -27,9 +32,15 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentDetailBinding.bind(view)
+        binding = FragmentDetailNewBinding.bind(view)
+        binding.detailToolbar.setNavigationIcon(R.drawable.ic_back)
+        binding.detailToolbar.setNavigationOnClickListener (View.OnClickListener { requireActivity().onBackPressed() })
+
         val apodDateSelected = args.apodDate.toIntDate()
         viewModel.getApodDetailFromDb(apodDateSelected)
+
+        binding.collapsingToolbarLayout.setTitle(" ");
+
 
         observeViewModel()
     }
@@ -55,12 +66,22 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 } else {
                     binding.detailImageView.visibility = View.VISIBLE
                     Log.i(TAG, "url: ${apod.url}")
-                    binding.detailImageView.loadImage(apod.url, false, binding.detailProgressImageView)
+                    //binding.detailImageView.loadImage(apod.url, false, binding.detailProgressImageView)
+
+                    binding.detailImageView.setImageBitmap(
+                        ImageUtils.loadImageUIL(
+                            apod.url,
+                            binding.detailImageView,
+                            binding.detailProgressImageView,
+                            requireContext()
+                        ))
+
                 }
 
                 binding.detailTextViewTitle.text = apod.title
                 binding.detailTextViewExplanation.text = apod.explanation
-                binding.detailTextViewDate.text = apod.date
+                if (apod.date.isNotEmpty()) binding.detailTextViewDate.text = apod.date.toSimpleDateFormat()
+                binding.collapsingToolbarLayout.setTitle(apod.title)
             }
         }
     }

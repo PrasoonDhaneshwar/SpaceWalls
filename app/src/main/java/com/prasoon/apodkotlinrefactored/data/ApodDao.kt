@@ -30,8 +30,12 @@ interface ApodDao {
     @Query("SELECT * FROM ApodEntity WHERE addToFavoritesDB = :isFavorite ")
     suspend fun getAllApods(isFavorite: Boolean): List<ApodEntity>
 
+    // todo: Check if ApodEntity is nullable
     @Query("SELECT * FROM ApodEntity WHERE dateString = :date")
     suspend fun getApodFromDate(date: String?): ApodEntity
+
+    @Query("SELECT * FROM ApodEntity WHERE dateInt = :date")
+    suspend fun getApodFromDatePrimaryKey(date: Int): ApodEntity?
 
     @Query("SELECT COUNT() FROM ApodEntity WHERE dateString = :date")
     fun count(date: String): Int

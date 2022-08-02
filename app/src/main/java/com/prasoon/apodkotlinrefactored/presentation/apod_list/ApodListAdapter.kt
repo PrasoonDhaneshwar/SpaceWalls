@@ -1,10 +1,12 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_list
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils.getYoutubeThumbnailUrlFromVideoUrl
@@ -13,19 +15,22 @@ import com.prasoon.apodkotlinrefactored.domain.model.Apod
 
 //                                                                                        2. Extend holder
 //                      4. Populate objects
-class ApodListAdapter(var apodModelList: ArrayList<Apod>, val actions: ListAction) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
+class ApodListAdapter(
+    var apodModelList: ArrayList<Apod>,
+    val actions: ListAction,
+) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
     private val TAG = "ApodListAdapter"
 
     // 3. Override methods
     // todo: view may not be val
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApodViewHolder {
-        Log.i("ApodListAdapter", "onCreateViewHolder")
+        Log.i(TAG, "onCreateViewHolder")
         val apodBinding = ItemApodBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ApodViewHolder(apodBinding)
     }
 
     override fun onBindViewHolder(holder: ApodViewHolder, position: Int) {
-        Log.i("ApodListAdapter", "onBindViewHolder")
+        Log.i(TAG, "onBindViewHolder")
         holder.bind(apodModelList[position], position)
     }
 
@@ -50,18 +55,21 @@ class ApodListAdapter(var apodModelList: ArrayList<Apod>, val actions: ListActio
                 val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
                 Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
 
-                itemImageView.loadImage(thumbnailUrl, true, progress)
+                //itemImageView.loadImage(thumbnailUrl, true, progress)
 
-                //itemImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, itemImageView, progress, requireContext()))
+                //val context = itemImageView.context
+                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, itemImageView, progress, itemImageView.context))
 
 
             } else {
                 itemImageView.visibility = View.VISIBLE
-                itemImageView.loadImage(apod.url, true, progress)
+                //itemImageView.loadImage(apod.url, true, progress)
+                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod.url, itemImageView, progress, itemImageView.context))
+
             }
 
             itemTitle.text = apod.title
-            itemDate.text = apod.date
+            itemDate.text = apod.date.toSimpleDateFormat()
 
             layout.setOnClickListener {
                 Log.i(TAG, "layout clicked for: ${apod.date}")

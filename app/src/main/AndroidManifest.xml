@@ -4,6 +4,10 @@
     <!-- Step 6.3: DEPENDENCY INJECTION: Allow internet permissions-->
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Allow Glide to reload image when internet is toggled-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
 

@@ -4,10 +4,12 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
 import com.prasoon.apodkotlinrefactored.databinding.FragmentListBinding
@@ -24,6 +26,9 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // todo https://stackoverflow.com/questions/62835053/how-to-set-fullscreen-in-android-r
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
         binding = FragmentListBinding.bind(view)
 
         binding.listSwipeRefreshLayout.setOnRefreshListener{
@@ -33,10 +38,16 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
 
         binding.listApod.apply {
             layoutManager = LinearLayoutManager(context)
+            //layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             adapter = apodListAdapter
         }
 
         observeViewModel()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 
     private fun observeViewModel() {

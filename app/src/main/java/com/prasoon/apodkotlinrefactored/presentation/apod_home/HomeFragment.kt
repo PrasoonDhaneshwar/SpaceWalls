@@ -83,7 +83,9 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     binding.homeTextViewDatePicker.text = date
 
                     val dateApiFormat = bundle.getString(CURRENT_DATE_FOR_API)
-                    DateInput.currentDate = dateApiFormat
+                    if (dateApiFormat != null) {
+                        DateInput.currentDate = dateApiFormat
+                    }
                     viewModel.refresh(dateApiFormat)
                 }
             }

@@ -1,25 +1,25 @@
 package com.prasoon.apodkotlinrefactored.core.utils
 
-import android.app.Activity
 import android.app.WallpaperManager
 import android.content.ContentValues
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
@@ -34,7 +34,6 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener
 import com.prasoon.apodkotlinrefactored.R
-import dagger.hilt.android.internal.managers.ViewComponentManager
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -47,6 +46,10 @@ import java.util.*
 
 
 object ImageUtils {
+    private val TAG = "ImageUtils"
+    val SCREEN_WIDTH = Resources.getSystem().displayMetrics.widthPixels
+    val SCREEN_HEIGHT = Resources.getSystem().displayMetrics.heightPixels
+
     fun saveImage(context: Context, url: String, hdurl: String, date: String) {
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
             throwable.localizedMessage
@@ -86,7 +89,7 @@ object ImageUtils {
             Objects.requireNonNull(fos)?.close()
 
             withContext(Dispatchers.Main) {
-                Log.i("HomeFragment", "Saved as $imageName.jpg in $storageDirectoryPath")
+                Log.i("saveImage", "Saved as $imageName.jpg in $storageDirectoryPath")
                 Toast.makeText(
                     context,
                     "Saved as $imageName.jpg in $storageDirectoryPath",
@@ -135,10 +138,7 @@ object ImageUtils {
                     (urlConnection as HttpURLConnection).disconnect()
             }
             withContext(Dispatchers.Main) {
-                Log.i(
-                    "ApodRepositoryImpl getFileSizeOfUrlCoroutines",
-                    "size of image:  ${size / 1024} kB"
-                )
+                Log.i(TAG,"size of image:  ${size / 1024} kB")
             }
         }
         return size
@@ -160,6 +160,7 @@ object ImageUtils {
         Glide.with(this.context)
             .setDefaultRequestOptions(options)
             .load(uri)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
@@ -184,54 +185,6 @@ object ImageUtils {
 
             })
             .into(this)
-    }
-
-    fun loadImageUIL(uri: String?, viewProgressBar: ProgressBar, context: Context): Bitmap? {
-        val imageLoader = ImageLoader.getInstance()
-
-        val config = ImageLoaderConfiguration.Builder(context)
-        config.threadPriority(Thread.NORM_PRIORITY - 2)
-        config.denyCacheImageMultipleSizesInMemory()
-        config.diskCacheFileNameGenerator(Md5FileNameGenerator())
-        config.diskCacheSize(50 * 1024 * 1024) // 50 MiB
-
-        config.tasksProcessingOrder(QueueProcessingType.LIFO)
-        config.writeDebugLogs() // Remove for release app
-
-
-        imageLoader.init(config.build())
-        var bmpImage: Bitmap? = null
-        //val imageUri = "http://www.ssaurel.com/tmp/logo_ssaurel.png"
-        //imageLoader.displayImage(uri, this)
-        imageLoader.loadImage(uri, object : SimpleImageLoadingListener() {
-            override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
-                viewProgressBar.isVisible = false
-                bmpImage = loadedImage
-            }
-        })
-        return bmpImage
-    }
-
-    fun ImageView.loadImageUILImageView(
-        uri: String?,
-        viewProgressBar: ProgressBar,
-        context: Context
-    ) {
-        val imageLoader = ImageLoader.getInstance()
-
-        val config = ImageLoaderConfiguration.Builder(context)
-        config.threadPriority(Thread.NORM_PRIORITY - 2)
-        config.denyCacheImageMultipleSizesInMemory()
-        config.diskCacheFileNameGenerator(Md5FileNameGenerator())
-        config.diskCacheSize(50 * 1024 * 1024) // 50 MiB
-
-        config.tasksProcessingOrder(QueueProcessingType.LIFO)
-        config.writeDebugLogs() // Remove for release app
-
-
-        imageLoader.init(config.build())
-        imageLoader.displayImage(uri, this)
-        viewProgressBar.isVisible = false
     }
 
     fun loadImageUIL(uri: String?, imageView: ImageView, viewProgressBar: RoundedProgressBar, context: Context): Bitmap? {
@@ -260,16 +213,19 @@ object ImageUtils {
 
         imageLoader.displayImage(uri, imageView, options, object : SimpleImageLoadingListener() {
             override fun onLoadingStarted(imageUri: String?, view: View?) {
+                Log.i(TAG, "onLoadingStarted: $uri")
                 viewProgressBar.isVisible = true
             }
 
             override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
+                Log.i(TAG, "onLoadingFailed: $uri")
                 super.onLoadingFailed(imageUri, view, failReason)
                 viewProgressBar.isVisible = false
                 Toast.makeText(context, "Connection timeout! Image loading failed", Toast.LENGTH_SHORT).show()
             }
 
             override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
+                Log.i(TAG, "onLoadingComplete: $uri")
                 viewProgressBar.isVisible = false
                 bmpImage = loadedImage
             }
@@ -293,37 +249,34 @@ object ImageUtils {
     }
 
     fun setWallpaper(context: Context, imageView: ImageView) {
+        Log.i(TAG, "set Wallpaper")
         val wallpaperManager = WallpaperManager.getInstance(context)
-
-        Log.i("setWallpaper", "set Wallpaper")
-        //val bitmap = home_image_view_result.buildDrawingCache()
         val bitmap = (imageView.drawable as BitmapDrawable).bitmap
-        // val bmpImg = (home_image_view_result.getDrawable() as BitmapDrawable).bitmap
-
-        val mContext = if (context is ViewComponentManager.FragmentContextWrapper)
-            context.baseContext
-        else
-            context
-
-        //todo
-        val metrics = DisplayMetrics()
-        (mContext as Activity).getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        val height = metrics.heightPixels
-        val width = metrics.widthPixels
-        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
 
         try {
             // Set on Home screen
-            wallpaperManager.setBitmap(scaledBitmap)
+            wallpaperManager.setBitmap(bitmap)
             // Set on Lock Screen
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_LOCK)
+                val cropHint = bitmap.cropHint(wallpaperManager.desiredMinimumHeight)
+
+                Log.i(TAG, "Screen size -> ${SCREEN_WIDTH}x$SCREEN_HEIGHT")
+                Log.i(TAG, "Bitmap height: ${bitmap.height} width: ${bitmap.width}")
+                Log.i(TAG, "Desired wallpaper height -> ${wallpaperManager.desiredMinimumHeight}")
+
+                wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_LOCK)
             } else {
-                Toast.makeText(context, "Wallpaper can't be set on devices running below Nougat!", Toast.LENGTH_SHORT).show()
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap ,SCREEN_WIDTH, SCREEN_HEIGHT, true)
+                wallpaperManager.setBitmap(scaledBitmap)
             }
             Toast.makeText(context, "Wallpaper Set Successfully!!", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
             Toast.makeText(context, "Setting WallPaper Failed!!", Toast.LENGTH_SHORT).show()
         }
+    }
+    fun Bitmap.cropHint(desiredHeight: Int): Rect {
+        val desiredWidth = SCREEN_WIDTH * height / desiredHeight
+        val offsetX = (width - desiredWidth) / 2
+        return Rect(offsetX, 0, width - offsetX, height)
     }
 }

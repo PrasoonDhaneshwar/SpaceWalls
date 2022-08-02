@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,6 +17,7 @@ import com.google.android.material.navigation.NavigationView
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.common.DateInput
+import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
 import com.prasoon.apodkotlinrefactored.core.utils.ShareActionUtils
@@ -27,15 +29,17 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeTestFragment : Fragment(R.layout.fragment_home_new),
-NavigationView.OnNavigationItemSelectedListener {
+    NavigationView.OnNavigationItemSelectedListener {
     private val TAG = "HomeFragment"
     private lateinit var binding: FragmentHomeNewBinding
     private val viewModel: ApodViewModel by viewModels()
 
+    private var isAddedToDB = false
+    var datePickerString: String? = String()
+
     @Inject
     lateinit var currentApod: Apod
 
-    var apodDateListDb: List<String> = listOf()
 
     lateinit var toggle: ActionBarDrawerToggle
 
@@ -46,7 +50,7 @@ NavigationView.OnNavigationItemSelectedListener {
         toggle = ActionBarDrawerToggle(
             activity,
             binding.drawerLayout,
-            binding.homeToolbar,
+            /*binding.homeToolbar,*/
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
@@ -57,10 +61,12 @@ NavigationView.OnNavigationItemSelectedListener {
         binding.navView.setNavigationItemSelectedListener(this)
         binding.navView.bringToFront()     // Needed for buttons to be clickable
 
-        // Start with an empty date
-        viewModel.refresh(DateInput.currentDate)
+        // Start with an actual date
+        val date =
+            if (DateInput.currentDate.isEmpty()) DateInput.getCurrentDateForInitialization() else DateInput.currentDate
+        viewModel.refresh(date)
 
-        binding.homeSelectDateButton.setOnClickListener {
+        binding.overviewFloatingActionButton.setOnClickListener {
             val datePickerFragment = DatePickerFragment()
             val supportFragmentManager = requireActivity().supportFragmentManager
             // Show the dialog
@@ -72,12 +78,14 @@ NavigationView.OnNavigationItemSelectedListener {
             ) { resultKey, bundle ->
                 if (resultKey == "REQUEST_KEY") {
 
-                    val date = bundle.getString(Constants.SELECTED_SIMPLE_DATE_FORMAT)
-                    DateInput.simpleDateFormat = date
-                    binding.homeTextViewDatePicker.text = date
+                    datePickerString = bundle.getString(Constants.SELECTED_SIMPLE_DATE_FORMAT)
+                    DateInput.simpleDateFormat = datePickerString
+                    binding.homeTextViewDatePicker.text = datePickerString
 
                     val dateApiFormat = bundle.getString(Constants.CURRENT_DATE_FOR_API)
-                    DateInput.currentDate = dateApiFormat
+                    if (dateApiFormat != null) {
+                        DateInput.currentDate = dateApiFormat
+                    }
                     viewModel.refresh(dateApiFormat)
                 }
             }
@@ -123,22 +131,54 @@ NavigationView.OnNavigationItemSelectedListener {
             }
         }
 
-        binding.homeScheduleWallpaper.setOnClickListener {
+/*        binding.homeScheduleWallpaper.setOnClickListener {
             Log.i(TAG, "imageViewResult")
             if (currentApod.mediaType == "image") {
                 //todo
             }
+        }*/
+
+        binding.homeAddToFavorites.setOnClickListener {
+            if (!isAddedToDB && !currentApod.mediaType.isEmpty()) {
+                viewModel.saveApod(currentApod, true)
+                Toast.makeText(activity, "Added to Favorites!", Toast.LENGTH_SHORT).show()
+                binding.homeAddToFavorites.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorAddToFavorites
+                    )
+                )
+            } else if (isAddedToDB && !currentApod.mediaType.isEmpty()) {
+                viewModel.saveApod(currentApod, false)
+                Toast.makeText(activity, "Removed from Favorites!", Toast.LENGTH_SHORT).show()
+                binding.homeAddToFavorites.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorRemovedFromFavorites
+                    )
+                )
+
+            }
+            isAddedToDB = !isAddedToDB
         }
 
         observeViewModel()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val date =
+            if (datePickerString.isNullOrEmpty() && DateInput.currentDate.isEmpty()) DateInput.getCurrentDateForInitialization() else DateInput.currentDate
+
+        viewModel.refresh(date)
+    }
+
     private fun observeViewModel() {
         viewModel.apodStateLiveData.observe(viewLifecycleOwner) { apodStateLiveData ->
-            if (!apodStateLiveData.isLoading && !apodStateLiveData.message.isNullOrEmpty()) {
+            if (!apodStateLiveData.message.isNullOrEmpty()) {
                 Log.i(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
                 Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
-            } else {
+            } else if (!apodStateLiveData.isLoading) {
                 currentApod = apodStateLiveData.apod
                 DateInput.currentDate =
                     currentApod.date    // Set the date received from the viewModel
@@ -146,6 +186,24 @@ NavigationView.OnNavigationItemSelectedListener {
                 Log.i(TAG, "Apod model received from viewmodel: $currentApod")
                 Log.i(TAG, "Web link : ${DateInput.createApodUrl(currentApod.date)}")
                 Log.i(TAG, "Api link : ${DateInput.createApodUrlApi(currentApod.date)}")
+
+                if (currentApod.addToFavoritesUI) {
+                    binding.homeAddToFavorites.setColorFilter(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorAddToFavorites
+                        )
+                    )
+                    isAddedToDB = true
+                } else {
+                    binding.homeAddToFavorites.setColorFilter(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorRemovedFromFavorites
+                        )
+                    )
+                    isAddedToDB = false
+                }
 
                 // VIDEO
                 if (currentApod.mediaType == "video") {
@@ -188,24 +246,22 @@ NavigationView.OnNavigationItemSelectedListener {
                     binding.homeImageViewResult.visibility = View.VISIBLE
                     binding.homeVideoViewButton.visibility = View.INVISIBLE
                     binding.homeAddToFavorites.visibility = View.VISIBLE
-                    //binding.homeImageViewResult.loadImage(currentApod.url, false, binding.homeProgressImageView)
                     binding.homeImageViewResult.setImageBitmap(
                         ImageUtils.loadImageUIL(
-                            currentApod.hdUrl,
+                            currentApod.url,
                             binding.homeImageViewResult,
                             binding.homeProgressImageView,
                             requireContext()
                         )
                     )
-                    //binding.homeImageViewResult.loadImageUILImageView(currentApod.url, binding.homeProgressImageView, requireContext())
-                    //binding.homeImageViewResult.loadImageUILImageViewTest(currentApod.url, binding.homeProgressImageView, requireContext())
                 }
 
 
                 binding.collapsingToolbarLayout.setTitle(currentApod.title)
                 binding.collapsingToolbarLayout.setCollapsedTitleTypeface(Typeface.DEFAULT_BOLD)
                 //binding.homeTextViewTitle.text = currentApod.title
-                // binding.homeTextViewMetadataDate.text = currentApod.date
+                if (currentApod.date.isNotEmpty()) binding.homeTextViewDatePicker.text =
+                    currentApod.date.toSimpleDateFormat()
                 binding.homeTextViewExplanation.text = currentApod.explanation
             }
         }

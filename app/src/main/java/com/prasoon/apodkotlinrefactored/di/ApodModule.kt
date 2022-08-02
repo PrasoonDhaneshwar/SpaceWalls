@@ -5,10 +5,13 @@ import android.content.Context
 import androidx.room.Room
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
+import com.prasoon.apodkotlinrefactored.data.repository.ApodArchivesRepositoryImpl
 import com.prasoon.apodkotlinrefactored.data.repository.ApodRepositoryImpl
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
+import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodRepository
 import com.prasoon.apodkotlinrefactored.domain.use_case.GetApod
+import com.prasoon.apodkotlinrefactored.domain.use_case.GetApodArchives
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -118,4 +121,16 @@ object ApodModule {
     @Provides
     @Singleton
     fun providesApod() = Apod("", "", "", "", "", "", "")
+
+    @Provides
+    @Singleton
+    fun provideGetApodArchivesUseCase(archiveRepository: ApodArchivesRepository): GetApodArchives {
+        return GetApodArchives(archiveRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideApodArchivesRepository(): ApodArchivesRepository {
+        return ApodArchivesRepositoryImpl()    // Return actual implementation.
+    }
 }

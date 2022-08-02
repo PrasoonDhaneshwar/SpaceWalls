@@ -3,12 +3,12 @@
 
     <!--IDs should match to get into respective fragments-->
     <item
-        android:id="@+id/homeFragment"
+        android:id="@+id/homeTestFragment"
         android:icon="@drawable/ic_home"
         android:title="Home"/>
 
     <item
-        android:id="@+id/homeTestFragment"
+        android:id="@+id/apodArchivesFragment"
         android:icon="@drawable/ic_photo_library"
         android:title="Archives"/>
 
