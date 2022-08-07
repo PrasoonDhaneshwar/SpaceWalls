@@ -11,7 +11,7 @@ class GetApod(
 ) {
 
     // Initialize the Use case with apod
-    operator fun invoke(date: String?): Flow<Resource<Apod>> {
+    operator fun invoke(date: String): Flow<Resource<Apod>> {
         return repository.getApodCustomDate(date)
     }
 }

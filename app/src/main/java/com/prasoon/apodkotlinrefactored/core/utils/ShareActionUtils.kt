@@ -19,7 +19,7 @@ object ShareActionUtils {
                 val shareIntent= Intent()
                 shareIntent.action= Intent.ACTION_SEND
                 shareIntent.putExtra(Intent.EXTRA_TEXT, url)
-                shareIntent.type="text/plain"
+                shareIntent.type="image/jpg"
                 ContextCompat.startActivity(
                     context,
                     Intent.createChooser(shareIntent, "Share To:"),

@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants.CURRENT_DATE_FOR_API
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SELECTED_SIMPLE_DATE_FORMAT
 import java.text.SimpleDateFormat
@@ -22,7 +23,7 @@ class DatePickerFragment: DialogFragment(), DatePickerDialog.OnDateSetListener {
         val month = cal.get(Calendar.MONTH)
         val day = cal.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = DatePickerDialog(requireContext(), this, year, month, day)
+        val datePickerDialog = DatePickerDialog(requireContext(), R.style.DatePickerDialogTheme,this, year, month, day)
 
         // Account for Date Picker to show till today's date.
         val halfDayBefore = 1 * 12 * 60 * 60 * 1000L

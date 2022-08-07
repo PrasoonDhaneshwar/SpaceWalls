@@ -16,7 +16,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import java.net.UnknownHostException
-import java.util.regex.Pattern
 
 
 class ViewFragment : Fragment(R.layout.fragment_view) {
@@ -50,8 +49,9 @@ class ViewFragment : Fragment(R.layout.fragment_view) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 document = Jsoup.connect("https://apod.nasa.gov/apod/ap220726.html").get()
-                element = document.select("a[href]")
-                png = document.select("iframe[width]").attr("src")
+                element = document.select("center").select("b")
+                //png = document.select("iframe[width]").attr("src")
+                png = document.select("div[id=\"center\"] strong").toString()
                 //png = document.select("iframe[src]").attr("src")
 
 
@@ -60,7 +60,7 @@ class ViewFragment : Fragment(R.layout.fragment_view) {
             }
             withContext(Dispatchers.Main) {
                 Log.d(TAG, "words png: $png")
-                Log.d(TAG, "words element: $element")
+                Log.d(TAG, "words element: ${element.first()?.text()}")
                 Log.d(TAG,"words png modified: https://apod.nasa.gov/apod/$png")
             }
         }

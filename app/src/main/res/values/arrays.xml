@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Reply Preference-->
+    <string-array name="select_screen">
+        <item>Home Screen</item>
+        <item>Lock Screen</item>
+        <item>Both Screens</item>
+    </string-array>
+
+    <string-array name="screen_values">
+        <item>home_screen</item>
+        <item>lock_screen</item>
+        <item>both_screens</item>
+    </string-array>
+
+
+
+</resources>

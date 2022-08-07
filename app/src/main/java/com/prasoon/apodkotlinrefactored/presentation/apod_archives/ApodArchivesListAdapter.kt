@@ -4,14 +4,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.databinding.ItemApodArchiveBinding
-import com.prasoon.apodkotlinrefactored.domain.model.Apod
+import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 
 //                                                                                        2. Extend holder
 //                      4. Populate objects
 class ApodArchivesListAdapter(
-    var apodDateList: ArrayList<String>,
+    var apodDateList: ArrayList<ApodArchive>,
 ) : RecyclerView.Adapter<ApodArchivesListAdapter.ApodViewHolder>() {
     private val TAG = "ApodArchivesListAdapter"
 
@@ -31,21 +32,23 @@ class ApodArchivesListAdapter(
     // 1. Create Holder
     // make it inner to access ListAction
     inner class ApodViewHolder(apodBinding: ItemApodArchiveBinding) : RecyclerView.ViewHolder(apodBinding.root) {
+        private val itemTitle = apodBinding.itemTitle
         private val itemDate = apodBinding.itemDate
         private val itemImageView = apodBinding.itemApodImage
         private val progress = apodBinding.itemProgressImageView
 
 
         // ***Binding between view and data
-        fun bind(apod: String, position: Int) {
+        fun bind(apod: ApodArchive, position: Int) {
             Log.i(TAG, "bind id: ${apod}")
-            itemDate.text = apod
-            itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod, itemImageView, progress, itemImageView.context))
+            itemTitle.text = apod.title
+            itemDate.text = apod.date.toSimpleDateFormat()
+            itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod.link, itemImageView, progress, itemImageView.context))
         }
     }
 
     // 4. update apod list when new information is invoked
-    fun updateApods(newApods: List<String>) {
+    fun updateApods(newApods: List<ApodArchive>) {
         Log.i(TAG, "updateApods")
         apodDateList.clear()
         apodDateList.addAll(newApods)

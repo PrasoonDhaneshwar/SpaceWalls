@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ArchiveApod(
+data class ApodArchive(
     val date: String,
     val title: String,
     val link: String,

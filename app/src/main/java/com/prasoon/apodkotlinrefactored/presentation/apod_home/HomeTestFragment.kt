@@ -22,16 +22,16 @@ import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
 import com.prasoon.apodkotlinrefactored.core.utils.ShareActionUtils
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
-import com.prasoon.apodkotlinrefactored.databinding.FragmentHomeNewBinding
+import com.prasoon.apodkotlinrefactored.databinding.FragmentHomeBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeTestFragment : Fragment(R.layout.fragment_home_new),
+class HomeTestFragment : Fragment(R.layout.fragment_home),
     NavigationView.OnNavigationItemSelectedListener {
     private val TAG = "HomeFragment"
-    private lateinit var binding: FragmentHomeNewBinding
+    private lateinit var binding: FragmentHomeBinding
     private val viewModel: ApodViewModel by viewModels()
 
     private var isAddedToDB = false
@@ -45,7 +45,7 @@ class HomeTestFragment : Fragment(R.layout.fragment_home_new),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentHomeNewBinding.bind(view)
+        binding = FragmentHomeBinding.bind(view)
 
         toggle = ActionBarDrawerToggle(
             activity,
@@ -86,7 +86,9 @@ class HomeTestFragment : Fragment(R.layout.fragment_home_new),
                     if (dateApiFormat != null) {
                         DateInput.currentDate = dateApiFormat
                     }
-                    viewModel.refresh(dateApiFormat)
+                    if (dateApiFormat != null) {
+                        viewModel.refresh(dateApiFormat)
+                    }
                 }
             }
         }

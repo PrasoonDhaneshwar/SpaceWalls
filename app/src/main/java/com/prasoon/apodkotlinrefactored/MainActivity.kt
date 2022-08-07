@@ -1,11 +1,13 @@
 package com.prasoon.apodkotlinrefactored
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.prasoon.apodkotlinrefactored.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,5 +30,10 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.findNavController()
 
         binding.bottomNav.setupWithNavController(navController)
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val isScheduleDailyWallpaper = prefs.getBoolean("schedule_wallpaper_checkbox_preference",false)
+        Log.i("MainActivity", "Schedule Daily Wallpaper: $isScheduleDailyWallpaper")
+
     }
 }

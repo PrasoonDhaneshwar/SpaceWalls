@@ -3,6 +3,7 @@ package com.prasoon.apodkotlinrefactored.presentation.apod_archives
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -27,6 +28,8 @@ class ApodArchivesFragment : Fragment(R.layout.fragment_archives) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // todo https://stackoverflow.com/questions/62835053/how-to-set-fullscreen-in-android-r
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         binding = FragmentArchivesBinding.bind(view)
         viewModel.refresh()
 
@@ -51,6 +54,11 @@ class ApodArchivesFragment : Fragment(R.layout.fragment_archives) {
         }
 
         observeViewModel()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 
     private fun observeViewModel() {

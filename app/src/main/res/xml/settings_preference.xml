@@ -1,32 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
-        android:title="Wallpaper Settings"
+        android:icon="@drawable/ic_wallpaper"
         android:textColor="@android:color/black"
-        android:icon="@drawable/ic_wallpaper">
+        android:title="General">
 
-        <CheckBoxPreference
-            android:key="schedule_wallpaper_checkbox_preference"
-            android:title="Schedule Daily Wallpaper"
-            android:defaultValue="true"
-            android:icon="@drawable/ic_schedule_wallpaper"/>
-
-        <Preference
-            android:key="wallpaper_fit_preference"
-            android:title="Wallpaper Fit"
-            android:summary="Change the way wallpaper should fit on screen"
+        <SwitchPreference
+            android:icon="@drawable/ic_dark_mode"
             android:dialogTitle="First section"
-            android:dependency="schedule_wallpaper_checkbox_preference" />
+            android:key="wallpaper_fit_preference"
+            android:summary="Select Theme"
+            android:title="Select Theme" />
 
     </PreferenceCategory>
 
+
+
     <PreferenceCategory
-        android:title="Second Section">
+        android:icon="@drawable/ic_wallpaper"
+        android:textColor="@android:color/black"
+        android:title="Wallpaper Settings">
+
+<!--    <EditTextPreference
+            app:key="signature"
+            app:title="string/signature_title"
+            app:useSimpleSummaryProvider="true" />-->
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_schedule_wallpaper"
+            android:key="schedule_wallpaper_checkbox_preference"
+            android:title="Schedule Daily Wallpaper" />
 
         <Preference
-            android:title="Clickable Link">
-            <intent android:action="android.intent.action.VIEW"
-                android:data="http://codepath.com/" />
+            android:icon="@drawable/ic_wallpaper"
+            android:dependency="schedule_wallpaper_checkbox_preference"
+            android:dialogTitle="First section"
+            android:key="wallpaper_fit_preference"
+            android:summary="Change the way wallpaper should fit on screen"
+            android:title="Wallpaper Fit" />
+
+        <SwitchPreference
+            android:icon="@drawable/ic_wallpaper"
+            android:dependency="schedule_wallpaper_checkbox_preference"
+            android:dialogTitle="First section"
+            android:key="wallpaper_fit_preference"
+            android:summary="Show notification"
+            android:title="" />
+
+        <ListPreference
+            app:defaultValue="home_screen"
+            app:entries="@array/select_screen"
+            android:dependency="schedule_wallpaper_checkbox_preference"
+            app:entryValues="@array/screen_values"
+            app:key="screen"
+            app:title="Select Screen"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Check the source code on GitHub">
+
+        <Preference android:title="GitHub">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-Kotlin" />
         </Preference>
 
     </PreferenceCategory>

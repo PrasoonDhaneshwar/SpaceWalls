@@ -15,7 +15,17 @@
     <color name="darkModeIcon">#E6E6E6</color>
     <color name="menuColor">#DC4A4949</color>
 
+    <color name="iconOutlineTint">#e2e2e2</color>
     <color name="mainBackground">#000000</color>
     <color name="buttonForeground">#3F51B5</color>
-    <color name="floatingActionColor">#5B6A7B</color>
+    <color name="floatingActionColor">#e2e2e2</color>
+
+    <!--DatePicker colors-->
+    <color name="headerBackground">#000000</color>
+    <color name="calendarBackground">#DC4A4949</color>
+    <color name="selectedDay">#3F51B5</color>
+    <color name="daysOfTheMonth">#FFFFFF</color>
+    <color name="daysOfTheWeek">#5e5e5e</color>
+
+
 </resources>

@@ -58,7 +58,7 @@
         android:id="@+id/homeTestFragment"
         android:name="com.prasoon.apodkotlinrefactored.presentation.apod_home.HomeTestFragment"
         android:label="fragment_home_new"
-        tools:layout="@layout/fragment_home_new" >
+        tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_homeTestFragment_to_viewFragment"
             app:destination="@id/viewFragment" />

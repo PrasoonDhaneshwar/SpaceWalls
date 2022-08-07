@@ -260,11 +260,15 @@ object ImageUtils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val cropHint = bitmap.cropHint(wallpaperManager.desiredMinimumHeight)
 
-                Log.i(TAG, "Screen size -> ${SCREEN_WIDTH}x$SCREEN_HEIGHT")
-                Log.i(TAG, "Bitmap height: ${bitmap.height} width: ${bitmap.width}")
+                Log.i(TAG, "Screen size -> height: $SCREEN_HEIGHT x width: $SCREEN_WIDTH")
+                Log.i(TAG, "Bitmap height -> ${bitmap.height} x width: ${bitmap.width}")
                 Log.i(TAG, "Desired wallpaper height -> ${wallpaperManager.desiredMinimumHeight}")
+                Log.i(TAG, "Crop hint -> $cropHint")
 
+                //Rect(left, top, right, bottom)
+                //val rect = Rect(0, 0, bitmap.height, bitmap.width)
                 wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_LOCK)
+                //wallpaperManager.setBitmap(bitmap, rect, true, WallpaperManager.FLAG_LOCK)
             } else {
                 val scaledBitmap = Bitmap.createScaledBitmap(bitmap ,SCREEN_WIDTH, SCREEN_HEIGHT, true)
                 wallpaperManager.setBitmap(scaledBitmap)
@@ -275,6 +279,10 @@ object ImageUtils {
         }
     }
     fun Bitmap.cropHint(desiredHeight: Int): Rect {
+        val screenRatio = SCREEN_HEIGHT/ SCREEN_WIDTH
+        Log.i(TAG, "screenRatio -> $screenRatio")
+        Log.i(TAG, "desiredHeight -> $desiredHeight")
+
         val desiredWidth = SCREEN_WIDTH * height / desiredHeight
         val offsetX = (width - desiredWidth) / 2
         return Rect(offsetX, 0, width - offsetX, height)

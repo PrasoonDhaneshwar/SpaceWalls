@@ -2,14 +2,6 @@ package com.prasoon.apodkotlinrefactored.core.common
 
 import android.util.Log
 import com.prasoon.apodkotlinrefactored.BuildConfig
-import com.prasoon.apodkotlinrefactored.core.common.Constants.LOAD_APOD_ARCHIVE_FACTOR
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.jsoup.HttpStatusException
-import org.jsoup.Jsoup
-import java.net.ProtocolException
-import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,8 +53,10 @@ object DateInput {
         return "https://api.nasa.gov/planetary/apod?api_key=${BuildConfig.APOD_API_KEY}&date=$date"
     }
     fun getCurrentDateForInitialization() : String {
-        val currentCalendarDateForInitialization: Calendar = GregorianCalendar(TimeZone.getTimeZone("UTC"))
+        val currentCalendarDateForInitialization: Calendar = GregorianCalendar()
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val timeZone = TimeZone.getTimeZone("UTC")  // Explicit set UTC TimeZone
+        dateFormat.timeZone = timeZone
         return dateFormat.format(currentCalendarDateForInitialization.time)
     }
 }

@@ -19,7 +19,7 @@
         <item name="android:textStyle">bold</item>
     </style>
     <color name="colorAddToFavorites">@color/red</color>
-    <color name="colorRemovedFromFavorites">#5B6A7B</color>
+    <color name="colorRemovedFromFavorites">#e2e2e2</color>
 
     <style name="Text">
         <item name="android:textSize">14sp</item>

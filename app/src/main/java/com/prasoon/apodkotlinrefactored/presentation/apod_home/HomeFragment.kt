@@ -66,6 +66,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         // Start with an empty date
         viewModel.refresh(DateInput.currentDate)
 
+/*
         binding.homeSelectDateButton.setOnClickListener {
             val datePickerFragment = DatePickerFragment()
             val supportFragmentManager = requireActivity().supportFragmentManager
@@ -90,13 +91,14 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 }
             }
         }
-
+*/
+/*
         // Swipe to refresh
         binding.homeSwipeRefreshLayout.setOnRefreshListener {
             Log.i(TAG, "Swipe refresh for date: ${DateInput.currentDate}")
             viewModel.refresh(DateInput.currentDate)
             binding.homeSwipeRefreshLayout.isRefreshing = false
-        }
+        }*/
 
         binding.homeVideoViewButton.setOnClickListener {
             performActionIntent(requireContext(), currentApod.url, INTENT_ACTION_VIEW)
@@ -123,13 +125,13 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             }
         }
 
-        binding.homeScheduleWallpaper.setOnClickListener {
+/*        binding.homeScheduleWallpaper.setOnClickListener {
             Log.i(TAG, "imageViewResult")
             if (currentApod.mediaType == "image") {
                 val action = HomeFragmentDirections.actionHomeFragmentToHomeTestFragment()
                 findNavController().navigate(action)
             }
-        }
+        }*/
 
         binding.homeAddToFavorites.setOnClickListener {
             if (!isAddedToDB && !currentApod.mediaType.isEmpty()) {
@@ -217,9 +219,9 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     //binding.homeImageViewResult.loadImageUILImageViewTest(currentApod.url, binding.homeProgressImageView, requireContext())
                 }
 
-                binding.homeTextViewTitle.text = currentApod.title
-                binding.homeTextViewMetadataDate.text = currentApod.date
-                binding.homeTextViewExplanation.text = currentApod.explanation
+/*                binding.homeTextViewTitle.text = currentApod.title
+                binding.homeTextViewMetadataDate.text = currentApod.date*/
+                binding.homeTextViewExplanation.text = currentApod.explanation + currentApod.copyright
             }
         }
     }

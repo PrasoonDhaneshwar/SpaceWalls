@@ -4,6 +4,7 @@ import android.util.Log
 import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.common.DateInput
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
+import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +24,9 @@ class ApodArchivesRepositoryImpl : ApodArchivesRepository {
     private val currentCalendarDate: Calendar = GregorianCalendar(TimeZone.getTimeZone("UTC"))
     private var iteration = 1
 
-    override suspend fun fetchImageArchivesFromCurrentDate(): List<String> {
-        val datesList: MutableList<String> = ArrayList()
-        Log.i(TAG, "Starting point of date: ${todayDate}")
+    override suspend fun fetchImageArchivesFromCurrentDate(): List<ApodArchive> {
+        val apodArchiveList: MutableList<ApodArchive> = ArrayList()
+        Log.i(TAG, "Starting point of date: $todayDate")
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")    // change format of date to "2022-01-10"
 
@@ -44,40 +45,49 @@ class ApodArchivesRepositoryImpl : ApodArchivesRepository {
         var currentCalDate = Date()
         var i = 0
         while (i++ <= Constants.LOAD_APOD_ARCHIVE_FACTOR) {
-
             currentCalDate = currentCalendarDate.time
-            if (currentCalDate.before(endDate)) return datesList
+            if (currentCalDate.before(endDate)) return apodArchiveList
 
             currentCalendarDate.add(Calendar.DAY_OF_MONTH, -1)
             val parsedDate: String = dateFormat.format(currentCalendarDate.time)
+            var title = String()
             var imgUrl = String()
             val job = CoroutineScope(Dispatchers.IO).launch {
-                imgUrl = createArchiveLinksWithDate(parsedDate)   // Wait for it to finish
+                val list = createArchiveLinksWithDate(parsedDate)   // Wait for it to finish
+                title = list[0]
+                imgUrl = list[1]
             }
             job.join()
-            datesList.add(imgUrl)
+            val apodArchive = ApodArchive(parsedDate, title, imgUrl, false)
+            apodArchiveList.add(apodArchive)
         }
 
         todayDate = currentCalendarDate.time
 
-        Log.i(TAG, "fetchImageArchivesFromCurrentDate iteration: ${iteration++}: " + datesList)
+        Log.i(TAG, "fetchImageArchivesFromCurrentDate iteration: ${iteration++}: " + apodArchiveList)
 
-        return datesList
+        return apodArchiveList
     }
 
-    private fun createArchiveLinksWithDate(date: String): String {
+    private fun createArchiveLinksWithDate(date: String): Array<String> {
+        val item = arrayOf("","")
         lateinit var document: org.jsoup.nodes.Document
         var png = String()
         var youTubeLink = String()
         var webLink = String()
+        var title = String()
         val link: String
         var url = String()
         try {
             url = DateInput.createApodUrl(date)
             document = Jsoup.connect(url).get() // Network call, to be performed in separate thread
+
             png = document.select("img[src\$=.jpg]").attr("src")
             youTubeLink = document.select("iframe[width]").attr("src")
             webLink = document.select("iframe[src]").attr("src")
+
+            title = document.select("center").select("b").first()?.text() ?: ""
+
         } catch (e: UnknownHostException) {
             e.printStackTrace();
         } catch (e: ProtocolException) {
@@ -96,7 +106,15 @@ class ApodArchivesRepositoryImpl : ApodArchivesRepository {
         Log.d(TAG, "createArchiveLinksWithDate for date: $date: IMG SRC: $png")
         Log.d(TAG, "createArchiveLinksWithDate link: $link")
 
-        return link
+        item[0] = title
+        item[1] = link
+
+        return item
     }
 
+
+
+    override suspend fun fetchImageArchivesFromCurrentDate(items: Int): List<String> {
+        return emptyList()
+    }
 }

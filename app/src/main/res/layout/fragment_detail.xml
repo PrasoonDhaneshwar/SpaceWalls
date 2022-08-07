@@ -1,129 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.apod_detail.DetailFragment">
+    android:fitsSystemWindows="true"
+    tools:context=".presentation.apod_detail.DetailFragment"
+    android:theme="@style/Theme.ApodKotlinRefactored.NoActionBar"
+    tools:openDrawer="right">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/detail_toolbar"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        tools:title="My title" />
-
-    <ImageView
-        android:id="@+id/detail_image_view"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_text_view_title"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-    <ImageButton
-        android:id="@+id/detail_video_view_button"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                app:contentScrim="@color/mainBackground"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:collapsedTitleTextAppearance="@style/MyCollapsedTitle"
+                app:expandedTitleTextAppearance="@style/MyExpandedTitle"
+                app:collapsedTitleGravity="left"
+                app:scrimAnimationDuration="@integer/material_motion_duration_short_1"
+                app:statusBarScrim="@color/mainBackground"
+                app:maxLines="3"
+                app:toolbarId="@id/detail_toolbar">
+
+                <ImageView
+                    android:id="@+id/detail_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/handle_another_app" />
+
+                <ImageButton
+                    android:id="@+id/detail_video_view_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_media_play"
+                    android:visibility="invisible"
+                    android:layout_gravity="center"
+                    app:layout_constraintBottom_toBottomOf="@+id/detail_image_view"
+                    app:layout_constraintEnd_toEndOf="@+id/detail_image_view"
+                    app:layout_constraintStart_toStartOf="@+id/detail_image_view"
+                    app:layout_constraintTop_toTopOf="@+id/detail_image_view"
+                    tools:visibility="visible" />
+
+                <com.mackhartley.roundedprogressbar.RoundedProgressBar
+                    android:id="@+id/detail_progress_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/detail_image_view"
+                    app:layout_constraintEnd_toEndOf="@+id/detail_image_view"
+                    app:rpbBackgroundColor="#DFD8D8"
+                    app:rpbBackgroundTextColor="#070600"
+                    app:rpbCornerRadiusBottomLeft="6dp"
+                    app:rpbCornerRadiusBottomRight="20dp"
+                    app:rpbCornerRadiusTopLeft="20dp"
+                    app:rpbCornerRadiusTopRight="6dp"
+                    app:rpbIsRadiusRestricted="false"
+                    app:rpbProgressColor="#5B6A7B"
+                    app:rpbProgressTextColor="#000000"
+                    app:rpbTextPadding="12dp" />
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/detail_toolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
+                    android:minHeight="?attr/actionBarSize"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_collapseMode="pin"
+                    tools:title="My Title" />
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/detail_text_view_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="@font/capriola"
+                    android:gravity="start"
+                    android:hyphenationFrequency="none"
+                    android:textColor="@color/mainText"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Some huge title will come here and take the space" />
+
+                <TextView
+                    android:id="@+id/detail_text_view_explanation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text= "Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras."
+                    tools:visibility="visible"/>
+            </LinearLayout>
+
+
+        </androidx.core.widget.NestedScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/home_constraint_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_anchorGravity="bottom|center">
+
+            <TextView
+                android:id="@+id/detail_text_view_date"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="center"
+                android:textColor="@color/mainText"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="Dec 29, 2021" />
+
+            <ImageView
+                android:id="@+id/detail_share_item"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_share"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/detail_text_view_date"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/detail_text_view_date" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_media_play"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/detail_image_view"
-        app:layout_constraintEnd_toEndOf="@+id/detail_image_view"
-        app:layout_constraintStart_toStartOf="@+id/detail_image_view"
-        app:layout_constraintTop_toTopOf="@+id/detail_image_view"
-        tools:visibility="visible" />
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu" />
 
-    <TextView
-        android:id="@+id/detail_text_view_title"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="60dp"
-        android:fontFamily="@font/capriola"
-        android:gravity="start"
-        android:hyphenationFrequency="none"
-        android:textColor="@color/mainText"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Some huge title will come here and take the space" />
-
-    <TextView
-        android:id="@+id/detail_text_view_date"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:textColor="@color/mainText"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_text_view_explanation"
-        tools:text="Dec 29, 2021" />
-
-    <TextView
-        android:id="@+id/detail_text_view_explanation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="20dp"
-        android:hyphenationFrequency="full"
-        android:justificationMode="inter_word"
-        android:maxHeight="300dp"
-        android:minHeight="200dp"
-        android:scrollbars="vertical"
-        android:textColor="@color/textAlt"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.55"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_barrier"
-        tools:text="Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras." />
-
-    <ImageView
-        android:id="@+id/detail_share_item"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/ic_share"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.mackhartley.roundedprogressbar.RoundedProgressBar
-        android:id="@+id/detail_progress_image_view"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        app:layout_constraintBottom_toBottomOf="@+id/detail_image_view"
-        app:rpbBackgroundColor="#DFD8D8"
-        app:rpbBackgroundTextColor="#070600"
-        app:rpbCornerRadiusBottomLeft="6dp"
-        app:rpbCornerRadiusBottomRight="20dp"
-        app:rpbCornerRadiusTopLeft="20dp"
-        app:rpbCornerRadiusTopRight="6dp"
-        app:rpbIsRadiusRestricted="false"
-        app:rpbProgressColor="#5B6A7B"
-        app:rpbProgressTextColor="#000000"
-        app:rpbTextPadding="12dp" />
-
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/detail_barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="detail_video_view_button,detail_image_view"
-        tools:layout_editor_absoluteY="796dp" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

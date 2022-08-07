@@ -33,7 +33,7 @@ class ApodDetailViewModel @Inject constructor(
     val apodLoadError = MutableLiveData<String?>()
     val loading = MutableLiveData<Boolean>()
 
-    fun refresh(date: String?) {
+    fun refresh(date: String) {
         getApod(date)
     }
 
