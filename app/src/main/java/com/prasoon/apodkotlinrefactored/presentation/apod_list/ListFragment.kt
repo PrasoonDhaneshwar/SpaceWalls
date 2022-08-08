@@ -26,7 +26,7 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // todo https://stackoverflow.com/questions/62835053/how-to-set-fullscreen-in-android-r
+        // Hidden Status Bar
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         binding = FragmentListBinding.bind(view)

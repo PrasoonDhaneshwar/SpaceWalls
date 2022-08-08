@@ -4,9 +4,7 @@ import android.app.WallpaperManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -34,6 +32,8 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener
 import com.prasoon.apodkotlinrefactored.R
+import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -50,14 +50,14 @@ object ImageUtils {
     val SCREEN_WIDTH = Resources.getSystem().displayMetrics.widthPixels
     val SCREEN_HEIGHT = Resources.getSystem().displayMetrics.heightPixels
 
-    fun saveImage(context: Context, url: String, hdurl: String, date: String) {
+    fun saveImage(context: Context, url: String, hdurl: String?, date: String) {
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
             throwable.localizedMessage
         }
         Toast.makeText(context, "Starting download...", Toast.LENGTH_SHORT).show()
         val imageName = "APOD_" + date.replace("-", "")
-        val imageUrl = if (hdurl.isEmpty()) URL(url) else URL(hdurl)
-        NotificationUtils.displayNotification(context, "Downloading APOD", date)
+        val imageUrl = if (hdurl.isNullOrEmpty()) URL(url) else URL(hdurl)
+        NotificationUtils.displayNotification(context, "Downloading APOD", date.toSimpleDateFormat(), true)
         CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
             val bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
             val storageDirectoryPath: String
@@ -96,6 +96,8 @@ object ImageUtils {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+            //NotificationUtils.cancelNotification(context, "Downloading APOD finished", date)
+            NotificationUtils.displayNotification(context, "Downloading APOD finished", date.toSimpleDateFormat(), false)
         }
     }
 
@@ -254,9 +256,6 @@ object ImageUtils {
         val bitmap = (imageView.drawable as BitmapDrawable).bitmap
 
         try {
-            // Set on Home screen
-            wallpaperManager.setBitmap(bitmap)
-            // Set on Lock Screen
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val cropHint = bitmap.cropHint(wallpaperManager.desiredMinimumHeight)
 
@@ -265,10 +264,12 @@ object ImageUtils {
                 Log.i(TAG, "Desired wallpaper height -> ${wallpaperManager.desiredMinimumHeight}")
                 Log.i(TAG, "Crop hint -> $cropHint")
 
-                //Rect(left, top, right, bottom)
-                //val rect = Rect(0, 0, bitmap.height, bitmap.width)
+                // Rect(left, top, right, bottom)
+                // val rect = Rect(0, 0, bitmap.height, bitmap.width)
+                // Set on Home screen
+                wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_SYSTEM)
+                // Set on Lock Screen
                 wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_LOCK)
-                //wallpaperManager.setBitmap(bitmap, rect, true, WallpaperManager.FLAG_LOCK)
             } else {
                 val scaledBitmap = Bitmap.createScaledBitmap(bitmap ,SCREEN_WIDTH, SCREEN_HEIGHT, true)
                 wallpaperManager.setBitmap(scaledBitmap)

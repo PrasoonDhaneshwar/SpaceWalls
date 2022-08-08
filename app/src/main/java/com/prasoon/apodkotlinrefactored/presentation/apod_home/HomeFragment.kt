@@ -114,7 +114,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             Log.i(TAG, "imageViewResult")
             if (currentApod.mediaType == "image") {
                 val action =
-                    HomeFragmentDirections.actionHomeFragmentToViewFragment(currentApod.hdUrl!!)
+                    HomeFragmentDirections.actionHomeFragmentToViewFragment(currentApod)
                 findNavController().navigate(action)
             }
         }

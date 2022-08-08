@@ -35,7 +35,7 @@ interface ApodDao {
     suspend fun getApodFromDate(date: String?): ApodEntity
 
     @Query("SELECT * FROM ApodEntity WHERE dateInt = :date")
-    suspend fun getApodFromDatePrimaryKey(date: Int): ApodEntity?
+    suspend fun getApodFromDatePrimaryKey(date: Int): ApodEntity
 
     @Query("SELECT COUNT() FROM ApodEntity WHERE dateString = :date")
     fun count(date: String): Int
@@ -45,4 +45,7 @@ interface ApodDao {
 
     @Query("SELECT * FROM ApodEntity WHERE dateInt = :date")
     suspend fun getApodModel(date: Int): ApodEntity
+
+    @Query("SELECT EXISTS(SELECT * FROM ApodEntity WHERE dateInt = :id)")
+    fun isRowIsExist(id : Int) : Boolean
 }

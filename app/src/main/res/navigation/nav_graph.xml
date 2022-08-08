@@ -42,8 +42,8 @@
         android:label="fragment_view"
         tools:layout="@layout/fragment_view" >
         <argument
-            android:name="imageUrl"
-            app:argType="string" />
+            android:name="apod"
+            app:argType="com.prasoon.apodkotlinrefactored.domain.model.Apod" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"

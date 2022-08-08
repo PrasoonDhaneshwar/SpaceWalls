@@ -24,6 +24,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -110,4 +116,8 @@ dependencies {
 
     // jsoup HTML parser library @ https://jsoup.org/
     implementation "org.jsoup:jsoup:1.15.2"
+
+    // EasyPermissions Library
+    implementation 'pub.devrel:easypermissions:3.0.0'
+
 }

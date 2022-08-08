@@ -16,7 +16,6 @@ import javax.inject.Inject
 // Step 5.1: PRESENTATION/UI: Create ViewModels by using the "use cases".
 @HiltViewModel
 class ApodDetailViewModel @Inject constructor(
-    private val getApod: GetApod,
     private val db: ApodDatabase,
     application: Application
 ) : AndroidViewModel(application) {
@@ -32,10 +31,6 @@ class ApodDetailViewModel @Inject constructor(
     val apodDetailLoaded = MutableLiveData<Boolean>()
     val apodLoadError = MutableLiveData<String?>()
     val loading = MutableLiveData<Boolean>()
-
-    fun refresh(date: String) {
-        getApod(date)
-    }
 
     fun getApodDetailFromDb(date: Int) {
         Log.i(TAG, "getApodDetailFromDb: $date")

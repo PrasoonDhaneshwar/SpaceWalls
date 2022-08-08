@@ -1,26 +1,28 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_archives
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.prasoon.apodkotlinrefactored.core.utils.Resource
+import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
+import com.prasoon.apodkotlinrefactored.domain.model.Apod
+import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.use_case.GetApodArchives
 import com.prasoon.apodkotlinrefactored.presentation.apod_home.ApodViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 // Step 22: Create view models and link domain
 @HiltViewModel
 class ApodArchivesViewModel @Inject constructor(
     application: Application,
-    private val getApodArchives: GetApodArchives
+    private val getApodArchives: GetApodArchives,
+    private val dbArchive: ApodArchiveDatabase
 ) : AndroidViewModel(application) {
 
     var apodArchivesListState = ApodArchivesListState()
@@ -98,5 +100,6 @@ class ApodArchivesViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         viewModelScope.coroutineContext.cancelChildren()
+        coroutineScope.cancel()
     }
 }

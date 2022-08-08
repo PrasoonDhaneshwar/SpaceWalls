@@ -3,6 +3,7 @@ package com.prasoon.apodkotlinrefactored.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
 import com.prasoon.apodkotlinrefactored.data.repository.ApodArchivesRepositoryImpl
@@ -42,8 +43,8 @@ object ApodModule {
     // Step 6.6: DEPENDENCY INJECTION: Return Impl first. Then provide api and dao dependency
     @Provides
     @Singleton
-    fun provideApodRepository(db: ApodDatabase, api: ApodAPI): ApodRepository {
-        return ApodRepositoryImpl(api = api, dao = db.dao)    // Return actual implementation.
+    fun provideApodRepository(db: ApodDatabase, api: ApodAPI, apod: Apod): ApodRepository {
+        return ApodRepositoryImpl(api = api, dao = db.dao, apod)    // Return actual implementation.
     }
 
     // Step 6.7: DEPENDENCY INJECTION: Provide db object, and use it as db.dao in Repository
@@ -130,7 +131,16 @@ object ApodModule {
 
     @Provides
     @Singleton
-    fun provideApodArchivesRepository(): ApodArchivesRepository {
-        return ApodArchivesRepositoryImpl()    // Return actual implementation.
+    fun provideApodArchivesRepository(dbArchiveDatabase: ApodArchiveDatabase): ApodArchivesRepository {
+        return ApodArchivesRepositoryImpl(dbArchiveDatabase.dao)    // Return actual implementation.
+    }
+
+    // DEPENDENCY INJECTION: Provide db object, and use it as db.dao in Repository
+    @Provides
+    @Singleton
+    fun provideApodArchiveDatabase(app: Application): ApodArchiveDatabase {
+        return Room.databaseBuilder(
+            app, ApodArchiveDatabase::class.java, "apod_archive_db"
+        ).build()
     }
 }

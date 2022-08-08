@@ -1,5 +1,7 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_home
 
+import android.Manifest
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -12,24 +14,36 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.navigation.NavigationView
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants
+import com.prasoon.apodkotlinrefactored.core.common.Constants.STORAGE_PERMISSION_CODE
 import com.prasoon.apodkotlinrefactored.core.common.DateInput
 import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
+import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.saveImage
+import com.prasoon.apodkotlinrefactored.core.utils.NotificationUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ShareActionUtils
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.databinding.FragmentHomeBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class HomeTestFragment : Fragment(R.layout.fragment_home),
-    NavigationView.OnNavigationItemSelectedListener {
+    NavigationView.OnNavigationItemSelectedListener,
+    EasyPermissions.PermissionCallbacks{
     private val TAG = "HomeFragment"
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: ApodViewModel by viewModels()
@@ -122,7 +136,7 @@ class HomeTestFragment : Fragment(R.layout.fragment_home),
             Log.i(TAG, "imageViewResult")
             if (currentApod.mediaType == "image") {
                 val action =
-                    HomeTestFragmentDirections.actionHomeTestFragmentToViewFragment(currentApod.hdUrl!!)
+                    HomeTestFragmentDirections.actionHomeTestFragmentToViewFragment(currentApod)
                 findNavController().navigate(action)
             }
         }
@@ -139,6 +153,17 @@ class HomeTestFragment : Fragment(R.layout.fragment_home),
                 //todo
             }
         }*/
+
+        binding.homeDownloadImage.setOnClickListener {
+            // val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            if (EasyPermissions.hasPermissions(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
+            } else {
+                EasyPermissions.requestPermissions(this, "Grant Storage Permissions to Save Image ",
+                    STORAGE_PERMISSION_CODE)
+                saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
+            }
+        }
 
         binding.homeAddToFavorites.setOnClickListener {
             if (!isAddedToDB && !currentApod.mediaType.isEmpty()) {
@@ -180,7 +205,7 @@ class HomeTestFragment : Fragment(R.layout.fragment_home),
             if (!apodStateLiveData.message.isNullOrEmpty()) {
                 Log.i(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
                 Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
-            } else if (!apodStateLiveData.isLoading) {
+            }
                 currentApod = apodStateLiveData.apod
                 DateInput.currentDate =
                     currentApod.date    // Set the date received from the viewModel
@@ -256,6 +281,18 @@ class HomeTestFragment : Fragment(R.layout.fragment_home),
                             requireContext()
                         )
                     )
+/*
+                    val bitmap =
+                    lifecycleScope.async {
+                        ImageUtils.loadImageUIL(currentApod.url, binding.homeImageViewResult, binding.homeProgressImageView, requireContext())
+                    }
+                    CoroutineScope(Dispatchers.Main).launch {
+                            binding.homeImageViewResult.setImageBitmap(bitmap.await())
+                            NotificationUtils.displayNotification(requireContext(), "Image Downloaded", currentApod.date.toSimpleDateFormat(), false, bitmap.await())
+                        Log.i(TAG, "bitmap : ${bitmap.await()?.height}")
+                    }
+*/
+
                 }
 
 
@@ -266,7 +303,7 @@ class HomeTestFragment : Fragment(R.layout.fragment_home),
                     currentApod.date.toSimpleDateFormat()
                 binding.homeTextViewExplanation.text = currentApod.explanation
             }
-        }
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -279,5 +316,31 @@ class HomeTestFragment : Fragment(R.layout.fragment_home),
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).build().show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+            saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
+        }
     }
 }
