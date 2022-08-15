@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".presentation.apod_home.HomeTestFragment"
+    tools:context=".presentation.apod_home.HomeFragment"
     android:theme="@style/Theme.ApodKotlinRefactored.NoActionBar"
     tools:openDrawer="right">
 
@@ -25,7 +25,7 @@
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="500dp"
+                android:layout_height="600dp"
                 android:minHeight="100dp"
                 app:collapsedTitleGravity="left"
                 app:collapsedTitleTextAppearance="@style/MyCollapsedTitle"
@@ -36,7 +36,7 @@
                 app:scrimAnimationDuration="@integer/material_motion_duration_short_1"
                 app:statusBarScrim="@color/mainBackground"
                 app:toolbarId="@id/home_toolbar"
-                tools:layout_height="500dp">
+                tools:layout_height="600dp">
 
                 <ImageView
                     android:id="@+id/home_image_view_result"

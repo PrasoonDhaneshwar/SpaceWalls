@@ -2,46 +2,55 @@ package com.prasoon.apodkotlinrefactored.presentation.settings
 
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.Toast
-import androidx.fragment.app.Fragment
-import com.google.android.material.chip.Chip
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
-import com.prasoon.apodkotlinrefactored.databinding.FragmentSettingsBinding
+import com.prasoon.apodkotlinrefactored.core.utils.scheduleDailyWallpaper
+import com.prasoon.apodkotlinrefactored.core.utils.setAppTheme
+import com.prasoon.apodkotlinrefactored.core.utils.showNotification
+import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 
-/*
 class SettingsFragment : PreferenceFragmentCompat() {
     private val TAG = "SettingsFragment"
-    private lateinit var list :List<String>
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_preference, rootKey)
-    }
-}*/
-class SettingsFragment : Fragment(R.layout.fragment_settings) {
-    private val TAG = "SettingsFragment"
 
-    private lateinit var binding: FragmentSettingsBinding
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentSettingsBinding.bind(view)
 
-        binding.darkMode.setOnClickListener {
-            Log.i(TAG, "darkMode")
-
+        val displayPref: Preference? = findPreference("display")
+        displayPref!!.setOnPreferenceChangeListener { _, newValue ->
+            Log.i(TAG, "displayPref: $newValue")
+            setAppTheme(newValue.toString())
+            true // return status.
         }
-        binding.lightMode.setOnClickListener {
-            Log.i(TAG, "lightMode")
 
+        val selectScreenPref: Preference? = findPreference("screen")
+        selectScreenPref!!.setOnPreferenceChangeListener { _, newValue ->
+            Log.i(TAG, "selectScreenPref: $newValue")
+            true // return status.
         }
-        binding.red.setOnClickListener {
-            Log.i(TAG, "red")
 
+        val scheduleDailyWallpaperPref: Preference? = findPreference("schedule_wallpaper")
+        scheduleDailyWallpaperPref!!.setOnPreferenceChangeListener { _, newValue ->
+
+            val isChecked: Boolean = newValue.toString().toBoolean()
+            Log.i(TAG, "scheduleDailyWallpaperPref: $isChecked")
+            scheduleDailyWallpaper(requireContext(), isChecked)
+            true // return status.
         }
-        binding.blue.setOnClickListener {
-            Log.i(TAG, "blue")
 
+        val showNotifications: Preference? = findPreference("notifications")
+        showNotifications!!.setOnPreferenceChangeListener { _, newValue ->
+            val isChecked: Boolean = newValue.toString().toBoolean()
+            Log.i(TAG, "Notifications are: $isChecked")
+            showNotification(isChecked)
+            true // return status.
         }
     }
 }

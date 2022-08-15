@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
+    android:layout_height="match_parent"
+    android:padding="1dp"
     android:id="@+id/item_layout">
 
     <ImageView
@@ -42,6 +43,17 @@
         app:layout_constraintBottom_toTopOf="@id/item_progress_image_view"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Date taken on " />
+
+    <ImageView
+        android:id="@+id/add_to_favorites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_baseline_favorite_border"
+        app:layout_constraintBottom_toTopOf="@id/item_progress_image_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@drawable/drawable_text_color_favorite" />
 
     <com.mackhartley.roundedprogressbar.RoundedProgressBar
         android:id="@+id/item_progress_image_view"

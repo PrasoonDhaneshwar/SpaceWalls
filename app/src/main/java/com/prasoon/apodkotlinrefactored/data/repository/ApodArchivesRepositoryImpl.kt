@@ -8,9 +8,7 @@ import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.ApodArchiveDao
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import java.net.ProtocolException
@@ -25,7 +23,6 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
     private var todayDate = Date()
     private val currentCalendarDate: Calendar = GregorianCalendar(TimeZone.getTimeZone("UTC"))
     private var iteration = 1
-
     override suspend fun fetchImageArchivesFromCurrentDate(): List<ApodArchive> {
         val apodArchiveList: MutableList<ApodArchive> = ArrayList()
         Log.i(TAG, "Starting point of date: $todayDate")
@@ -38,11 +35,11 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         val endDate = calendarEndDate.time
 
         // Test like this
-/*        val teststartingpointofDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        // val teststartingpointofDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         // Date must be after Jun 16, 1995, but changed here due to loop counting difference of 1 day
-        teststartingpointofDate.set(2017, Calendar.MARCH, 19, 0, 0)
-        val testDate = teststartingpointofDate.time
-        currentCalendarDate.time = testDate*/
+        // teststartingpointofDate.set(2017, Calendar.MARCH, 19, 0, 0)
+        // val testDate = teststartingpointofDate.time
+        // currentCalendarDate.time = testDate
 
         var currentCalDate: Date
         var i = 0
@@ -52,41 +49,27 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
 
             currentCalendarDate.add(Calendar.DAY_OF_MONTH, -1)
             val parsedDate: String = dateFormat.format(currentCalendarDate.time)
-            var title = String()
-            var imgUrl = String()
 
-            var apodArchiveDb = ApodArchive("", "", "", false)
             var apodArchive: ApodArchive
-            var isDateExistInDB = false
-
 
             val job = CoroutineScope(Dispatchers.IO).launch {
-                isDateExistInDB = daoArchive.isRowIsExist(parsedDate.toIntDate())
+                val isDateExistInDB = daoArchive.isRowIsExist(parsedDate.toIntDate())
                 if (isDateExistInDB) {
-                    apodArchiveDb = daoArchive.getApodFromDatePrimaryKey(parsedDate.toIntDate()).toApodArchive()
+                    apodArchive = daoArchive.getApodFromDatePrimaryKey(parsedDate.toIntDate()).toApodArchive()
+                    Log.i(TAG, "Fetch from DB -> apodArchive: $apodArchive")
+
                 } else {
-                    val list = createArchiveLinksWithDate(parsedDate)   // Wait for it to finish
-                    title = list[0]
-                    imgUrl = list[1]
+                    apodArchive = createArchiveLinksWithDate(parsedDate)   // Wait for it to finish
+                    Log.i(TAG, "Fetch from Network -> apodArchive: $apodArchive")
+
+                    val jobAddToDb = CoroutineScope(Dispatchers.IO).launch {
+                        daoArchive.insertApod(apodArchive.toApodArchiveEntity())
+                    }
+                    jobAddToDb.join()
                 }
+                apodArchiveList.add(apodArchive)
             }
             job.join()
-
-            if (isDateExistInDB) {
-
-                Log.i(TAG, "isDateExistInDB: $isDateExistInDB apodArchiveDb $apodArchiveDb")
-                apodArchiveList.add(apodArchiveDb)
-
-            } else {
-
-                apodArchive = ApodArchive(parsedDate, title, imgUrl, false)
-                apodArchiveList.add(apodArchive)
-                val jobAddToDb = CoroutineScope(Dispatchers.IO).launch {
-                    daoArchive.insertApod(apodArchive.toApodArchiveEntity())
-                }
-                jobAddToDb.join()
-
-            }
         }
 
         todayDate = currentCalendarDate.time
@@ -96,8 +79,8 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         return apodArchiveList
     }
 
-    private fun createArchiveLinksWithDate(date: String): Array<String> {
-        val item = arrayOf("","")
+    private fun createArchiveLinksWithDate(date: String): ApodArchive {
+        val archive: ApodArchive
         lateinit var document: org.jsoup.nodes.Document
         var png = String()
         var youTubeLink = String()
@@ -133,10 +116,9 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         Log.d(TAG, "createArchiveLinksWithDate for date: $date: IMG SRC: $png")
         Log.d(TAG, "createArchiveLinksWithDate link: $link")
 
-        item[0] = title
-        item[1] = link
+        archive = ApodArchive(date, title, link, false)
 
-        return item
+        return archive
     }
 
     override suspend fun fetchImageArchivesFromCurrentDate(items: Int): List<String> {

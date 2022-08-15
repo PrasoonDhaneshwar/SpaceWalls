@@ -17,7 +17,7 @@ import com.prasoon.apodkotlinrefactored.domain.model.Apod
 //                      4. Populate objects
 class ApodListAdapter(
     var apodModelList: ArrayList<Apod>,
-    val actions: ListAction,
+    val actions: ListAction
 ) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
     private val TAG = "ApodListAdapter"
 
@@ -58,13 +58,13 @@ class ApodListAdapter(
                 //itemImageView.loadImage(thumbnailUrl, true, progress)
 
                 //val context = itemImageView.context
-                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, itemImageView, progress, itemImageView.context))
+                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, itemImageView, progress, itemImageView.context, true))
 
 
             } else {
                 itemImageView.visibility = View.VISIBLE
                 //itemImageView.loadImage(apod.url, true, progress)
-                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod.url, itemImageView, progress, itemImageView.context))
+                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod.url, itemImageView, progress, itemImageView.context, true))
 
             }
 

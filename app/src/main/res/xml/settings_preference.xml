@@ -1,66 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory
-        android:icon="@drawable/ic_wallpaper"
-        android:textColor="@android:color/black"
-        android:title="General">
 
-        <SwitchPreference
+    <PreferenceCategory app:title="Display"
+        android:textColor="@android:color/black">
+
+        <ListPreference
+            app:defaultValue="system"
+            app:entries="@array/theme_entry"
+            app:entryValues="@array/theme_values"
             android:icon="@drawable/ic_dark_mode"
             android:dialogTitle="First section"
-            android:key="wallpaper_fit_preference"
+            android:key="display"
             android:summary="Select Theme"
             android:title="Select Theme" />
 
     </PreferenceCategory>
 
 
-
     <PreferenceCategory
-        android:icon="@drawable/ic_wallpaper"
         android:textColor="@android:color/black"
         android:title="Wallpaper Settings">
 
-<!--    <EditTextPreference
-            app:key="signature"
-            app:title="string/signature_title"
-            app:useSimpleSummaryProvider="true" />-->
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:icon="@drawable/ic_schedule_wallpaper"
-            android:key="schedule_wallpaper_checkbox_preference"
-            android:title="Schedule Daily Wallpaper" />
-
         <Preference
             android:icon="@drawable/ic_wallpaper"
-            android:dependency="schedule_wallpaper_checkbox_preference"
             android:dialogTitle="First section"
             android:key="wallpaper_fit_preference"
             android:summary="Change the way wallpaper should fit on screen"
             android:title="Wallpaper Fit" />
 
-        <SwitchPreference
-            android:icon="@drawable/ic_wallpaper"
-            android:dependency="schedule_wallpaper_checkbox_preference"
-            android:dialogTitle="First section"
-            android:key="wallpaper_fit_preference"
-            android:summary="Show notification"
-            android:title="" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_schedule_wallpaper"
+            android:key="schedule_wallpaper"
+            android:title="Schedule Daily Wallpaper" />
 
         <ListPreference
             app:defaultValue="home_screen"
             app:entries="@array/select_screen"
-            android:dependency="schedule_wallpaper_checkbox_preference"
+            android:dependency="schedule_wallpaper"
             app:entryValues="@array/screen_values"
             app:key="screen"
             app:title="Select Screen"
             app:useSimpleSummaryProvider="true" />
 
+        <SwitchPreference
+            android:icon="@drawable/ic_notifications"
+            android:dialogTitle="First section"
+            android:key="notifications"
+            android:summary="Show notification"
+            android:title="" />
+
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Check the source code on GitHub">
+    <PreferenceCategory app:title="About">
 
         <Preference android:title="GitHub">
             <intent

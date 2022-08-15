@@ -23,6 +23,7 @@ object DateInput {
 
     fun String.toSimpleDateFormat(): String {
         val values = this.split("-")
+        if (values.size == 1) return ""
         val cal = GregorianCalendar()
         cal.set(Calendar.YEAR, Integer.parseInt(values[0]))
         cal.set(Calendar.MONTH, Integer.parseInt(values[1]) - 1)
@@ -49,7 +50,7 @@ object DateInput {
         return "https://apod.nasa.gov/apod/ap$packedDate.html"
     }
 
-    // https://api.nasa.gov/planetary/apod?api_key=XqN37uhbQmRUqsm2nTFk4rsugtM2Ibe0YUS9HDE3&date=2022-01-10
+    // https://api.nasa.gov/planetary/apod?api_key=API_KEY&date=2022-01-10
     fun createApodUrlApi(date: String): String {
         return "https://api.nasa.gov/planetary/apod?api_key=${BuildConfig.APOD_API_KEY}&date=$date"
     }

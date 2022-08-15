@@ -1,6 +1,8 @@
 package com.prasoon.apodkotlinrefactored.data.remote
 
 import com.prasoon.apodkotlinrefactored.data.remote.dto.ApodDto
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -25,5 +27,12 @@ interface ApodAPI {
     // Step 6.8: DEPENDENCY INJECTION: Provide Base URL
     companion object {
         const val BASE_URL = "https://api.nasa.gov/"
+        val instance by lazy {
+            Retrofit.Builder()
+                .baseUrl(ApodAPI.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(ApodAPI::class.java)
+        }
     }
 }

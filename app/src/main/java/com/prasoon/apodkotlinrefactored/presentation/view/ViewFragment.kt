@@ -6,14 +6,22 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants
+import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ShareActionUtils
 import com.prasoon.apodkotlinrefactored.databinding.FragmentViewBinding
+import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import pub.devrel.easypermissions.EasyPermissions
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 
 class ViewFragment : Fragment(R.layout.fragment_view) {
@@ -31,7 +39,7 @@ class ViewFragment : Fragment(R.layout.fragment_view) {
         val hdUrl = apod.hdUrl
         val date = apod.date
         Log.i(TAG, "imageUrl: $url")
-        binding.fragmentImageView.setImageBitmap(ImageUtils.loadImageUIL(url, binding.fragmentImageView, binding.fragmentViewProgress, requireContext()))
+        binding.fragmentImageView.setImageBitmap(ImageUtils.loadImageUIL(url, binding.fragmentImageView, binding.fragmentViewProgress, requireContext(), false))
 
 
         binding.viewToolbar.setNavigationIcon(R.drawable.ic_back)
@@ -54,9 +62,10 @@ class ViewFragment : Fragment(R.layout.fragment_view) {
 
         binding.fragmentSetWallpaper.setOnClickListener {
             if (apod.mediaType == "image") {
-                ImageUtils.setWallpaper(requireContext(), binding.fragmentImageView)
+                ImageUtils.setWallpaper(requireContext(), binding.fragmentImageView, BOTH_SCREENS, null)
             }
         }
+        //setOneTimeWorkRequest()
 
         lateinit var document : Document
         lateinit var element : Elements
@@ -80,5 +89,11 @@ class ViewFragment : Fragment(R.layout.fragment_view) {
                 Log.d(TAG,"words png modified: https://apod.nasa.gov/apod/$png")
             }
         }*/
+    }
+
+
+    private fun setOneTimeWorkRequest() {
+        val myWorkBuilder = PeriodicWorkRequest.Builder(WallpaperWorker::class.java, 15, TimeUnit.MINUTES)
+        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork("WorkImage", ExistingPeriodicWorkPolicy.KEEP, myWorkBuilder.build())
     }
 }

@@ -21,9 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class DetailFragment : Fragment(R.layout.fragment_detail) {
     private val TAG = "DetailFragment"
     private lateinit var binding: FragmentDetailBinding
-
     private val viewModel: ApodDetailViewModel by viewModels()
-
     private val args: DetailFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,9 +32,6 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         val apodDateSelected = args.apodDate.toIntDate()
         viewModel.getApodDetailFromDb(apodDateSelected)
-
-        //binding.collapsingToolbarLayout.setTitle(" ");
-
 
         observeViewModel()
     }
@@ -69,7 +64,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                             apod.url,
                             binding.detailImageView,
                             binding.detailProgressImageView,
-                            requireContext()
+                            requireContext(),
+                            false
                         ))
 
                 }

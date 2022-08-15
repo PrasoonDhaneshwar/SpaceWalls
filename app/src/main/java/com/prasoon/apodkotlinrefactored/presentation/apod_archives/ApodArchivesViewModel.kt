@@ -22,9 +22,9 @@ import javax.inject.Inject
 class ApodArchivesViewModel @Inject constructor(
     application: Application,
     private val getApodArchives: GetApodArchives,
-    private val dbArchive: ApodArchiveDatabase
+    private val db: ApodArchiveDatabase
 ) : AndroidViewModel(application) {
-
+    private val TAG = "ApodArchivesViewModel"
     var apodArchivesListState = ApodArchivesListState()
     val apodArchivesListLiveData = MutableLiveData<ApodArchivesListState>()
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -64,37 +64,12 @@ class ApodArchivesViewModel @Inject constructor(
         }
     }
 
-/*    private fun getApodFromArchives(items: Int) {
+    fun saveApodArchive(apod: ApodArchive, processFavoriteDB: Boolean) {
+        Log.i(TAG, "saveApod for ${apod.date}: $processFavoriteDB")
         coroutineScope.launch {
-            getApodArchives.invoke(items = items)
-                .onEach {
-                     result ->
-                        when (result) {
-                            is Resource.Success -> {
-                                apodArchivesListState =
-                                    ApodArchivesListState(apodArchivesList = result.data ?: emptyList())
-                                apodArchivesListLiveData.postValue(apodArchivesListState)
-                            }
-                            is Resource.Error -> {
-                                apodArchivesListState =
-                                    ApodArchivesListState(
-                                        apodArchivesList = result.data
-                                            ?: apodArchivesListState.apodArchivesList,
-                                        isLoading = false,
-                                        message = result.message
-                                    )
-                                apodArchivesListLiveData.postValue(apodArchivesListState)
-                            }
-                            is Resource.Loading -> {
-                                apodArchivesListState =
-                                    ApodArchivesListState(isLoading = true, message = "Unknown error occurred")
-                                apodArchivesListLiveData.postValue(apodArchivesListState)
-                                ApodViewModel.UIEvent.ShowSnackbar(result.message ?: "Unknown error occurred")
-                            }
-                        }
-                    }.launchIn(viewModelScope)
+            db.dao.addIntoDB(apod.toApodArchiveEntity((processFavoriteDB)))
         }
-    }*/
+    }
 
     // To cancel coroutineScope when component moves away from the viewModel
     override fun onCleared() {

@@ -27,4 +27,7 @@
     <color name="daysOfTheMonth">#000000</color>
     <color name="daysOfTheWeek">#5e5e5e</color>
 
+    <color name="favoriteOutlineTint">#C4C5C6</color>
+
+
 </resources>

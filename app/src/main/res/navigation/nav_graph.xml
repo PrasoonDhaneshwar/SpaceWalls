@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/homeTestFragment">
+    app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/homeFragment"
@@ -19,9 +19,6 @@
         <action
             android:id="@+id/action_homeFragment_to_listFragment"
             app:destination="@id/listFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_homeTestFragment"
-            app:destination="@id/homeTestFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -55,20 +52,8 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/homeTestFragment"
-        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_home.HomeTestFragment"
-        android:label="fragment_home_new"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeTestFragment_to_viewFragment"
-            app:destination="@id/viewFragment" />
-        <action
-            android:id="@+id/action_homeTestFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/apodArchivesFragment"
-        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_archives.ApodArchivesFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_archives.ArchivesFragment"
         android:label="fragment_archives"
         tools:layout="@layout/fragment_archives" />
 </navigation>

@@ -11,7 +11,7 @@ data class ApodArchive(
     val date: String,
     val title: String,
     val link: String,
-    val isAddedToFavorites: Boolean
+    var isAddedToFavorites: Boolean
 ) : Parcelable {
     fun toApodArchiveEntity(processFavoritesDB: Boolean = false): ApodArchiveEntity {
         return ApodArchiveEntity(
@@ -19,7 +19,7 @@ data class ApodArchive(
             dateString = date,
             title = title,
             url = link,
-            isAddedToFavorites = isAddedToFavorites
+            isAddedToFavorites = processFavoritesDB
         )
     }
 }

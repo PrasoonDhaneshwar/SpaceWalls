@@ -4,7 +4,9 @@ import android.app.WallpaperManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -28,27 +30,32 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
 import com.nostra13.universalimageloader.core.assist.FailReason
+import com.nostra13.universalimageloader.core.assist.ImageSize
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener
 import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
+import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
+import com.prasoon.apodkotlinrefactored.core.common.Constants.LOCK_SCREEN
 import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import kotlinx.coroutines.*
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLConnection
+import org.jsoup.HttpStatusException
+import java.io.*
+import java.net.*
 import java.util.*
+import kotlin.math.roundToInt
 
 
 object ImageUtils {
     private val TAG = "ImageUtils"
     val SCREEN_WIDTH = Resources.getSystem().displayMetrics.widthPixels
     val SCREEN_HEIGHT = Resources.getSystem().displayMetrics.heightPixels
+    private val COLUMN_WIDTH = SCREEN_WIDTH / 2
+    private val COLUMN_HEIGHT = SCREEN_HEIGHT / 2
+    val IMAGE_WIDTH = COLUMN_WIDTH
+    val IMAGE_HEIGHT = COLUMN_WIDTH * COLUMN_HEIGHT / COLUMN_WIDTH
 
     fun saveImage(context: Context, url: String, hdurl: String?, date: String) {
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -189,7 +196,7 @@ object ImageUtils {
             .into(this)
     }
 
-    fun loadImageUIL(uri: String?, imageView: ImageView, viewProgressBar: RoundedProgressBar, context: Context): Bitmap? {
+    fun loadImageUIL(uri: String?, imageView: ImageView, viewProgressBar: RoundedProgressBar, context: Context, isSizeConstraint: Boolean): Bitmap? {
         val imageLoader = ImageLoader.getInstance()
         var bmpImage: Bitmap? = null
 
@@ -212,48 +219,90 @@ object ImageUtils {
             .build()
 
         imageLoader.init(config.build())
+        val imageViewAware = ImageViewAware(imageView)
+        val targetSize = ImageSize(IMAGE_WIDTH, IMAGE_HEIGHT)
+        if (isSizeConstraint) {
+            imageLoader.displayImage(uri, imageViewAware, options, targetSize, object : SimpleImageLoadingListener() {
+                override fun onLoadingStarted(imageUri: String?, view: View?) {
+                    Log.i(TAG, "onLoadingStarted: $uri")
+                    viewProgressBar.isVisible = true
+                }
 
-        imageLoader.displayImage(uri, imageView, options, object : SimpleImageLoadingListener() {
-            override fun onLoadingStarted(imageUri: String?, view: View?) {
-                Log.i(TAG, "onLoadingStarted: $uri")
-                viewProgressBar.isVisible = true
-            }
+                override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
+                    Log.i(TAG, "onLoadingFailed: $uri")
+                    super.onLoadingFailed(imageUri, view, failReason)
+                    viewProgressBar.isVisible = false
+                }
 
-            override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
-                Log.i(TAG, "onLoadingFailed: $uri")
-                super.onLoadingFailed(imageUri, view, failReason)
-                viewProgressBar.isVisible = false
-                Toast.makeText(context, "Connection timeout! Image loading failed", Toast.LENGTH_SHORT).show()
-            }
+                override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
+                    Log.i(TAG, "onLoadingComplete: $uri")
+                    viewProgressBar.isVisible = false
+                    bmpImage = loadedImage
+                }
+            }, object : ImageLoadingProgressListener {
+                override fun onProgressUpdate(
+                    imageUri: String?,
+                    view: View?,
+                    current: Int,
+                    total: Int
+                ) {
+                    val downloadProgressPercentage = (100.0f * current / total).roundToInt().toDouble()
+                    viewProgressBar.setProgressPercentage(
+                        downloadProgressPercentage, true
+                    )
+                    Log.i("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
+                }
+            })
+            return bmpImage
 
-            override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
-                Log.i(TAG, "onLoadingComplete: $uri")
-                viewProgressBar.isVisible = false
-                bmpImage = loadedImage
-            }
-        }, object : ImageLoadingProgressListener {
-            override fun onProgressUpdate(
-                imageUri: String?,
-                view: View?,
-                current: Int,
-                total: Int
-            ) {
-                viewProgressBar.setProgressPercentage(
-                    Math.round(100.0f * current / total).toDouble(), true
-                )
-                Log.i("ImageLoader", "Progress(bytes) : ${current / 1024} ${total / 1024}")
-                Log.i("ImageLoader", "Progress: ${Math.round(100.0f * current / total).toDouble()}")
+        } else {
+            imageLoader.displayImage(uri, imageView, options, object : SimpleImageLoadingListener() {
+                override fun onLoadingStarted(imageUri: String?, view: View?) {
+                    Log.i(TAG, "onLoadingStarted: $uri")
+                    viewProgressBar.isVisible = true
+                }
 
-            }
-        })
+                override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
+                    Log.i(TAG, "onLoadingFailed: $uri")
+                    super.onLoadingFailed(imageUri, view, failReason)
+                    viewProgressBar.isVisible = false
+                    Toast.makeText(context, "Connection timeout! Image loading failed", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
+                    Log.i(TAG, "onLoadingComplete: $uri")
+                    viewProgressBar.isVisible = false
+                    bmpImage = loadedImage
+                }
+            }, object : ImageLoadingProgressListener {
+                override fun onProgressUpdate(
+                    imageUri: String?,
+                    view: View?,
+                    current: Int,
+                    total: Int
+                ) {
+                    val downloadProgressPercentage = (100.0f * current / total).roundToInt().toDouble()
+                    viewProgressBar.setProgressPercentage(
+                        downloadProgressPercentage, true
+                    )
+                    Log.i("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
+                }
+            })
 
         return bmpImage
+        }
     }
 
-    fun setWallpaper(context: Context, imageView: ImageView) {
+    fun setWallpaper(context: Context, imageView: ImageView?, screenFlag: Int, inputBitmap: Bitmap?) {
         Log.i(TAG, "set Wallpaper")
         val wallpaperManager = WallpaperManager.getInstance(context)
-        val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+        val bitmap = if (imageView != null && inputBitmap == null) {
+            (imageView.drawable as BitmapDrawable).bitmap
+        } else {
+            inputBitmap
+        }
+
+        if (bitmap == null) return
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -266,17 +315,19 @@ object ImageUtils {
 
                 // Rect(left, top, right, bottom)
                 // val rect = Rect(0, 0, bitmap.height, bitmap.width)
-                // Set on Home screen
-                wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_SYSTEM)
-                // Set on Lock Screen
-                wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_LOCK)
+                when (screenFlag) {
+                    HOME_SCREEN -> wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_SYSTEM)
+                    LOCK_SCREEN ->  wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_LOCK)
+                    BOTH_SCREENS -> wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
+                }
             } else {
                 val scaledBitmap = Bitmap.createScaledBitmap(bitmap ,SCREEN_WIDTH, SCREEN_HEIGHT, true)
                 wallpaperManager.setBitmap(scaledBitmap)
             }
-            Toast.makeText(context, "Wallpaper Set Successfully!!", Toast.LENGTH_SHORT).show()
+            // Imageview will be null from WorkManager, so no toast to be shown
+            if (imageView !=null) Toast.makeText(context, "Wallpaper Set Successfully!!", Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
-            Toast.makeText(context, "Setting WallPaper Failed!!", Toast.LENGTH_SHORT).show()
+            if (imageView !=null) Toast.makeText(context, "Setting WallPaper Failed!!", Toast.LENGTH_SHORT).show()
         }
     }
     fun Bitmap.cropHint(desiredHeight: Int): Rect {
@@ -287,5 +338,28 @@ object ImageUtils {
         val desiredWidth = SCREEN_WIDTH * height / desiredHeight
         val offsetX = (width - desiredWidth) / 2
         return Rect(offsetX, 0, width - offsetX, height)
+    }
+
+    suspend fun createBitmapFromCacheFile(urlString: String, context: Context): Bitmap {
+        return withContext(Dispatchers.IO) {
+        val file = File(context.cacheDir, "apodToday.jpg")
+        val outputStream = FileOutputStream(file)
+        var inputStream: InputStream? = null
+
+            try {
+                inputStream = URL(urlString).openConnection().getInputStream()
+            } catch (e: UnknownHostException) {
+                e.printStackTrace();
+            } catch (e: ProtocolException) {
+                e.printStackTrace();
+            } catch (e: HttpStatusException) {
+                e.printStackTrace();
+            }
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        Objects.requireNonNull(outputStream)?.close()
+        Log.i(TAG, "bitmap.height -> ${bitmap.height}")
+        bitmap
+        }
     }
 }
