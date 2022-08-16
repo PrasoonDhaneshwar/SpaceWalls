@@ -3,31 +3,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".presentation.view.ViewFragment">
 
-    <ProgressBar
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/view_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:fitsSystemWindows="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <com.mackhartley.roundedprogressbar.RoundedProgressBar
         android:id="@+id/fragment_view_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminateTint="@color/darkModeIcon"
-        android:indeterminateTintMode="src_atop"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:rpbBackgroundColor="#D3CECE"
+        app:rpbBackgroundTextColor="#FFFFFF"
+        app:rpbCornerRadiusBottomLeft="6dp"
+        app:rpbCornerRadiusBottomRight="20dp"
+        app:rpbCornerRadiusTopLeft="20dp"
+        app:rpbCornerRadiusTopRight="6dp"
+        app:rpbIsRadiusRestricted="false"
+        app:rpbProgressColor="#5B6A7B"
+        app:rpbProgressTextColor="#000000"
+        app:rpbTextPadding="12dp" />
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/fragment_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.496"
         tools:layout_height="300dp"
         tools:src="@tools:sample/backgrounds/scenic" />
 
@@ -50,7 +65,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/home_download_image"
+        android:id="@+id/fragment_download_image"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginEnd="10dp"

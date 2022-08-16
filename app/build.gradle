@@ -1,38 +1,40 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-    // Extra added for Resources discovery in Activity
-    id 'kotlin-android-extensions'
-    // for kotlin annotations
+    id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
-    // Passing data between fragments in a compile type safe way
-    id "androidx.navigation.safeargs.kotlin"
-    // Secrets Gradle Plugin for Android
-    id 'com.google.secrets_gradle_plugin' version '0.4'
-
     // Dagger Hilt plugin
     id 'dagger.hilt.android.plugin'
+    // Navigation Component. Passing data between fragments in a compile type safe way
+    id "androidx.navigation.safeargs.kotlin"
+    // Secrets Gradle Plugin for Android
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1'
+
+    // For transferring objects into other components
+    id 'kotlin-parcelize'
 }
 
-
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    compileSdk 32
 
     defaultConfig {
-        applicationId "com.prasoon.apodkotlin"
-        minSdkVersion 21
-        targetSdkVersion 31
+        applicationId "com.prasoon.apod"
+        minSdk 24
+        targetSdk 31
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -43,68 +45,85 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    // Make view binding
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.5.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.+'
+
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
 
-    // Recycler View
-    implementation "androidx.recyclerview:recyclerview:1.2.1"
-    // Swipe Refresh Layout
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    // Coroutine Lifecycle Scopes
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+
+    // Dagger - Hilt
+    implementation "com.google.dagger:hilt-android:2.42"
+    kapt "com.google.dagger:hilt-android-compiler:2.42"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
+    // Inject WorkManager with Hilt
+    implementation 'androidx.hilt:hilt-work:1.0.0'
 
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
 
     // Retrofit
-    implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // OkHttp
-    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+    implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.2"
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
 
     // Room
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-runtime:2.4.3"
+    kapt "androidx.room:room-compiler:2.4.3"
 
-    // Navigation Component dependencies
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.4.3"
 
     // PhotoView for easy zooming of images
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
 
-    // WorkManager Api with Kotlin + coroutines
-    implementation("androidx.work:work-runtime-ktx:$work_version")
-
-    // Dagger-Hilt
-    implementation 'com.google.dagger:hilt-android:2.41'
-
-    // Annotations necessary for AppModule and entry point in Hilt
-    kapt "com.google.dagger:hilt-android-compiler:2.41"
-    annotationProcessor 'com.google.dagger:hilt-compiler:2.41'
+    // Swipe Refresh Layout
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     // AndroidX Preference Library for Settings Fragment
     implementation "androidx.preference:preference-ktx:1.2.0"
 
-    // For instrumentation tests
-    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.41'
-    androidTestAnnotationProcessor 'com.google.dagger:hilt-compiler:2.41'
+    // Navigation Component dependencies
+    implementation "androidx.navigation:navigation-fragment-ktx:2.5.1"
+    implementation "androidx.navigation:navigation-ui-ktx:2.5.1"
 
-    // For local unit tests
-    testImplementation 'com.google.dagger:hilt-android-testing:2.41'
-    testAnnotationProcessor 'com.google.dagger:hilt-compiler:2.41'
+    // Fix for "No field mMaxWidth in class Landroid/widget/ImageView;"
+    implementation 'com.github.nostra13:Android-Universal-Image-Loader:458df4da2e'
+
+    // Show Progress with percentage
+    implementation 'com.github.MackHartley:RoundedProgressBar:3.0.0'
+
+    // jsoup HTML parser library @ https://jsoup.org/
+    implementation "org.jsoup:jsoup:1.15.2"
+
+    // EasyPermissions Library
+    implementation 'pub.devrel:easypermissions:3.0.0'
+
+    // WorkManager Api with Kotlin + coroutines
+    implementation("androidx.work:work-runtime-ktx:2.7.1")
+
 }

@@ -2,61 +2,58 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
+    android:id="@+id/nav_graph.xml"
     app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.prasoon.apodkotlin.view.HomeFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeFragment_to_listFragment"
-            app:destination="@id/listFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_homeFragment_to_viewFragment"
             app:destination="@id/viewFragment" />
         <action
             android:id="@+id/action_homeFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_listFragment"
+            app:destination="@id/listFragment" />
     </fragment>
     <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.settings.SettingsFragment"
+        android:label="SettingsFragment" />
+    <fragment
         android:id="@+id/listFragment"
-        android:name="com.prasoon.apodkotlin.view.ListFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_list.ListFragment"
         android:label="fragment_list"
         tools:layout="@layout/fragment_list" >
         <action
             android:id="@+id/action_listFragment_to_detailFragment"
-            app:destination="@id/detailFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
-    <fragment
-        android:id="@+id/detailFragment"
-        android:name="com.prasoon.apodkotlin.view.DetailFragment"
-        android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail" >
-        <argument
-            android:name="apodId"
-            app:argType="integer" />
+            app:destination="@id/detailFragment" />
     </fragment>
     <fragment
         android:id="@+id/viewFragment"
-        android:name="com.prasoon.apodkotlin.view.ViewFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.view.ViewFragment"
         android:label="fragment_view"
         tools:layout="@layout/fragment_view" >
         <argument
-            android:name="imageUrl"
+            android:name="apod"
+            app:argType="com.prasoon.apodkotlinrefactored.domain.model.Apod" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_detail.DetailFragment"
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="apodDate"
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.prasoon.apodkotlin.view.SettingsFragment"
-        android:label="SettingsFragment" />
+        android:id="@+id/apodArchivesFragment"
+        android:name="com.prasoon.apodkotlinrefactored.presentation.apod_archives.ArchivesFragment"
+        android:label="fragment_archives"
+        tools:layout="@layout/fragment_archives" />
 </navigation>

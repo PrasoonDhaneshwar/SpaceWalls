@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:id="@+id/list_swipe_refresh_layout"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".view.ListFragment">
+    tools:context=".presentation.apod_list.ListFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

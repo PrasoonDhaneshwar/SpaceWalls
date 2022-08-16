@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="1dp"
+    android:id="@+id/item_layout">
+
+    <ImageView
+        android:id="@+id/item_apod_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_title"
+        style="@style/Text"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="8dp"
+        android:ellipsize="end"
+        android:gravity="start"
+        android:maxLines="3"
+        app:layout_constraintBottom_toTopOf="@id/item_date"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="This is the title" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_date"
+        style="@style/Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:ellipsize="end"
+        android:gravity="start"
+        android:maxLines="1"
+        app:layout_constraintBottom_toTopOf="@id/item_progress_image_view"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Date taken on " />
+
+    <ImageView
+        android:id="@+id/add_to_favorites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_baseline_favorite_border"
+        app:layout_constraintBottom_toTopOf="@id/item_progress_image_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@drawable/drawable_text_color_favorite" />
+
+    <com.mackhartley.roundedprogressbar.RoundedProgressBar
+        android:id="@+id/item_progress_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/item_apod_image"
+        app:rpbBackgroundColor="#DFD8D8"
+        app:rpbBackgroundTextColor="#070600"
+        app:rpbCornerRadiusBottomLeft="6dp"
+        app:rpbCornerRadiusBottomRight="20dp"
+        app:rpbCornerRadiusTopLeft="20dp"
+        app:rpbCornerRadiusTopRight="6dp"
+        app:rpbIsRadiusRestricted="false"
+        app:rpbProgressColor="#5B6A7B"
+        app:rpbProgressTextColor="#000000"
+        app:rpbTextPadding="12dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

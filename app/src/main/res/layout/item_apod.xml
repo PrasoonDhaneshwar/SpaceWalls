@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:padding="8dp"
-        tools:src="@mipmap/ic_launcher" />
+        android:scaleType="centerCrop"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <TextView
         android:id="@+id/item_title"
@@ -38,7 +38,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/item_apod_image"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_margin="8dp"
         android:ellipsize="end"
         android:gravity="center"
@@ -63,23 +62,26 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_gravity="end"
         android:layout_margin="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/ic_baseline_delete_outline" />
 
-    <ProgressBar
+    <com.mackhartley.roundedprogressbar.RoundedProgressBar
         android:id="@+id/item_progress_image_view"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminateTint="@color/darkModeIcon"
-        android:indeterminateTintMode="src_atop"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
         app:layout_constraintBottom_toBottomOf="@+id/item_apod_image"
-        app:layout_constraintEnd_toEndOf="@+id/item_apod_image"
-        app:layout_constraintStart_toStartOf="@+id/item_apod_image"
-        app:layout_constraintTop_toTopOf="@+id/item_apod_image" />
+        app:rpbBackgroundColor="#DFD8D8"
+        app:rpbBackgroundTextColor="#070600"
+        app:rpbCornerRadiusBottomLeft="6dp"
+        app:rpbCornerRadiusBottomRight="20dp"
+        app:rpbCornerRadiusTopLeft="20dp"
+        app:rpbCornerRadiusTopRight="6dp"
+        app:rpbIsRadiusRestricted="false"
+        app:rpbProgressColor="#5B6A7B"
+        app:rpbProgressTextColor="#000000"
+        app:rpbTextPadding="12dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
