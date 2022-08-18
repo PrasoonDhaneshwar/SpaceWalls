@@ -70,7 +70,8 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
 
             if (!apodList.isLoading) {
                 binding.loader.hide()
-                apodListAdapter.updateApods(apodList.apodArchivesList)
+                //apodListAdapter.updateApods(apodList.apodArchivesList)
+                apodListAdapter.updateApodArchiveListItems(apodList.apodArchivesList)
             }
             if (!apodList.message.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "Unexpected error occurred", Toast.LENGTH_SHORT).show()

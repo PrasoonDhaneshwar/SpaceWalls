@@ -3,17 +3,13 @@ package com.prasoon.apodkotlinrefactored.presentation.apod_archives
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.databinding.ItemApodArchiveBinding
-import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
-import kotlinx.coroutines.launch
 
 //                                                                                        2. Extend holder
 //                      4. Populate objects
@@ -78,7 +74,6 @@ class ApodArchivesListAdapter(
         }
     }
 
-    // 4. update apod list when new information is invoked
     fun updateApods(newApods: List<ApodArchive>) {
         Log.i(TAG, "updateApods")
         apodDateList.clear()
@@ -87,7 +82,6 @@ class ApodArchivesListAdapter(
         val start = 0
         val end = newApods.size - 1;
         //notifyItemRangeRemoved(start, end)
-        // todo: Add diff utils
         notifyDataSetChanged()
     }
 
@@ -95,4 +89,15 @@ class ApodArchivesListAdapter(
         Log.i(TAG, "addToFavorites")
         apodDateList[position].isAddedToFavorites = processFavoriteDB
     }
+
+    // 4. update apod archive list when new information is invoked
+    fun updateApodArchiveListItems(newApodArchivesList: List<ApodArchive>) {
+        Log.i(TAG, "updateApodArchiveListItems")
+        val diffCallback = ArchiveDiffUtilCallback(this.apodDateList, newApodArchivesList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        this.apodDateList.clear()
+        this.apodDateList.addAll(newApodArchivesList)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
 }

@@ -2,6 +2,7 @@ package com.prasoon.apodkotlinrefactored.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.data.local.entity.ApodArchiveEntity
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodEntity
 
 data class ApodDto(
@@ -28,6 +29,15 @@ data class ApodDto(
             mediaType = mediaType,
             hdUrl = hdurl,
             copyright = copyright
+        )
+    }
+    fun convertToApodArchiveEntity(processFavoritesDB: Boolean = false): ApodArchiveEntity {
+        return ApodArchiveEntity(
+            dateInt = date.toIntDate(),
+            dateString = date,
+            title = title,
+            url = url,
+            isAddedToFavorites = processFavoritesDB
         )
     }
 }

@@ -9,7 +9,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import com.prasoon.apodkotlinrefactored.core.utils.scheduleDailyWallpaper
+import com.prasoon.apodkotlinrefactored.core.utils.scheduleFrequency
 import com.prasoon.apodkotlinrefactored.core.utils.screenPreference
 import com.prasoon.apodkotlinrefactored.core.utils.setAppTheme
 import com.prasoon.apodkotlinrefactored.core.utils.showNotification
@@ -18,8 +18,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
     private val TAG = "MainActivity"
+    private lateinit var binding: ActivityMainBinding
 
     private lateinit var navController: NavController
     private lateinit var settingPerf: SharedPreferences
@@ -57,6 +57,5 @@ class MainActivity : AppCompatActivity() {
             screenPreference(it)
             Log.i(TAG, "Screen Preference : $it")
         }
-
     }
 }

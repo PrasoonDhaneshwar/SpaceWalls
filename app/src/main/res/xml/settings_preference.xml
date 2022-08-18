@@ -6,10 +6,10 @@
         android:textColor="@android:color/black">
 
         <ListPreference
+            android:icon="@drawable/ic_theme"
             app:defaultValue="system"
             app:entries="@array/theme_entry"
             app:entryValues="@array/theme_values"
-            android:icon="@drawable/ic_dark_mode"
             android:dialogTitle="First section"
             android:key="display"
             android:summary="Select Theme"
@@ -35,10 +35,35 @@
             android:key="schedule_wallpaper"
             android:title="Schedule Daily Wallpaper" />
 
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_baseline_view_list"
+            android:key="schedule_favorites"
+            android:title="Schedule Wallpaper from favorites " />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_photo_library"
+            android:key="schedule_archive"
+            android:summary="Choosing this option will select wallpaper from archives"
+            android:title="Schedule Wallpaper from archives" />
+
         <ListPreference
+            android:enabled="false"
+            android:icon="@drawable/ic_schedule_archive"
+            app:defaultValue="two_hours"
+            app:entries="@array/select_frequency"
+            app:entryValues="@array/frequency"
+            app:key="frequency"
+            app:title="Select Frequency"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:enabled="false"
+            android:icon="@drawable/screen_both"
             app:defaultValue="home_screen"
             app:entries="@array/select_screen"
-            android:dependency="schedule_wallpaper"
             app:entryValues="@array/screen_values"
             app:key="screen"
             app:title="Select Screen"
@@ -55,7 +80,10 @@
 
     <PreferenceCategory app:title="About">
 
-        <Preference android:title="GitHub">
+        <Preference android:title="Made by Prasoon!"
+            android:icon="@drawable/ic_favorite_fill"/>
+        <Preference android:title="Check the sources on GitHub."
+            android:icon="@drawable/ic_android_sources">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-Kotlin" />

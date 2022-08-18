@@ -1,14 +1,13 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_list
 
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
-import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils.getYoutubeThumbnailUrlFromVideoUrl
 import com.prasoon.apodkotlinrefactored.databinding.ItemApodBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
@@ -86,7 +85,6 @@ class ApodListAdapter(
         }
     }
 
-    // 4. update apod list when new information is invoked
     fun updateApods(newApods: List<Apod>) {
         Log.i(TAG, "updateApods")
         apodModelList.clear()
@@ -95,7 +93,6 @@ class ApodListAdapter(
         val start = 0
         val end = newApods.size - 1;
         //notifyItemRangeRemoved(start, end)
-        // todo: Add diff utils
         notifyDataSetChanged()
     }
 
@@ -105,5 +102,15 @@ class ApodListAdapter(
         notifyItemRangeChanged(position, itemCount)
         // notifyDataSetChanged()
         Log.i(TAG, "delete item size: ${apodModelList.size}")
+    }
+
+    // 4. update apod list when new information is invoked
+    fun updateApodListItems(newApodList: List<Apod>) {
+        Log.i(TAG, "updateApodListItems")
+        val diffCallback = ApodDiffUtilCallback(this.apodModelList, newApodList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        this.apodModelList.clear()
+        this.apodModelList.addAll(newApodList)
+        diffResult.dispatchUpdatesTo(this)
     }
 }

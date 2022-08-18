@@ -49,13 +49,13 @@ import kotlin.math.roundToInt
 
 
 object ImageUtils {
-    private val TAG = "ImageUtils"
-    val SCREEN_WIDTH = Resources.getSystem().displayMetrics.widthPixels
-    val SCREEN_HEIGHT = Resources.getSystem().displayMetrics.heightPixels
+    private const val TAG = "ImageUtils"
+    private val SCREEN_WIDTH = Resources.getSystem().displayMetrics.widthPixels
+    private val SCREEN_HEIGHT = Resources.getSystem().displayMetrics.heightPixels
     private val COLUMN_WIDTH = SCREEN_WIDTH / 2
     private val COLUMN_HEIGHT = SCREEN_HEIGHT / 2
-    val IMAGE_WIDTH = COLUMN_WIDTH
-    val IMAGE_HEIGHT = COLUMN_WIDTH * COLUMN_HEIGHT / COLUMN_WIDTH
+    private val IMAGE_WIDTH = COLUMN_WIDTH
+    private val IMAGE_HEIGHT = COLUMN_WIDTH * COLUMN_HEIGHT / COLUMN_WIDTH
 
     fun saveImage(context: Context, url: String, hdurl: String?, date: String) {
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -308,9 +308,9 @@ object ImageUtils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val cropHint = bitmap.cropHint(wallpaperManager.desiredMinimumHeight)
 
-                Log.i(TAG, "Screen size -> height: $SCREEN_HEIGHT x width: $SCREEN_WIDTH")
-                Log.i(TAG, "Bitmap height -> ${bitmap.height} x width: ${bitmap.width}")
-                Log.i(TAG, "Desired wallpaper height -> ${wallpaperManager.desiredMinimumHeight}")
+                Log.i(TAG, "Screen size -> height x width: $SCREEN_HEIGHT x $SCREEN_WIDTH")
+                Log.i(TAG, "Bitmap dimensions -> height x width: ${bitmap.height} x ${bitmap.width}")
+                Log.i(TAG, "Desired wallpaper dimensions -> height x width ${wallpaperManager.desiredMinimumHeight} x ${wallpaperManager.desiredMinimumWidth}")
                 Log.i(TAG, "Crop hint -> $cropHint")
 
                 // Rect(left, top, right, bottom)
@@ -330,10 +330,9 @@ object ImageUtils {
             if (imageView !=null) Toast.makeText(context, "Setting WallPaper Failed!!", Toast.LENGTH_SHORT).show()
         }
     }
-    fun Bitmap.cropHint(desiredHeight: Int): Rect {
-        val screenRatio = SCREEN_HEIGHT/ SCREEN_WIDTH
+    private fun Bitmap.cropHint(desiredHeight: Int): Rect {
+        val screenRatio: Float = (SCREEN_HEIGHT/ SCREEN_WIDTH).toFloat()
         Log.i(TAG, "screenRatio -> $screenRatio")
-        Log.i(TAG, "desiredHeight -> $desiredHeight")
 
         val desiredWidth = SCREEN_WIDTH * height / desiredHeight
         val offsetX = (width - desiredWidth) / 2
@@ -344,7 +343,7 @@ object ImageUtils {
         return withContext(Dispatchers.IO) {
         val file = File(context.cacheDir, "apodToday.jpg")
         val outputStream = FileOutputStream(file)
-        var inputStream: InputStream? = null
+            var inputStream: InputStream? = null
 
             try {
                 inputStream = URL(urlString).openConnection().getInputStream()

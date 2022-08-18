@@ -54,7 +54,8 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
         viewModel.apodModelList.observe(viewLifecycleOwner) { apodList ->
             binding.listProgress.visibility = View.GONE
             binding.listApod.visibility = View.VISIBLE
-            apodListAdapter.updateApods(apodList.sortedByDescending { it.date.toIntDate() })
+            //apodListAdapter.updateApods(apodList.sortedByDescending { it.date.toIntDate() })
+            apodListAdapter.updateApodListItems(apodList.sortedByDescending { it.date.toIntDate() })
         }
     }
 
