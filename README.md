@@ -6,7 +6,7 @@ Browse through **thousands** of NASA's archives and learn about the universe.
 **Schedule wallpaper** through these archives, your favorites or a new content everyday.
 
 ## **👇 Download** ##
-Click [here](https://raw.githubusercontent.com/PrasoonDhaneshwar/Astronomy-Photo-Of-The-Day-Android/main/Astronomy-Picture-of-the-Day-v1.0.apk) to download **Astronomy Picture Of The Day.**
+Click [here](https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-Kotlin/blob/main/Astronomy-Picture-of-the-Day-v1.0.apk) to download **Astronomy Picture Of The Day.**
 
 ## **✨App Features:** ##
 - Browse archives from **1995** to present day
