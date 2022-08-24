@@ -1,6 +1,6 @@
 package com.prasoon.apodkotlinrefactored.domain.repository
 
-import com.prasoon.apodkotlinrefactored.core.utils.Resource
+import com.prasoon.apodkotlinrefactored.core.common.Resource
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import kotlinx.coroutines.flow.Flow
 

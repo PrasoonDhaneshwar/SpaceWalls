@@ -12,11 +12,6 @@ interface ApodDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertApod(apodDb: ApodEntity)
 
-/*
-    @Query("SELECT * FROM ApodEntity WHERE id = :id")
-    suspend fun getApodDb(id: Int): ApodEntity?
-*/
-
     @Delete
     suspend fun delete(apodDb: ApodEntity)
 
@@ -24,13 +19,12 @@ interface ApodDao {
     suspend fun deleteAllApods()
 
     // Step 2.5: DATABASE: Delete apod from cache when needed
-    @Query("DELETE FROM Apodentity WHERE url IN(:url)")
-    suspend fun deleteUrls(url: List<String>)
+    @Query("DELETE FROM ApodEntity WHERE dateInt IN(:date)")
+    suspend fun deleteFromList(date: Int)
 
     @Query("SELECT * FROM ApodEntity WHERE addToFavoritesDB = :isFavorite ")
     suspend fun getAllApods(isFavorite: Boolean): List<ApodEntity>
 
-    // todo: Check if ApodEntity is nullable
     @Query("SELECT * FROM ApodEntity WHERE dateString = :date")
     suspend fun getApodFromDate(date: String?): ApodEntity
 
@@ -41,10 +35,10 @@ interface ApodDao {
     fun count(date: String): Int
 
     @Update(entity = ApodEntity::class)
-    fun addIntoDB(apodDb: ApodEntity)
+    fun addOrRemoveFavoritesInApodDB(apodDb: ApodEntity)
 
-    @Query("SELECT * FROM ApodEntity WHERE dateInt = :date")
-    suspend fun getApodModel(date: Int): ApodEntity
+    @Query("UPDATE ApodEntity SET addToFavoritesDB = :isFavorite WHERE dateInt = :id")
+    suspend fun updateFavorites(id : Int, isFavorite: Boolean)
 
     @Query("SELECT EXISTS(SELECT * FROM ApodEntity WHERE dateInt = :id)")
     fun isRowIsExist(id : Int) : Boolean

@@ -2,11 +2,13 @@ package com.prasoon.apodkotlinrefactored.presentation.settings
 
 import android.os.Bundle
 import android.util.Log
+import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants.FREQUENCY_ARCHIVE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_DAILY_WALLPAPER
+import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
 import com.prasoon.apodkotlinrefactored.core.utils.*
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -14,9 +16,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_preference, rootKey)
 
-        val scheduleDailyWallpaperPref: Preference? = findPreference("schedule_wallpaper")
-        val scheduleArchivePref: Preference? = findPreference("schedule_archive")
-        val scheduleFavoritesPref: Preference? = findPreference("schedule_favorites")
+        val scheduleDailyWallpaperPref: CheckBoxPreference? = findPreference("schedule_wallpaper")
+        val scheduleArchivePref: CheckBoxPreference? = findPreference("schedule_archive")
+        val scheduleFavoritesPref: CheckBoxPreference? = findPreference("schedule_favorites")
         val scheduleFrequencyPref: Preference? = findPreference("frequency")
         val selectScreenPref: Preference? = findPreference("screen")
 
@@ -56,7 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val isChecked: Boolean = newValue.toString().toBoolean()
             selectScreenPref.isEnabled = isChecked
 
-            if (!isChecked && (!scheduleArchivePref!!.isEnabled) && (!scheduleFavoritesPref!!.isEnabled))
+            if (!isChecked && (!scheduleArchivePref!!.isEnabled) && (!scheduleFavoritesPref!!.isEnabled) && scheduleDailyWallpaperPref.isChecked)
                 scheduleFrequencyPref.isEnabled = false
 
             scheduleArchivePref?.isEnabled = !isChecked
@@ -95,6 +97,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             Log.i(TAG, "scheduleFavoritesPref: $isChecked")
             true // return status.
+        }
+
+        if (scheduleDailyWallpaperPref.isChecked) {
+            scheduleArchivePref.isEnabled = false
+            scheduleFavoritesPref.isEnabled = false
+            scheduleFrequencyPref.isEnabled =false
+        }
+
+        if (scheduleArchivePref.isChecked) {
+            scheduleDailyWallpaperPref.isEnabled = false
+            scheduleFavoritesPref.isEnabled = false
+        }
+
+        if (scheduleFavoritesPref.isChecked) {
+            scheduleDailyWallpaperPref.isEnabled = false
+            scheduleArchivePref.isEnabled = false
+        }
+
+        if (!scheduleDailyWallpaperPref.isChecked && !scheduleArchivePref.isChecked && !scheduleFavoritesPref.isChecked) {
+            scheduleFrequencyPref.isEnabled =false
+            selectScreenPref.isEnabled =false
         }
     }
 }

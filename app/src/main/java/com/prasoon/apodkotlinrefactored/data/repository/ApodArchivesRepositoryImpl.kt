@@ -2,8 +2,8 @@ package com.prasoon.apodkotlinrefactored.data.repository
 
 import android.util.Log
 import com.prasoon.apodkotlinrefactored.core.common.Constants
-import com.prasoon.apodkotlinrefactored.core.common.DateInput
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.ApodArchiveDao
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import java.net.ProtocolException
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,14 +33,11 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         val calendarEndDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         // Date must be after Jun 16, 1995, but changed here due to loop counting difference of 1 day
         calendarEndDate.set(1995, Calendar.JUNE, 17, 0, 0)
-        val endDate = calendarEndDate.time
+        //val endDate = calendarEndDate.time
+        val endDate = DateUtils.getEndDate()
 
-        // Test like this
-        // val teststartingpointofDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        // Date must be after Jun 16, 1995, but changed here due to loop counting difference of 1 day
-        // teststartingpointofDate.set(2017, Calendar.MARCH, 19, 0, 0)
-        // val testDate = teststartingpointofDate.time
-        // currentCalendarDate.time = testDate
+        // Uncomment to test from a starting date
+        // currentCalendarDate.time = DateUtils.generateStartingPointOfDate()
 
         var currentCalDate: Date
         var i = 0
@@ -47,8 +45,8 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
             currentCalDate = currentCalendarDate.time
             if (currentCalDate.before(endDate)) return apodArchiveList
 
-            currentCalendarDate.add(Calendar.DAY_OF_MONTH, -1)
             val parsedDate: String = dateFormat.format(currentCalendarDate.time)
+            currentCalendarDate.add(Calendar.DAY_OF_MONTH, -1)
 
             var apodArchive: ApodArchive
 
@@ -74,7 +72,7 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
 
         todayDate = currentCalendarDate.time
 
-        Log.i(TAG, "fetchImageArchivesFromCurrentDate iteration: ${iteration++}: " + apodArchiveList)
+        Log.i(TAG, "fetchImageArchivesFromCurrentDate with todayDate: ${todayDate} iteration: ${iteration++}: " + apodArchiveList)
 
         return apodArchiveList
     }
@@ -89,7 +87,7 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         val link: String
         var url = String()
         try {
-            url = DateInput.createApodUrl(date)
+            url = DateUtils.createApodUrl(date)
             document = Jsoup.connect(url).get() // Network call, to be performed in separate thread
 
             png = document.select("img[src\$=.jpg]").attr("src")
@@ -101,6 +99,8 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         } catch (e: UnknownHostException) {
             e.printStackTrace();
         } catch (e: ProtocolException) {
+            e.printStackTrace();
+        } catch (e: SocketTimeoutException) {
             e.printStackTrace();
         } catch (e: HttpStatusException) {
             Log.i(TAG, "link $url does not exist for : $date")

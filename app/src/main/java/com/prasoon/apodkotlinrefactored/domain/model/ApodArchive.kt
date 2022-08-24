@@ -1,9 +1,8 @@
 package com.prasoon.apodkotlinrefactored.domain.model
 
 import android.os.Parcelable
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodArchiveEntity
-import com.prasoon.apodkotlinrefactored.data.local.entity.ApodEntity
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

@@ -2,8 +2,9 @@ package com.prasoon.apodkotlinrefactored.data.repository
 
 import android.util.Log
 import com.prasoon.apodkotlinrefactored.BuildConfig
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
-import com.prasoon.apodkotlinrefactored.core.utils.Resource
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
+import com.prasoon.apodkotlinrefactored.core.common.Resource
+import com.prasoon.apodkotlinrefactored.data.ApodArchiveDao
 import com.prasoon.apodkotlinrefactored.data.ApodDao
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-import retrofit2.http.HTTP
 import java.io.IOException
 
 // Step 3.2: REPOSITORY: Create actual implementations in "data" layer
@@ -23,6 +23,7 @@ import java.io.IOException
 class ApodRepositoryImpl(
     private val api: ApodAPI,
     private val dao: ApodDao,
+    private val daoArchive: ApodArchiveDao,
     private var apod: Apod
 ) : ApodRepository {
     private val TAG = "ApodRepositoryImpl"
@@ -53,6 +54,7 @@ class ApodRepositoryImpl(
             try {
                 val remoteApod = api.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
                 dao.insertApod(remoteApod.toApodEntity())   // Update in DB
+                daoArchive.insertApod(remoteApod.convertToApodArchiveEntity())   // Update in Archive DB
 
                 // Emit data to UI
                 apod = dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod()

@@ -13,8 +13,8 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_DAILY_WAL
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_FAVORITES_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SHOW_NOTIFICATION
+import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
 import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
-import java.util.concurrent.TimeUnit
 
 fun setAppTheme(mode: String) {
     when (mode) {
@@ -52,7 +52,6 @@ fun scheduleFrequency(frequencyArchive: String): WallpaperFrequency {
 
 fun scheduleWallpaper(context: Context, scheduleType: Int, isSet: Boolean, wallpaperFrequency: WallpaperFrequency) {
     when (scheduleType) {
-
         SCHEDULE_DAILY_WALLPAPER -> {
             when (isSet) {
                 true -> setPeriodicWorkRequest(context, wallpaperFrequency, false)
@@ -74,7 +73,6 @@ fun scheduleWallpaper(context: Context, scheduleType: Int, isSet: Boolean, wallp
             }
         }
     }
-
 }
 
 fun setPeriodicWorkRequest(context:Context, wallpaperFrequency: WallpaperFrequency, delay: Boolean) {
@@ -87,7 +85,9 @@ fun setPeriodicWorkRequest(context:Context, wallpaperFrequency: WallpaperFrequen
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
     val myWorkBuilder = PeriodicWorkRequestBuilder<WallpaperWorker>(repeatInterval, timeUnit).addTag(WallpaperWorker.WORK_NAME).apply {
-    if (delay) setInitialDelay(repeatInterval, timeUnit)
+        if (delay) {
+            setInitialDelay(repeatInterval, timeUnit)
+        }
         setConstraints(constraints)
     }
     WorkManager.getInstance(context).enqueueUniquePeriodicWork(WallpaperWorker.WORK_NAME, ExistingPeriodicWorkPolicy.REPLACE, myWorkBuilder.build())

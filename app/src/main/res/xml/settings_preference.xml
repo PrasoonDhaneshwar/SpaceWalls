@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="Display"
+    <PreferenceCategory app:title="General"
         android:textColor="@android:color/black">
 
         <ListPreference
@@ -15,13 +15,6 @@
             android:summary="Select Theme"
             android:title="Select Theme" />
 
-    </PreferenceCategory>
-
-
-    <PreferenceCategory
-        android:textColor="@android:color/black"
-        android:title="Wallpaper Settings">
-
         <Preference
             android:icon="@drawable/ic_wallpaper"
             android:dialogTitle="First section"
@@ -29,28 +22,37 @@
             android:summary="Change the way wallpaper should fit on screen"
             android:title="Wallpaper Fit" />
 
+        <SwitchPreference
+            android:icon="@drawable/ic_notifications"
+            android:dialogTitle="First section"
+            android:key="notifications"
+            android:title="Show notifications" />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:textColor="@android:color/black"
+        android:title="Wallpaper Scheduler">
+
         <CheckBoxPreference
-            android:defaultValue="true"
             android:icon="@drawable/ic_schedule_wallpaper"
             android:key="schedule_wallpaper"
-            android:title="Schedule Daily Wallpaper" />
-
-
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:icon="@drawable/ic_baseline_view_list"
-            android:key="schedule_favorites"
-            android:title="Schedule Wallpaper from favorites " />
+            android:title="Schedule Wallpaper Daily" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
             android:icon="@drawable/ic_photo_library"
             android:key="schedule_archive"
             android:summary="Choosing this option will select wallpaper from archives"
             android:title="Schedule Wallpaper from archives" />
 
+        <CheckBoxPreference
+            android:icon="@drawable/ic_baseline_view_list"
+            android:key="schedule_favorites"
+            android:title="Schedule Wallpaper from favorites " />
+
+
         <ListPreference
-            android:enabled="false"
             android:icon="@drawable/ic_schedule_archive"
             app:defaultValue="two_hours"
             app:entries="@array/select_frequency"
@@ -60,7 +62,6 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            android:enabled="false"
             android:icon="@drawable/screen_both"
             app:defaultValue="home_screen"
             app:entries="@array/select_screen"
@@ -68,13 +69,6 @@
             app:key="screen"
             app:title="Select Screen"
             app:useSimpleSummaryProvider="true" />
-
-        <SwitchPreference
-            android:icon="@drawable/ic_notifications"
-            android:dialogTitle="First section"
-            android:key="notifications"
-            android:summary="Show notification"
-            android:title="" />
 
     </PreferenceCategory>
 

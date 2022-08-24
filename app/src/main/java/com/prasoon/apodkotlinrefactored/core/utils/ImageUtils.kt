@@ -39,7 +39,7 @@ import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
 import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
 import com.prasoon.apodkotlinrefactored.core.common.Constants.LOCK_SCREEN
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import kotlinx.coroutines.*
 import org.jsoup.HttpStatusException
 import java.io.*
@@ -350,6 +350,8 @@ object ImageUtils {
             } catch (e: UnknownHostException) {
                 e.printStackTrace();
             } catch (e: ProtocolException) {
+                e.printStackTrace();
+            } catch (e: SocketTimeoutException) {
                 e.printStackTrace();
             } catch (e: HttpStatusException) {
                 e.printStackTrace();

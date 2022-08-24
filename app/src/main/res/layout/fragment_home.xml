@@ -108,6 +108,7 @@
             android:id="@+id/home_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="2dp"
             android:background="@color/mainBackground"
             app:layout_anchor="@+id/attachment_layout"
             app:layout_anchorGravity="bottom|center">

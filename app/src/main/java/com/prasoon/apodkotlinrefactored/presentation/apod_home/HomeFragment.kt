@@ -26,20 +26,18 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
 import com.prasoon.apodkotlinrefactored.core.common.Constants.LOCK_SCREEN
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SHOW_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.common.Constants.STORAGE_PERMISSION_CODE
-import com.prasoon.apodkotlinrefactored.core.common.DateInput
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
-import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
+import com.prasoon.apodkotlinrefactored.core.utils.*
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.createBitmapFromCacheFile
-import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.saveImage
-import com.prasoon.apodkotlinrefactored.core.utils.NotificationUtils
-import com.prasoon.apodkotlinrefactored.core.utils.ShareActionUtils
-import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.databinding.FragmentHomeBinding
 import com.prasoon.apodkotlinrefactored.databinding.ScreenMenuBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import javax.inject.Inject
@@ -80,7 +78,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
         // Start with an actual date
         val date =
-            if (DateInput.currentDate.isEmpty()) DateInput.getCurrentDateForInitialization() else DateInput.currentDate
+            if (DateUtils.currentDate.isEmpty()) DateUtils.getCurrentDateForInitialization() else DateUtils.currentDate
         viewModel.refresh(date)
 
         binding.overviewFloatingActionButton.setOnClickListener {
@@ -96,12 +94,12 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 if (resultKey == "REQUEST_KEY") {
 
                     datePickerString = bundle.getString(Constants.SELECTED_SIMPLE_DATE_FORMAT)
-                    DateInput.simpleDateFormat = datePickerString
+                    DateUtils.simpleDateFormat = datePickerString
                     binding.homeTextViewDatePicker.text = datePickerString
 
                     val dateApiFormat = bundle.getString(Constants.CURRENT_DATE_FOR_API)
                     if (dateApiFormat != null) {
-                        DateInput.currentDate = dateApiFormat
+                        DateUtils.currentDate = dateApiFormat
                     }
                     if (dateApiFormat != null) {
                         viewModel.refresh(dateApiFormat)
@@ -191,7 +189,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     override fun onResume() {
         super.onResume()
         val date =
-            if (datePickerString.isNullOrEmpty() && DateInput.currentDate.isEmpty()) DateInput.getCurrentDateForInitialization() else DateInput.currentDate
+            if (datePickerString.isNullOrEmpty() && DateUtils.currentDate.isEmpty()) DateUtils.getCurrentDateForInitialization() else DateUtils.currentDate
 
         viewModel.refresh(date)
     }
@@ -203,12 +201,12 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
             }
                 currentApod = apodStateLiveData.apod
-                DateInput.currentDate =
+                DateUtils.currentDate =
                     currentApod.date    // Set the date received from the viewModel
 
                 Log.i(TAG, "Apod model received from viewmodel: $currentApod")
-                Log.i(TAG, "Web link : ${DateInput.createApodUrl(currentApod.date)}")
-                Log.i(TAG, "Api link : ${DateInput.createApodUrlApi(currentApod.date)}")
+                Log.i(TAG, "Web link : ${DateUtils.createApodUrl(currentApod.date)}")
+                Log.i(TAG, "Api link : ${DateUtils.createApodUrlApi(currentApod.date)}")
 
                 if (currentApod.addToFavoritesUI) {
                     binding.homeAddToFavorites.setColorFilter(
@@ -243,10 +241,13 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                         val thumbnailUrl =
                             VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                         Log.i(TAG, "YouTube thumbnailUrl: $thumbnailUrl")
-                        binding.homeImageViewResult.loadImage(
-                            thumbnailUrl,
-                            false,
-                            binding.homeProgressImageView
+                        binding.homeImageViewResult.setImageBitmap(
+                            ImageUtils.loadImageUIL(
+                                thumbnailUrl,
+                                binding.homeImageViewResult,
+                                binding.homeProgressImageView,
+                                requireContext(),
+                                false)
                         )
                     } else {
                         // Handling for Apod which is not an image or a YouTube video.

@@ -1,4 +1,4 @@
-package com.prasoon.apodkotlinrefactored.core.utils
+package com.prasoon.apodkotlinrefactored.core.common
 
 // Step 2.9: DATABASE: Provide the success/error/loading states via Resource
 sealed class Resource<T>(val data: T? = null, val message: String? = null) {

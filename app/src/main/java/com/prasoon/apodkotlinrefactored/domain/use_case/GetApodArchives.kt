@@ -1,6 +1,6 @@
 package com.prasoon.apodkotlinrefactored.domain.use_case
 
-import com.prasoon.apodkotlinrefactored.core.utils.Resource
+import com.prasoon.apodkotlinrefactored.core.common.Resource
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
 import kotlinx.coroutines.flow.Flow

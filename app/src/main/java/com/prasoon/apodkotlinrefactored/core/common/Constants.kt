@@ -1,7 +1,5 @@
 package com.prasoon.apodkotlinrefactored.core.common
 
-import com.prasoon.apodkotlinrefactored.core.utils.WallpaperFrequency
-
 object Constants {
     val APOD_DATABASE_NAME = "apod_database"
     val BASE_URL = "https://api.nasa.gov/"

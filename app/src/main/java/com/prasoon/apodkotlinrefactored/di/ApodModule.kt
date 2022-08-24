@@ -43,8 +43,8 @@ object ApodModule {
     // Step 6.6: DEPENDENCY INJECTION: Return Impl first. Then provide api and dao dependency
     @Provides
     @Singleton
-    fun provideApodRepository(db: ApodDatabase, api: ApodAPI, apod: Apod): ApodRepository {
-        return ApodRepositoryImpl(api = api, dao = db.dao, apod)    // Return actual implementation.
+    fun provideApodRepository(db: ApodDatabase, dbArchiveDatabase: ApodArchiveDatabase, api: ApodAPI, apod: Apod): ApodRepository {
+        return ApodRepositoryImpl(api = api, dao = db.dao, daoArchive = dbArchiveDatabase.dao , apod)    // Return actual implementation.
     }
 
     // Step 6.7: DEPENDENCY INJECTION: Provide db object, and use it as db.dao in Repository

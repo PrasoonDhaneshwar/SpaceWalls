@@ -1,12 +1,12 @@
-package com.prasoon.apodkotlinrefactored.core.common
+package com.prasoon.apodkotlinrefactored.core.utils
 
 import android.util.Log
 import com.prasoon.apodkotlinrefactored.BuildConfig
-import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 
-object DateInput {
+object DateUtils {
     private val TAG = "DateInput"
 
     var currentDate: String = String()
@@ -60,5 +60,32 @@ object DateInput {
         val timeZone = TimeZone.getTimeZone("UTC")  // Explicit set UTC TimeZone
         dateFormat.timeZone = timeZone
         return dateFormat.format(currentCalendarDateForInitialization.time)
+    }
+
+    fun getEndDate(): Date {
+        val calendarEndDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        // Date must be after Jun 16, 1995, but changed here due to loop counting difference of 1 day
+        calendarEndDate.set(1995, Calendar.JUNE, 17, 0, 0)
+        val endDate = calendarEndDate.time
+        return endDate
+    }
+
+    fun generateRandomDate(): Date {
+        val startingPointOfDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        val startDate: Date = startingPointOfDate.time
+        val endDate = getEndDate()
+        val random: Long = ThreadLocalRandom.current().nextLong(endDate.time, startDate.getTime())
+        val date = Date(random)
+        Log.d(TAG, "generateRandomDate: $date")
+        return date
+    }
+
+    // Test like this in fetchImageArchivesFromCurrentDate
+    fun generateStartingPointOfDate() : Date {
+        val teststartingpointofDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        //Date must be after Jun 16, 1995, but changed here due to loop counting difference of 1 day
+        teststartingpointofDate.set(2015, Calendar.MARCH, 19, 0, 0)
+        val testDate = teststartingpointofDate.time
+        return testDate
     }
 }

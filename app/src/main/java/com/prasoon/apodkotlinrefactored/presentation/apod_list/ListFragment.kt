@@ -9,11 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.databinding.FragmentListBinding
-import com.prasoon.apodkotlinrefactored.domain.model.Apod
+import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -69,17 +68,17 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
         findNavController().navigate(action)
     }
 
-    override fun onItemClickDeleted(apod: Apod, position: Int): Boolean {
+    override fun onItemClickDeleted(apodArchive: ApodArchive, position: Int): Boolean {
         var isDeleted = false
         activity?.let {
             AlertDialog.Builder(it)
                 .setTitle("Deleting this item...")
                 .setMessage("Are you sure?")
                 .setPositiveButton("Yes") {p0,p1->
-                    Log.i(TAG, "onItemClickDeleted: ${apod.date}")
+                    Log.i(TAG, "onItemClickDeleted: ${apodArchive.date}")
                     isDeleted = true
                     apodListAdapter.deleteApods(position)
-                    viewModel.deleteApodModel(apod)
+                    viewModel.deleteApodModel(apodArchive)
                     Log.i(TAG, "isDeleted: $isDeleted")
                 }
                 .setNegativeButton("Cancel", null)

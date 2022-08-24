@@ -6,18 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils.getYoutubeThumbnailUrlFromVideoUrl
 import com.prasoon.apodkotlinrefactored.databinding.ItemApodBinding
-import com.prasoon.apodkotlinrefactored.domain.model.Apod
+import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
+import com.prasoon.apodkotlinrefactored.presentation.apod_archives.ArchiveDiffUtilCallback
 
 //                                                                                        2. Extend holder
 //                      4. Populate objects
-class ApodListAdapter(
-    var apodModelList: ArrayList<Apod>,
-    val actions: ListAction
-) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
+class ApodListAdapter(var apodModelList: ArrayList<ApodArchive>, val actions: ListAction) : RecyclerView.Adapter<ApodListAdapter.ApodViewHolder>() {
     private val TAG = "ApodListAdapter"
 
     // 3. Override methods
@@ -46,38 +44,35 @@ class ApodListAdapter(
         private val progress = apodBinding.itemProgressImageView
 
         // ***Binding between view and data
-        fun bind(apod: Apod, position: Int) {
-            Log.i(TAG, "bind id: ${apod.date}")
-            Log.i(TAG, "bind url: ${apod.url}")
+        fun bind(apodArchive: ApodArchive, position: Int) {
+            Log.i(TAG, "bind id: ${apodArchive.date} url: ${apodArchive.link}")
 
-            if (apod.mediaType == "video") {
-                val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(apod.url)
-                Log.i(TAG, "observeViewModel apodDetail thumbnailUrl: $thumbnailUrl")
+            if (apodArchive.link.contains("youtube")) {
+                val thumbnailUrl = apodArchive.link
+                Log.i(TAG, "observeViewModel ApodListAdapter thumbnailUrl: $thumbnailUrl")
 
                 //itemImageView.loadImage(thumbnailUrl, true, progress)
 
                 //val context = itemImageView.context
                 itemImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, itemImageView, progress, itemImageView.context, true))
 
-
             } else {
                 itemImageView.visibility = View.VISIBLE
                 //itemImageView.loadImage(apod.url, true, progress)
-                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod.url, itemImageView, progress, itemImageView.context, true))
-
+                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context, true))
             }
 
-            itemTitle.text = apod.title
-            itemDate.text = apod.date.toSimpleDateFormat()
+            itemTitle.text = apodArchive.title
+            itemDate.text = apodArchive.date.toSimpleDateFormat()
 
             layout.setOnClickListener {
-                Log.i(TAG, "layout clicked for: ${apod.date}")
-                actions.onItemClickDetail(apod.date)
+                Log.i(TAG, "layout clicked for: ${apodArchive.date}")
+                actions.onItemClickDetail(apodArchive.date)
             }
 
             itemDelete.setOnClickListener {
-                Log.i(TAG, "delete clicked for: ${apod.date}")
-                val isDeleted = actions.onItemClickDeleted(apod, position)
+                Log.i(TAG, "delete clicked for: ${apodArchive.date}")
+                val isDeleted = actions.onItemClickDeleted(apodArchive, position)
                 if (isDeleted) {
                     deleteApods(position)
                 }
@@ -85,7 +80,7 @@ class ApodListAdapter(
         }
     }
 
-    fun updateApods(newApods: List<Apod>) {
+    fun updateApods(newApods: List<ApodArchive>) {
         Log.i(TAG, "updateApods")
         apodModelList.clear()
         apodModelList.addAll(newApods)
@@ -105,9 +100,9 @@ class ApodListAdapter(
     }
 
     // 4. update apod list when new information is invoked
-    fun updateApodListItems(newApodList: List<Apod>) {
+    fun updateApodListItems(newApodList: List<ApodArchive>) {
         Log.i(TAG, "updateApodListItems")
-        val diffCallback = ApodDiffUtilCallback(this.apodModelList, newApodList)
+        val diffCallback = ArchiveDiffUtilCallback(this.apodModelList, newApodList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.apodModelList.clear()
         this.apodModelList.addAll(newApodList)

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.databinding.ItemApodArchiveBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive

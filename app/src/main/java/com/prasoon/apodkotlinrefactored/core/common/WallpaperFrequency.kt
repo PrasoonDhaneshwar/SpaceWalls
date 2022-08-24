@@ -1,4 +1,4 @@
-package com.prasoon.apodkotlinrefactored.core.utils
+package com.prasoon.apodkotlinrefactored.core.common
 
 import java.util.concurrent.TimeUnit
 

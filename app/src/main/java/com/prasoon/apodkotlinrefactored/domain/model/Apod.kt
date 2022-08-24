@@ -1,7 +1,8 @@
 package com.prasoon.apodkotlinrefactored.domain.model
 
 import android.os.Parcelable
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toIntDate
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
+import com.prasoon.apodkotlinrefactored.data.local.entity.ApodArchiveEntity
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodEntity
 import kotlinx.parcelize.Parcelize
 
@@ -17,6 +18,7 @@ data class Apod(
     val url: String,
     val addToFavoritesUI: Boolean = false
 ) : Parcelable {
+    // Convert domain/UI Apod component to DB entity
     fun toApodEntity(processFavoritesDB: Boolean = false): ApodEntity {
         return ApodEntity(
             dateInt = date.toIntDate(),
@@ -28,6 +30,17 @@ data class Apod(
             hdUrl = hdUrl,
             copyright = copyright,
             addToFavoritesDB = processFavoritesDB
+        )
+    }
+
+    // Convert domain/UI Apod component to DB ApodArchive entity
+    fun convertToApodArchiveEntity(processFavoritesDB: Boolean = false): ApodArchiveEntity {
+        return ApodArchiveEntity(
+            dateInt = date.toIntDate(),
+            dateString = date,
+            title = title,
+            url = url,
+            isAddedToFavorites = processFavoritesDB
         )
     }
 }

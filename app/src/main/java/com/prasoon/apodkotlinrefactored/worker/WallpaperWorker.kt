@@ -13,8 +13,8 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.common.Constants.DOWNLOAD_IMAGE_MESSAGE_ID
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SHOW_NOTIFICATION
-import com.prasoon.apodkotlinrefactored.core.common.DateInput
-import com.prasoon.apodkotlinrefactored.core.common.DateInput.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.createBitmapFromCacheFile
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.setWallpaper
 import com.prasoon.apodkotlinrefactored.core.utils.NotificationUtils.displayNotification
@@ -34,7 +34,7 @@ class WallpaperWorker(
     override suspend fun doWork(): Result {
         //startForegroundService()
 
-        val date = DateInput.currentDate.ifEmpty { DateInput.getCurrentDateForInitialization() }
+        val date = DateUtils.currentDate.ifEmpty { DateUtils.getCurrentDateForInitialization() }
         supervisorScope {
 
             try {

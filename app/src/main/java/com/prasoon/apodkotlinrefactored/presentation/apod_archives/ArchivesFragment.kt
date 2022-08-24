@@ -43,6 +43,7 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
         binding.listApod.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!recyclerView.canScrollVertically(1) && dy != 0) {
+                    Log.i(TAG, "addOnScrollListener")
                     viewModel.refresh()
                 }
             }

@@ -1,8 +1,8 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_list
 
-import com.prasoon.apodkotlinrefactored.domain.model.Apod
+import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 
 interface ListAction {
     fun onItemClickDetail(date: String)
-    fun onItemClickDeleted(apodModel: Apod, position: Int) : Boolean
+    fun onItemClickDeleted(apodArchive: ApodArchive, position: Int) : Boolean
 }

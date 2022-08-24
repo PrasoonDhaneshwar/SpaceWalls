@@ -5,9 +5,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.prasoon.apodkotlinrefactored.core.utils.Resource
+import com.prasoon.apodkotlinrefactored.core.common.Resource
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
-import com.prasoon.apodkotlinrefactored.domain.model.Apod
+import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.use_case.GetApodArchives
 import com.prasoon.apodkotlinrefactored.presentation.apod_home.ApodViewModel
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class ApodArchivesViewModel @Inject constructor(
     application: Application,
     private val getApodArchives: GetApodArchives,
-    private val db: ApodArchiveDatabase
+    private val dbArchive: ApodArchiveDatabase,
+    private val db: ApodDatabase,
 ) : AndroidViewModel(application) {
     private val TAG = "ApodArchivesViewModel"
     var apodArchivesListState = ApodArchivesListState()
@@ -64,10 +66,11 @@ class ApodArchivesViewModel @Inject constructor(
         }
     }
 
-    fun saveApodArchive(apod: ApodArchive, processFavoriteDB: Boolean) {
-        Log.i(TAG, "saveApod for ${apod.date}: $processFavoriteDB")
+    fun saveApodArchive(apodArchive: ApodArchive, processFavoriteDB: Boolean) {
+        Log.i(TAG, "saveApodArchive for ${apodArchive.date}: $processFavoriteDB")
         coroutineScope.launch {
-            db.dao.addIntoDB(apod.toApodArchiveEntity((processFavoriteDB)))
+            dbArchive.dao.addOrRemoveFavoritesInArchivesDB(apodArchive.toApodArchiveEntity((processFavoriteDB)))
+            db.dao.updateFavorites(apodArchive.date.toIntDate(), processFavoriteDB)
         }
     }
 
