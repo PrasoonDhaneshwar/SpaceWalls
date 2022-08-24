@@ -56,7 +56,7 @@ object DateUtils {
     }
     fun getCurrentDateForInitialization() : String {
         val currentCalendarDateForInitialization: Calendar = GregorianCalendar()
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd")     // change format of date to "2022-01-10"
         val timeZone = TimeZone.getTimeZone("UTC")  // Explicit set UTC TimeZone
         dateFormat.timeZone = timeZone
         return dateFormat.format(currentCalendarDateForInitialization.time)

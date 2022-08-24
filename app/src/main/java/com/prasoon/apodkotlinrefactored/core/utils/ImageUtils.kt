@@ -202,18 +202,17 @@ object ImageUtils {
 
         val config = ImageLoaderConfiguration.Builder(context)
         config.threadPriority(Thread.NORM_PRIORITY - 2)
-        config.denyCacheImageMultipleSizesInMemory()
         config.diskCacheFileNameGenerator(Md5FileNameGenerator())
         config.diskCacheSize(50 * 1024 * 1024) // 50 MiB
 
-        config.tasksProcessingOrder(QueueProcessingType.LIFO)
+        config.tasksProcessingOrder(QueueProcessingType.FIFO)
         config.writeDebugLogs() // Remove for release app
 
 
         val options = DisplayImageOptions.Builder()
             .showImageOnFail(R.drawable.handle_another_app) // resource or drawable
             .resetViewBeforeLoading(true) // default
-            .delayBeforeLoading(500)
+            .delayBeforeLoading(50)
             .cacheInMemory(true) // default
             .cacheOnDisk(true) // default
             .build()

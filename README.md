@@ -16,7 +16,17 @@ Click [here](https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-K
 - Support for tablet devices with both portrait and landscape orientations
 ---
 ## 📸 Screenshots ##
-![](images/PortraitMode.JPG)
+<div class="column">
+  <img src="images/LandscapeLight.JPG" width="266" height="569" />
+  <img src="images/LandscapeDark.JPG" width="266" height="569" />
+  <img src="images/ArchiveDarkJPG.JPG" width="266" height="569"/>
+  <img src="images/ArchiveLight.JPG" width="266" height="569"/>
+  <img src="images/FavoritesLight.JPG" width="266" height="569"/>
+  <img src="images/FavoritesDark.JPG" width="266" height="569"/>
+  <img src="images/SettingsLight.JPG" width="266" height="569"/>
+  <img src="images/SettingsFrequencyLight.JPG" width="266" height="569"/>
+  <img src="images/SettingsDailyWallpaperLight.JPG" width="266" height="569"/>
+</div>
 
 ---
 ### **🔑 NASA APIs** ###
@@ -30,6 +40,7 @@ https://api.nasa.gov/
 #### *Sign up for your API key at:* https://api.nasa.gov/index.html#apply-for-an-api-key
 
 #### *An example query:* For any given **date**: https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date=YYYY-MM-DD
+
 ---
 # 🛠️Libraries and Dependencies #
 

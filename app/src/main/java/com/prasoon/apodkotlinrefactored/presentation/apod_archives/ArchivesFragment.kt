@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.databinding.FragmentArchivesBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
@@ -34,8 +35,8 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
 
         binding.listApod.apply {
             setHasFixedSize(true)
-             layoutManager = LinearLayoutManager(context)
-            //layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+             //layoutManager = LinearLayoutManager(context)
+            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             //layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = apodListAdapter
         }
