@@ -35,7 +35,7 @@ class ApodDetailViewModel @Inject constructor(
     val apodStateLiveData = MutableLiveData<ApodState>()         // To be OBSERVED from the UI
 
     fun getApodDetailFromDb(date: String) {
-        Log.i(TAG, "getApodDetailFromDb: $date")
+        Log.d(TAG, "getApodDetailFromDb: $date")
         coroutineScope.launch {
             val job = CoroutineScope(Dispatchers.IO).launch {
                 isDateExistInDB = db.dao.isRowIsExist(date.toIntDate())

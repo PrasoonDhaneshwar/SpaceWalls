@@ -50,7 +50,7 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
     }
 
     private fun observeViewModel() {
-        viewModel.apodModelList.observe(viewLifecycleOwner) { apodList ->
+        viewModel.apodFavoritesLiveData.observe(viewLifecycleOwner) { apodList ->
             binding.listProgress.visibility = View.GONE
             binding.listApod.visibility = View.VISIBLE
             //apodListAdapter.updateApods(apodList.sortedByDescending { it.date.toIntDate() })
@@ -59,7 +59,7 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
     }
 
     override fun onItemClickDetail(date: String) {
-        Log.i(TAG, "onItemClickDetail: $date")
+        Log.d(TAG, "onItemClickDetail: $date")
         goToApodModelDetails(date)
     }
 
@@ -75,11 +75,11 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
                 .setTitle("Deleting this item...")
                 .setMessage("Are you sure?")
                 .setPositiveButton("Yes") {p0,p1->
-                    Log.i(TAG, "onItemClickDeleted: ${apodArchive.date}")
+                    Log.d(TAG, "onItemClickDeleted: ${apodArchive.date}")
                     isDeleted = true
                     apodListAdapter.deleteApods(position)
                     viewModel.deleteApodModel(apodArchive)
-                    Log.i(TAG, "isDeleted: $isDeleted")
+                    Log.d(TAG, "isDeleted: $isDeleted")
                 }
                 .setNegativeButton("Cancel", null)
                 .create()

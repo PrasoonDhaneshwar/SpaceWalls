@@ -42,7 +42,7 @@ class ApodRepositoryImpl(
         // *** load from it.
         if (isDateExistInDB) {
             apod = dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod()
-            Log.i(TAG, "Emit apod from DB:  $apod" )
+            Log.d(TAG, "Emit apod from DB:  $apod" )
             // Data loaded
             emit(Resource.Success(data = apod))
 
@@ -58,11 +58,11 @@ class ApodRepositoryImpl(
 
                 // Emit data to UI
                 apod = dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod()
-                Log.i(TAG, "Emit apod from remote:  $apod")
+                Log.d(TAG, "Emit apod from remote:  $apod")
                 emit(Resource.Success(apod))
 
             } catch (e: HttpException) {
-                Log.i(TAG, "Exception occurred: $e")
+                Log.d(TAG, "Exception occurred: $e")
                 if (e.code() == 400) return@flow    // Don't handle bad requests
                 emit(Resource.Error(message = "Oops, something went wrong!", data = Apod("", "", "", "", "", "", "")))
 

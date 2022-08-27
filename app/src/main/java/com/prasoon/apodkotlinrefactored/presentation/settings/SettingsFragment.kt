@@ -6,13 +6,29 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.common.Constants.FREQUENCY_ARCHIVE
+import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENCY
+import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_ARCHIVE_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_DAILY_WALLPAPER
+import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_FAVORITES_WALLPAPER
+import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_TYPE
+import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
+import com.prasoon.apodkotlinrefactored.core.common.Constants.TOTAL_FAVORITES
 import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
 import com.prasoon.apodkotlinrefactored.core.utils.*
+import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
     private val TAG = "SettingsFragment"
+
+    @Inject
+    lateinit var dbArchive: ApodArchiveDatabase
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_preference, rootKey)
 
@@ -26,30 +42,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val showNotifications: Preference? = findPreference("notifications")
 
         displayPref!!.setOnPreferenceChangeListener { _, newValue ->
-            Log.i(TAG, "displayPref: $newValue")
+            Log.d(TAG, "displayPref: $newValue")
             setAppTheme(newValue.toString())
             true // return status.
         }
 
         showNotifications!!.setOnPreferenceChangeListener { _, newValue ->
             val isChecked: Boolean = newValue.toString().toBoolean()
-            Log.i(TAG, "Notifications are: $isChecked")
+            Log.d(TAG, "Notifications are: $isChecked")
             showNotification(isChecked)
             true // return status.
         }
 
         // SCREENS
-        selectScreenPref!!.setOnPreferenceChangeListener { _, newValue ->
-            Log.i(TAG, "selectScreenPref: $newValue")
+        selectScreenPref!!.setOnPreferenceChangeListener { _, newValueOfScreen ->
+            Log.d(TAG, "selectScreenPref: $newValueOfScreen")
+            val screenPreference = screenPreference(newValueOfScreen.toString())
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, screenPreference, true, WALLPAPER_FREQUENCY)
             true // return status.
         }
 
         // FREQUENCY
         scheduleFrequencyPref!!.setOnPreferenceChangeListener { _, frequencyArchive ->
 
-            Log.i(TAG, "scheduleFrequencyPref: $frequencyArchive")
+            Log.d(TAG, "scheduleFrequencyPref: $frequencyArchive")
             val frequency = scheduleFrequency(frequencyArchive.toString())
-            setPeriodicWorkRequest(requireContext(), frequency, true)
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, true, frequency)
             true // return status.
         }
 
@@ -62,10 +80,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 scheduleFrequencyPref.isEnabled = false
 
             scheduleArchivePref?.isEnabled = !isChecked
-            scheduleFavoritesPref?.isEnabled = !isChecked
-
-            Log.i(TAG, "scheduleDailyWallpaperPref: $isChecked")
-            scheduleWallpaper(requireContext(), SCHEDULE_DAILY_WALLPAPER, isChecked, WallpaperFrequency.EVERY_DAY)
+            scheduleFavoritesPref?.isEnabled = !isChecked && (TOTAL_FAVORITES != 0)
+            SCHEDULE_TYPE = SCHEDULE_DAILY_WALLPAPER
+            Log.d(TAG, "scheduleDailyWallpaperPref: $isChecked")
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, WallpaperFrequency.EVERY_DAY)
             true // return status.
         }
 
@@ -76,10 +94,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleFrequencyPref.isEnabled = isChecked
 
             scheduleDailyWallpaperPref.isEnabled = !isChecked
-            scheduleFavoritesPref?.isEnabled = !isChecked
-
-            Log.i(TAG, "scheduleArchivePref: $isChecked")
-            scheduleWallpaper(requireContext(), SCHEDULE_DAILY_WALLPAPER, isChecked, FREQUENCY_ARCHIVE)
+            scheduleFavoritesPref?.isEnabled = !isChecked && (TOTAL_FAVORITES != 0)
+            Log.d(TAG, "scheduleArchivePref: $isChecked")
+            SCHEDULE_TYPE = SCHEDULE_ARCHIVE_WALLPAPER
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, WALLPAPER_FREQUENCY)
 
             true // return status.
         }
@@ -93,24 +111,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             scheduleArchivePref.isEnabled = !isChecked
             scheduleDailyWallpaperPref.isEnabled = !isChecked
-            scheduleWallpaper(requireContext(), SCHEDULE_DAILY_WALLPAPER, isChecked, FREQUENCY_ARCHIVE)
-
-            Log.i(TAG, "scheduleFavoritesPref: $isChecked")
+            Log.d(TAG, "scheduleFavoritesPref: $isChecked")
+            SCHEDULE_TYPE = SCHEDULE_FAVORITES_WALLPAPER
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, WALLPAPER_FREQUENCY)
             true // return status.
         }
 
         if (scheduleDailyWallpaperPref.isChecked) {
+            SCHEDULE_TYPE = SCHEDULE_DAILY_WALLPAPER
             scheduleArchivePref.isEnabled = false
             scheduleFavoritesPref.isEnabled = false
             scheduleFrequencyPref.isEnabled =false
         }
 
         if (scheduleArchivePref.isChecked) {
+            SCHEDULE_TYPE = SCHEDULE_ARCHIVE_WALLPAPER
             scheduleDailyWallpaperPref.isEnabled = false
             scheduleFavoritesPref.isEnabled = false
         }
 
         if (scheduleFavoritesPref.isChecked) {
+            SCHEDULE_TYPE = SCHEDULE_FAVORITES_WALLPAPER
             scheduleDailyWallpaperPref.isEnabled = false
             scheduleArchivePref.isEnabled = false
         }
@@ -118,6 +139,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
         if (!scheduleDailyWallpaperPref.isChecked && !scheduleArchivePref.isChecked && !scheduleFavoritesPref.isChecked) {
             scheduleFrequencyPref.isEnabled =false
             selectScreenPref.isEnabled =false
+        }
+
+        var count: Int
+        CoroutineScope(Dispatchers.IO).launch {
+            val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
+            val favoritesSize = apodArchiveList.size
+            withContext(Dispatchers.Main) {
+                count = favoritesSize
+                TOTAL_FAVORITES = count
+                Log.d(TAG, "count.value: $count TOTAL_FAVORITES: $TOTAL_FAVORITES")
+                if (TOTAL_FAVORITES == 0) scheduleFavoritesPref.isEnabled = false
+                //else if (TOTAL_FAVORITES != 0 && !(scheduleDailyWallpaperPref.isEnabled) && (!scheduleArchivePref.isEnabled))scheduleFavoritesPref.isEnabled = true
+            }
         }
     }
 }

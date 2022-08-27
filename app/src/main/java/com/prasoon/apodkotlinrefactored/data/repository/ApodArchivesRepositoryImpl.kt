@@ -11,6 +11,7 @@ import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
 import kotlinx.coroutines.*
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
+import java.net.ConnectException
 import java.net.ProtocolException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -24,9 +25,9 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
     private var todayDate = Date()
     private val currentCalendarDate: Calendar = GregorianCalendar(TimeZone.getTimeZone("UTC"))
     private var iteration = 1
-    override suspend fun fetchImageArchivesFromCurrentDate(): List<ApodArchive> {
+    override suspend fun fetchArchivesFromCurrentDate(): List<ApodArchive> {
         val apodArchiveList: MutableList<ApodArchive> = ArrayList()
-        Log.i(TAG, "Starting point of date: $todayDate")
+        Log.d(TAG, "Starting point of date: $todayDate")
 
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")    // change format of date to "2022-01-10"
 
@@ -54,11 +55,11 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
                 val isDateExistInDB = daoArchive.isRowIsExist(parsedDate.toIntDate())
                 if (isDateExistInDB) {
                     apodArchive = daoArchive.getApodFromDatePrimaryKey(parsedDate.toIntDate()).toApodArchive()
-                    Log.i(TAG, "Fetch from DB -> apodArchive: $apodArchive")
+                    Log.d(TAG, "Fetch from DB -> apodArchive: $apodArchive")
 
                 } else {
                     apodArchive = createArchiveLinksWithDate(parsedDate)   // Wait for it to finish
-                    Log.i(TAG, "Fetch from Network -> apodArchive: $apodArchive")
+                    Log.d(TAG, "Fetch from Network -> apodArchive: $apodArchive")
 
                     val jobAddToDb = CoroutineScope(Dispatchers.IO).launch {
                         daoArchive.insertApod(apodArchive.toApodArchiveEntity())
@@ -71,8 +72,7 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         }
 
         todayDate = currentCalendarDate.time
-
-        Log.i(TAG, "fetchImageArchivesFromCurrentDate with todayDate: ${todayDate} iteration: ${iteration++}: " + apodArchiveList)
+        Log.d(TAG, "fetchImageArchivesFromCurrentDate with todayDate: $todayDate iteration: ${iteration++}: " + apodArchiveList)
 
         return apodArchiveList
     }
@@ -102,8 +102,10 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
             e.printStackTrace();
         } catch (e: SocketTimeoutException) {
             e.printStackTrace();
+        } catch (e: ConnectException) {
+            e.printStackTrace();
         } catch (e: HttpStatusException) {
-            Log.i(TAG, "link $url does not exist for : $date")
+            Log.d(TAG, "link $url does not exist for : $date")
             e.printStackTrace();
         }
         if (png.isNotEmpty()) {
@@ -121,7 +123,6 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         return archive
     }
 
-    override suspend fun fetchImageArchivesFromCurrentDate(items: Int): List<String> {
-        return emptyList()
-    }
+    override suspend fun fetchArchiveFromDate(date: String) = createArchiveLinksWithDate(date)
+
 }

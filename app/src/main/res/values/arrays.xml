@@ -26,6 +26,8 @@
     </string-array>
 
     <string-array name="select_frequency">
+        <item>Fifteen minutes</item>
+        <item>Thirty minutes</item>
         <item>One hour</item>
         <item>Two hours</item>
         <item>Four hours</item>
@@ -34,6 +36,8 @@
     </string-array>
 
     <string-array name="frequency">
+        <item>fifteen_minutes</item>
+        <item>thirty_minutes</item>
         <item>one_hour</item>
         <item>two_hours</item>
         <item>four_hours</item>

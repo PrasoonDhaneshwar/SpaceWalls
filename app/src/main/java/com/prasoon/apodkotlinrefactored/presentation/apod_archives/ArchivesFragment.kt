@@ -44,7 +44,7 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
         binding.listApod.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!recyclerView.canScrollVertically(1) && dy != 0) {
-                    Log.i(TAG, "addOnScrollListener")
+                    Log.d(TAG, "addOnScrollListener")
                     viewModel.refresh()
                 }
             }
@@ -67,7 +67,7 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
 
     private fun observeViewModel() {
         viewModel.apodArchivesListLiveData.observe(viewLifecycleOwner) { apodList ->
-            Log.i(TAG, "apodArchivesListLiveData: $apodList")
+            Log.d(TAG, "apodArchivesListLiveData: $apodList")
             if (apodList.isLoading) binding.loader.show()
 
             if (!apodList.isLoading) {
@@ -82,7 +82,7 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
     }
 
     override fun onItemClickDetail(date: String) {
-        Log.i(TAG, "onItemClickDetail: $date")
+        Log.d(TAG, "onItemClickDetail: $date")
     }
 
     override fun onItemAddedToFavorites(apodModel: ApodArchive, position: Int, processFavoriteDB: Boolean): Boolean {

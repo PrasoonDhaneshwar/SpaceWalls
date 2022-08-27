@@ -110,7 +110,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
 /*        // Swipe to refresh
         binding.homeSwipeRefreshLayout.setOnRefreshListener {
-            Log.i(TAG, "Swipe refresh for date: ${DateInput.currentDate}")
+            Log.d(TAG, "Swipe refresh for date: ${DateInput.currentDate}")
             viewModel.refresh(DateInput.currentDate)
             binding.homeSwipeRefreshLayout.isRefreshing = false
         }*/
@@ -134,7 +134,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         }
 
         binding.homeImageViewResult.setOnClickListener {
-            Log.i(TAG, "imageViewResult")
+            Log.d(TAG, "imageViewResult")
             if (currentApod.mediaType == "image") {
                 val action =
                     HomeFragmentDirections.actionHomeFragmentToViewFragment(currentApod)
@@ -197,16 +197,16 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     private fun observeViewModel() {
         viewModel.apodStateLiveData.observe(viewLifecycleOwner) { apodStateLiveData ->
             if (!apodStateLiveData.message.isNullOrEmpty()) {
-                Log.i(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
+                Log.d(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
                 Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
             }
                 currentApod = apodStateLiveData.apod
                 DateUtils.currentDate =
                     currentApod.date    // Set the date received from the viewModel
 
-                Log.i(TAG, "Apod model received from viewmodel: $currentApod")
-                Log.i(TAG, "Web link : ${DateUtils.createApodUrl(currentApod.date)}")
-                Log.i(TAG, "Api link : ${DateUtils.createApodUrlApi(currentApod.date)}")
+                Log.d(TAG, "Apod model received from viewmodel: $currentApod")
+                Log.d(TAG, "Web link : ${DateUtils.createApodUrl(currentApod.date)}")
+                Log.d(TAG, "Api link : ${DateUtils.createApodUrlApi(currentApod.date)}")
 
                 if (currentApod.addToFavoritesUI) {
                     binding.homeAddToFavorites.setColorFilter(
@@ -240,7 +240,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                         binding.homeAddToFavorites.visibility = View.VISIBLE
                         val thumbnailUrl =
                             VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
-                        Log.i(TAG, "YouTube thumbnailUrl: $thumbnailUrl")
+                        Log.d(TAG, "YouTube thumbnailUrl: $thumbnailUrl")
                         binding.homeImageViewResult.setImageBitmap(
                             ImageUtils.loadImageUIL(
                                 thumbnailUrl,
@@ -311,19 +311,19 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         var screenFlag= HOME_SCREEN
         mBinding.homeScreen.setOnClickListener {
             screenFlag = HOME_SCREEN
-            Log.i(TAG, "homeScreen: $screenFlag")
+            Log.d(TAG, "homeScreen: $screenFlag")
             ImageUtils.setWallpaper(requireContext(), imageView, screenFlag, null)
             bottomSheetDialog.hide()
         }
         mBinding.lockScreen.setOnClickListener {
             screenFlag = LOCK_SCREEN
-            Log.i(TAG, "lockScreen: $screenFlag")
+            Log.d(TAG, "lockScreen: $screenFlag")
             ImageUtils.setWallpaper(requireContext(), imageView, screenFlag, null)
             bottomSheetDialog.hide()
         }
         mBinding.bothScreens.setOnClickListener {
             screenFlag = BOTH_SCREENS
-            Log.i(TAG, "bothScreen: $screenFlag")
+            Log.d(TAG, "bothScreen: $screenFlag")
             ImageUtils.setWallpaper(requireContext(), imageView, screenFlag, null)
             bottomSheetDialog.hide()
         }

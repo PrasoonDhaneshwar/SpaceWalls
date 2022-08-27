@@ -67,8 +67,7 @@ object NotificationUtils {
         val notificationIntent = Intent(context, MainActivity::class.java)
         notificationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 
-        val pendingIntent: PendingIntent
-        pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val pendingIntent: PendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.getActivity(
                 context,
                 0,

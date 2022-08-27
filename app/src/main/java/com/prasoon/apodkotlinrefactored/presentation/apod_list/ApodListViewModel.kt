@@ -1,6 +1,7 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_list
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -22,7 +23,7 @@ class ApodListViewModel @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
 
-    val apodModelList = MutableLiveData<List<ApodArchive>>()
+    val apodFavoritesLiveData = MutableLiveData<List<ApodArchive>>()
     val loading = MutableLiveData<Boolean>()
 
     // Entry point for view
@@ -34,8 +35,8 @@ class ApodListViewModel @Inject constructor(
         // Loading spinner active. Disabled when information is retrieved.
         loading.value = true
         coroutineScope.launch {
-            val apod = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
-            apodModelList.postValue(apod)
+            val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
+            apodFavoritesLiveData.postValue(apodArchiveList)
             withContext(Dispatchers.Main) {
                 loading.value = false
             }

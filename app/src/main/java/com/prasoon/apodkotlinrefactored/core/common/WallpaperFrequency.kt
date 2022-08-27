@@ -7,6 +7,8 @@ enum class WallpaperFrequency(
     val interval: Long,
     val timeUnit: TimeUnit
 ) {
+    EVERY_FIFTEEN_MINUTES("Fifteen minutes", 15L, TimeUnit.MINUTES),
+    EVERY_THIRTY_MINUTES("Thirty minutes", 30L, TimeUnit.MINUTES),
     EVERY_HOUR("One hour", 1L, TimeUnit.HOURS),
     EVERY_TWO_HOURS("Two hours", 2L, TimeUnit.HOURS),
     EVERY_FOUR_HOURS("Four hours", 4L, TimeUnit.HOURS),

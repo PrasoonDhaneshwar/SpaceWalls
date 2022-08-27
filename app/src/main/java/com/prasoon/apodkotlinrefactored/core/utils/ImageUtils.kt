@@ -96,7 +96,7 @@ object ImageUtils {
             Objects.requireNonNull(fos)?.close()
 
             withContext(Dispatchers.Main) {
-                Log.i("saveImage", "Saved as $imageName.jpg in $storageDirectoryPath")
+                Log.d("saveImage", "Saved as $imageName.jpg in $storageDirectoryPath")
                 Toast.makeText(
                     context,
                     "Saved as $imageName.jpg in $storageDirectoryPath",
@@ -147,7 +147,7 @@ object ImageUtils {
                     (urlConnection as HttpURLConnection).disconnect()
             }
             withContext(Dispatchers.Main) {
-                Log.i(TAG,"size of image:  ${size / 1024} kB")
+                Log.d(TAG,"size of image:  ${size / 1024} kB")
             }
         }
         return size
@@ -196,7 +196,7 @@ object ImageUtils {
             .into(this)
     }
 
-    fun loadImageUIL(uri: String?, imageView: ImageView, viewProgressBar: RoundedProgressBar, context: Context, isSizeConstraint: Boolean): Bitmap? {
+    fun loadImageUIL(uri: String?, imageView: ImageView, viewProgressBar: RoundedProgressBar, context: Context, isSizeConstraintForList: Boolean): Bitmap? {
         val imageLoader = ImageLoader.getInstance()
         var bmpImage: Bitmap? = null
 
@@ -220,21 +220,21 @@ object ImageUtils {
         imageLoader.init(config.build())
         val imageViewAware = ImageViewAware(imageView)
         val targetSize = ImageSize(IMAGE_WIDTH, IMAGE_HEIGHT)
-        if (isSizeConstraint) {
+        if (isSizeConstraintForList) {
             imageLoader.displayImage(uri, imageViewAware, options, targetSize, object : SimpleImageLoadingListener() {
                 override fun onLoadingStarted(imageUri: String?, view: View?) {
-                    Log.i(TAG, "onLoadingStarted: $uri")
+                    Log.d(TAG, "onLoadingStarted: $uri")
                     viewProgressBar.isVisible = true
                 }
 
                 override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
-                    Log.i(TAG, "onLoadingFailed: $uri")
+                    Log.d(TAG, "onLoadingFailed: $uri")
                     super.onLoadingFailed(imageUri, view, failReason)
                     viewProgressBar.isVisible = false
                 }
 
                 override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
-                    Log.i(TAG, "onLoadingComplete: $uri")
+                    Log.d(TAG, "onLoadingComplete: $uri")
                     viewProgressBar.isVisible = false
                     bmpImage = loadedImage
                 }
@@ -249,7 +249,7 @@ object ImageUtils {
                     viewProgressBar.setProgressPercentage(
                         downloadProgressPercentage, true
                     )
-                    Log.i("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
+                    Log.d("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
                 }
             })
             return bmpImage
@@ -257,19 +257,28 @@ object ImageUtils {
         } else {
             imageLoader.displayImage(uri, imageView, options, object : SimpleImageLoadingListener() {
                 override fun onLoadingStarted(imageUri: String?, view: View?) {
-                    Log.i(TAG, "onLoadingStarted: $uri")
+                    Log.d(TAG, "onLoadingStarted: $uri")
                     viewProgressBar.isVisible = true
                 }
 
                 override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
-                    Log.i(TAG, "onLoadingFailed: $uri")
+                    Log.d(TAG, "onLoadingFailed: $uri")
                     super.onLoadingFailed(imageUri, view, failReason)
                     viewProgressBar.isVisible = false
+
+                    val t = failReason!!.cause
+                    if (t is FileNotFoundException) {
+                        return
+                    } else if (t is SocketTimeoutException) {
+                        return
+                    } else if (t is ProtocolException) {
+                        return
+                    }
                     Toast.makeText(context, "Connection timeout! Image loading failed", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
-                    Log.i(TAG, "onLoadingComplete: $uri")
+                    Log.d(TAG, "onLoadingComplete: $uri")
                     viewProgressBar.isVisible = false
                     bmpImage = loadedImage
                 }
@@ -284,7 +293,7 @@ object ImageUtils {
                     viewProgressBar.setProgressPercentage(
                         downloadProgressPercentage, true
                     )
-                    Log.i("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
+                    Log.d("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
                 }
             })
 
@@ -293,7 +302,7 @@ object ImageUtils {
     }
 
     fun setWallpaper(context: Context, imageView: ImageView?, screenFlag: Int, inputBitmap: Bitmap?) {
-        Log.i(TAG, "set Wallpaper")
+        Log.d(TAG, "set Wallpaper")
         val wallpaperManager = WallpaperManager.getInstance(context)
         val bitmap = if (imageView != null && inputBitmap == null) {
             (imageView.drawable as BitmapDrawable).bitmap
@@ -307,10 +316,10 @@ object ImageUtils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val cropHint = bitmap.cropHint(wallpaperManager.desiredMinimumHeight)
 
-                Log.i(TAG, "Screen size -> height x width: $SCREEN_HEIGHT x $SCREEN_WIDTH")
-                Log.i(TAG, "Bitmap dimensions -> height x width: ${bitmap.height} x ${bitmap.width}")
-                Log.i(TAG, "Desired wallpaper dimensions -> height x width ${wallpaperManager.desiredMinimumHeight} x ${wallpaperManager.desiredMinimumWidth}")
-                Log.i(TAG, "Crop hint -> $cropHint")
+                Log.d(TAG, "Screen size -> height x width: $SCREEN_HEIGHT x $SCREEN_WIDTH")
+                Log.d(TAG, "Bitmap dimensions -> height x width: ${bitmap.height} x ${bitmap.width}")
+                Log.d(TAG, "Desired wallpaper dimensions -> height x width ${wallpaperManager.desiredMinimumHeight} x ${wallpaperManager.desiredMinimumWidth}")
+                Log.d(TAG, "Crop hint -> $cropHint")
 
                 // Rect(left, top, right, bottom)
                 // val rect = Rect(0, 0, bitmap.height, bitmap.width)
@@ -331,14 +340,16 @@ object ImageUtils {
     }
     private fun Bitmap.cropHint(desiredHeight: Int): Rect {
         val screenRatio: Float = (SCREEN_HEIGHT/ SCREEN_WIDTH).toFloat()
-        Log.i(TAG, "screenRatio -> $screenRatio")
+        Log.d(TAG, "screenRatio -> $screenRatio")
 
         val desiredWidth = SCREEN_WIDTH * height / desiredHeight
         val offsetX = (width - desiredWidth) / 2
         return Rect(offsetX, 0, width - offsetX, height)
     }
 
-    suspend fun createBitmapFromCacheFile(urlString: String, context: Context): Bitmap {
+    suspend fun createBitmapFromCacheFile(urlString: String, context: Context): Bitmap? {
+        Log.d(TAG, "createBitmapFromCacheFile: $urlString")
+
         return withContext(Dispatchers.IO) {
         val file = File(context.cacheDir, "apodToday.jpg")
         val outputStream = FileOutputStream(file)
@@ -346,19 +357,24 @@ object ImageUtils {
 
             try {
                 inputStream = URL(urlString).openConnection().getInputStream()
+                Log.d(TAG, "createBitmapFromCacheFile: inputStream: $inputStream")
+
             } catch (e: UnknownHostException) {
-                e.printStackTrace();
+                e.printStackTrace()
             } catch (e: ProtocolException) {
-                e.printStackTrace();
+                e.printStackTrace()
             } catch (e: SocketTimeoutException) {
-                e.printStackTrace();
+                e.printStackTrace()
             } catch (e: HttpStatusException) {
-                e.printStackTrace();
+                e.printStackTrace()
+            } catch (e: ConnectException) {
+                e.printStackTrace()
             }
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        val bitmap :Bitmap? = BitmapFactory.decodeStream(inputStream)
+        Log.d(TAG, "createBitmapFromCacheFile: bitmap: $bitmap")
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         Objects.requireNonNull(outputStream)?.close()
-        Log.i(TAG, "bitmap.height -> ${bitmap.height}")
+        Log.d(TAG, "Bitmap dimensions -> height x width: ${bitmap?.height} x ${bitmap?.width}")
         bitmap
         }
     }

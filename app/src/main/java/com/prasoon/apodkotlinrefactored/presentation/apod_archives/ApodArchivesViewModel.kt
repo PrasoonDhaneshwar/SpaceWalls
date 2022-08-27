@@ -67,7 +67,7 @@ class ApodArchivesViewModel @Inject constructor(
     }
 
     fun saveApodArchive(apodArchive: ApodArchive, processFavoriteDB: Boolean) {
-        Log.i(TAG, "saveApodArchive for ${apodArchive.date}: $processFavoriteDB")
+        Log.d(TAG, "saveApodArchive for ${apodArchive.date}: $processFavoriteDB")
         coroutineScope.launch {
             dbArchive.dao.addOrRemoveFavoritesInArchivesDB(apodArchive.toApodArchiveEntity((processFavoriteDB)))
             db.dao.updateFavorites(apodArchive.date.toIntDate(), processFavoriteDB)

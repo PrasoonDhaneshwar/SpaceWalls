@@ -32,7 +32,7 @@ class ViewFragment : Fragment(R.layout.fragment_view) {
         val url = apod.url
         val hdUrl = apod.hdUrl
         val date = apod.date
-        Log.i(TAG, "imageUrl: $url")
+        Log.d(TAG, "imageUrl: $url")
         binding.fragmentImageView.setImageBitmap(ImageUtils.loadImageUIL(url, binding.fragmentImageView, binding.fragmentViewProgress, requireContext(), false))
 
 
@@ -59,29 +59,5 @@ class ViewFragment : Fragment(R.layout.fragment_view) {
                 ImageUtils.setWallpaper(requireContext(), binding.fragmentImageView, BOTH_SCREENS, null)
             }
         }
-        generateRandomDate()
-
-        lateinit var document : Document
-        lateinit var element : Elements
-        lateinit var png : String
-
-/*        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                document = Jsoup.connect("https://apod.nasa.gov/apod/ap220726.html").get()
-                element = document.select("center").select("b")
-                //png = document.select("iframe[width]").attr("src")
-                png = document.select("div[id=\"center\"] strong").toString()
-                //png = document.select("iframe[src]").attr("src")
-
-
-            } catch (e: UnknownHostException) {
-                e.printStackTrace();
-            }
-            withContext(Dispatchers.Main) {
-                Log.d(TAG, "words png: $png")
-                Log.d(TAG, "words element: ${element.first()?.text()}")
-                Log.d(TAG,"words png modified: https://apod.nasa.gov/apod/$png")
-            }
-        }*/
     }
 }

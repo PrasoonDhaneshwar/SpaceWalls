@@ -41,18 +41,18 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     private fun observeViewModel() {
         viewModel.apodStateLiveData.observe(viewLifecycleOwner) { apodStateLiveData ->
             if (!apodStateLiveData.message.isNullOrEmpty()) {
-                Log.i(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
+                Log.d(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
                 Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
             }
             currentApod = apodStateLiveData.apod
 
-            Log.i(TAG, "observeViewModel currentApod: $currentApod")
-            Log.i(TAG, "observeViewModel currentApod date: ${currentApod.date}")
+            Log.d(TAG, "observeViewModel currentApod: $currentApod")
+            Log.d(TAG, "observeViewModel currentApod date: ${currentApod.date}")
 
             if (currentApod.mediaType == "video") {
                 binding.detailVideoViewButton.visibility = View.VISIBLE
                 val thumbnailUrl = getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
-                Log.i(TAG, "observeViewModel currentApod thumbnailUrl: $thumbnailUrl")
+                Log.d(TAG, "observeViewModel currentApod thumbnailUrl: $thumbnailUrl")
 
                 //binding.detailImageView.loadImage(thumbnailUrl, false, binding.detailProgressImageView)
                 binding.detailImageView.setImageBitmap(
@@ -66,7 +66,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
             } else {
                 binding.detailImageView.visibility = View.VISIBLE
-                Log.i(TAG, "url: ${currentApod.url}")
+                Log.d(TAG, "url: ${currentApod.url}")
                 //binding.detailImageView.loadImage(currentApod.url, false, binding.detailProgressImageView)
 
                 binding.detailImageView.setImageBitmap(

@@ -63,7 +63,7 @@
 
         <ListPreference
             android:icon="@drawable/screen_both"
-            app:defaultValue="home_screen"
+            app:defaultValue="both_screens"
             app:entries="@array/select_screen"
             app:entryValues="@array/screen_values"
             app:key="screen"

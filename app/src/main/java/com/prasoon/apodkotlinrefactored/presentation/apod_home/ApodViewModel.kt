@@ -36,7 +36,7 @@ class ApodViewModel @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun refresh(date: String) {
-        Log.i(TAG, "refresh for date: $date")
+        Log.d(TAG, "refresh for date: $date")
         getApod(date)
     }
 
@@ -71,14 +71,14 @@ class ApodViewModel @Inject constructor(
         coroutineScope.launch {
             size = getFileSizeOfUrl("https://apod.nasa.gov/apod/image/2206/V838Mon_Hubble_2238.jpg")
             withContext(Dispatchers.Main) {
-                Log.i("ApodRepositoryImpl", "size of image:  ${size!! /1024} kB")
+                Log.d("ApodRepositoryImpl", "size of image:  ${size!! /1024} kB")
             }
         }*/
     }
 
 
     fun saveApod(apod: Apod, processFavoriteDB: Boolean) {
-        Log.i(TAG, "saveApod for ${apod.date}: $processFavoriteDB")
+        Log.d(TAG, "saveApod for ${apod.date}: $processFavoriteDB")
         coroutineScope.launch {
             db.dao.addOrRemoveFavoritesInApodDB(apod.toApodEntity(processFavoriteDB))
             dbArchiveDatabase.dao.addOrRemoveFavoritesInArchivesDB(apod.convertToApodArchiveEntity(processFavoriteDB))

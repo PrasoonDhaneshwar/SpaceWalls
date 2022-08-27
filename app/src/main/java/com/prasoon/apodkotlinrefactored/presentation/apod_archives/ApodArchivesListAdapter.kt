@@ -21,7 +21,7 @@ class ApodArchivesListAdapter(
 
     // 3. Override methods
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApodViewHolder {
-        Log.i(TAG, "onCreateViewHolder")
+        Log.d(TAG, "onCreateViewHolder")
         val apodBinding = ItemApodArchiveBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ApodViewHolder(apodBinding)
     }
@@ -45,19 +45,19 @@ class ApodArchivesListAdapter(
 
         // ***Binding between view and data
         fun bind(apod: ApodArchive, position: Int) {
-            Log.i(TAG, "bind id: ${apod}")
+            Log.d(TAG, "bind id: ${apod}")
             itemTitle.text = apod.title
             itemDate.text = apod.date.toSimpleDateFormat()
             itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod.link, itemImageView, progress, itemImageView.context, true))
 
             addToFavorite.setOnClickListener {
                 if (!isAddedToDB) {
-                    Log.i(TAG, "add to favorites: ${apod.date}")
+                    Log.d(TAG, "add to favorites: ${apod.date}")
                     actions.onItemAddedToFavorites(apod, position, true)
                     addToFavorite.setImageResource(R.drawable.ic_favorite_fill)
 
                 } else if (isAddedToDB) {
-                    Log.i(TAG, "remove from favorites: ${apod.date}")
+                    Log.d(TAG, "remove from favorites: ${apod.date}")
                     actions.onItemAddedToFavorites(apod, position, false)
                     addToFavorite.setImageResource(R.drawable.ic_baseline_favorite_border)
 
@@ -75,7 +75,7 @@ class ApodArchivesListAdapter(
     }
 
     fun updateApods(newApods: List<ApodArchive>) {
-        Log.i(TAG, "updateApods")
+        Log.d(TAG, "updateApods")
         apodDateList.clear()
         apodDateList.addAll(newApods)
         // Alternative for notifyDataSetChanged()
@@ -86,13 +86,13 @@ class ApodArchivesListAdapter(
     }
 
     fun addToFavorites(apod: ApodArchive, position: Int, processFavoriteDB: Boolean) {
-        Log.i(TAG, "addToFavorites")
+        Log.d(TAG, "addToFavorites")
         apodDateList[position].isAddedToFavorites = processFavoriteDB
     }
 
     // 4. update apod archive list when new information is invoked
     fun updateApodArchiveListItems(newApodArchivesList: List<ApodArchive>) {
-        Log.i(TAG, "updateApodArchiveListItems")
+        Log.d(TAG, "updateApodArchiveListItems")
         val diffCallback = ArchiveDiffUtilCallback(this.apodDateList, newApodArchivesList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.apodDateList.clear()

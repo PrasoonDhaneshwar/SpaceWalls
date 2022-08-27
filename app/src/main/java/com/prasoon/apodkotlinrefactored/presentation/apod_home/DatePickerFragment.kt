@@ -43,13 +43,13 @@ class DatePickerFragment: DialogFragment(), DatePickerDialog.OnDateSetListener {
         cal.set(Calendar.MONTH, selectedMonth)
         cal.set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
         // Default format ex: YEAR: 2021 MONTH: 4 DAY: 19
-        Log.i(TAG, "calendar default format: YEAR: $selectedYear MONTH: $selectedDayOfMonth DAY: $selectedDayOfMonth")
+        Log.d(TAG, "calendar default format: YEAR: $selectedYear MONTH: $selectedDayOfMonth DAY: $selectedDayOfMonth")
 
         // val myFormat = "dd.MM.yyyy" // mention the format you need
         // val myFormat2 = "dd LLL yyyy HH:mm:ss aaa z" // mention the format you need
         val format = "LLL d, yyyy" // mention the format you need
         val selectedDate = SimpleDateFormat(format, Locale.US).format(cal.time)
-        Log.i(TAG, "calendar simpleDateFormat: $selectedDate")    // Jul 1, 2022
+        Log.d(TAG, "calendar simpleDateFormat: $selectedDate")    // Jul 1, 2022
 
         val monthOfYearString =
             if (selectedMonth + 1 < 10) "0" + (selectedMonth + 1) else (selectedMonth + 1).toString()

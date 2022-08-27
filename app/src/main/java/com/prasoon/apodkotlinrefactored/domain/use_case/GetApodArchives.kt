@@ -15,16 +15,15 @@ class GetApodArchives(
     // Initialize the Use case with apods
     operator fun invoke(): Flow<Resource<List<ApodArchive>>> = flow {
         // Emit a list of apods
-        val apodDates = archiveRepository.fetchImageArchivesFromCurrentDate()
+        val apodDates = archiveRepository.fetchArchivesFromCurrentDate()
         // val apodDates = archiveRepository.fetchImageArchivesFromCurrentDateN()
         apodList.addAll(apodDates)
         emit(Resource.Success(apodList))
     }
 
-    operator fun invoke(items: Int):  Flow<Resource<List<ApodArchive>>> = flow {
+    operator fun invoke(date: String):  Flow<Resource<ApodArchive>> = flow {
         // Emit a list of apods
-        val apodDates = archiveRepository.fetchImageArchivesFromCurrentDate()
-        apodList.addAll(apodDates)
-        emit(Resource.Success(apodList))
+        val apodArchive = archiveRepository.fetchArchiveFromDate(date)
+        emit(Resource.Success(apodArchive))
     }
 }

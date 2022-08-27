@@ -3,7 +3,7 @@ package com.prasoon.apodkotlinrefactored.domain.repository
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 
 interface ApodArchivesRepository {
-    suspend fun fetchImageArchivesFromCurrentDate(): List<ApodArchive>
+    suspend fun fetchArchivesFromCurrentDate(): List<ApodArchive>
 
-    suspend fun fetchImageArchivesFromCurrentDate(items: Int): List<String>
+    suspend fun fetchArchiveFromDate(date: String): ApodArchive
 }
