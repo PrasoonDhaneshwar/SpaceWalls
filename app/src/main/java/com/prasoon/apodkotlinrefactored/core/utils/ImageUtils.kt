@@ -57,14 +57,14 @@ object ImageUtils {
     private val IMAGE_WIDTH = COLUMN_WIDTH
     private val IMAGE_HEIGHT = COLUMN_WIDTH * COLUMN_HEIGHT / COLUMN_WIDTH
 
-    fun saveImage(context: Context, url: String, hdurl: String?, date: String) {
+    fun saveImage(context: Context, title: String, date: String, url: String, hdUrl: String?) {
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
             throwable.localizedMessage
         }
         Toast.makeText(context, "Starting download...", Toast.LENGTH_SHORT).show()
         val imageName = "APOD_" + date.replace("-", "")
-        val imageUrl = if (hdurl.isNullOrEmpty()) URL(url) else URL(hdurl)
-        NotificationUtils.displayNotification(context, "Downloading APOD", date.toSimpleDateFormat(), true)
+        val imageUrl = if (hdUrl.isNullOrEmpty()) URL(url) else URL(hdUrl)
+        NotificationUtils.displayNotification(context, "Downloading $title", date.toSimpleDateFormat(), true)
         CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
             val bitmap = BitmapFactory.decodeStream(imageUrl.openConnection().getInputStream())
             val storageDirectoryPath: String
@@ -104,7 +104,7 @@ object ImageUtils {
                 ).show()
             }
             //NotificationUtils.cancelNotification(context, "Downloading APOD finished", date)
-            NotificationUtils.displayNotification(context, "Downloading APOD finished", date.toSimpleDateFormat(), false)
+            NotificationUtils.displayNotification(context, "Downloaded: $title", date.toSimpleDateFormat(), false)
         }
     }
 
@@ -350,32 +350,41 @@ object ImageUtils {
     suspend fun createBitmapFromCacheFile(urlString: String, context: Context): Bitmap? {
         Log.d(TAG, "createBitmapFromCacheFile: $urlString")
 
-        return withContext(Dispatchers.IO) {
+        //return withContext(Dispatchers.IO) {
         val file = File(context.cacheDir, "apodToday.jpg")
         val outputStream = FileOutputStream(file)
             var inputStream: InputStream? = null
 
             try {
-                inputStream = URL(urlString).openConnection().getInputStream()
+                inputStream = withContext(Dispatchers.IO) {
+                    withContext(Dispatchers.IO) {
+                        URL(urlString).openConnection()
+                    }.getInputStream()
+                }
                 Log.d(TAG, "createBitmapFromCacheFile: inputStream: $inputStream")
 
             } catch (e: UnknownHostException) {
                 e.printStackTrace()
+                return null
             } catch (e: ProtocolException) {
                 e.printStackTrace()
+                return null
             } catch (e: SocketTimeoutException) {
                 e.printStackTrace()
+                return null
             } catch (e: HttpStatusException) {
                 e.printStackTrace()
+                return null
             } catch (e: ConnectException) {
                 e.printStackTrace()
+                return null
             }
         val bitmap :Bitmap? = BitmapFactory.decodeStream(inputStream)
         Log.d(TAG, "createBitmapFromCacheFile: bitmap: $bitmap")
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         Objects.requireNonNull(outputStream)?.close()
         Log.d(TAG, "Bitmap dimensions -> height x width: ${bitmap?.height} x ${bitmap?.width}")
-        bitmap
-        }
+        return bitmap
+        //}
     }
 }

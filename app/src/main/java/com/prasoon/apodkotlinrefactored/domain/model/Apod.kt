@@ -2,6 +2,7 @@ package com.prasoon.apodkotlinrefactored.domain.model
 
 import android.os.Parcelable
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
+import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodArchiveEntity
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodEntity
 import kotlinx.parcelize.Parcelize
@@ -9,8 +10,8 @@ import kotlinx.parcelize.Parcelize
 // Step 1.5: REMOTE:  Create mapper data class
 @Parcelize
 data class Apod(
-    val copyright: String?,
     val date: String,
+    val copyright: String?,
     val explanation: String,
     val hdUrl: String?,
     val mediaType: String,
@@ -39,7 +40,7 @@ data class Apod(
             dateInt = date.toIntDate(),
             dateString = date,
             title = title,
-            url = url,
+            url = if (url.contains("youtube")) VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(url) else url,
             isAddedToFavorites = processFavoritesDB
         )
     }

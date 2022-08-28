@@ -36,7 +36,6 @@ class ApodViewModel @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun refresh(date: String) {
-        Log.d(TAG, "refresh for date: $date")
         getApod(date)
     }
 

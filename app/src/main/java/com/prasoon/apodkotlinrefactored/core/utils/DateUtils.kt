@@ -89,4 +89,13 @@ object DateUtils {
         val testDate = testStartingPointOfDate.time
         return testDate
     }
+
+    fun getTimeInHoursMinutesSeconds(totalMilliSecs: Long) : String{
+        val totalSecs = totalMilliSecs / 1000
+        val hours = totalSecs / 3600;
+        val minutes = (totalSecs % 3600) / 60;
+        val seconds = totalSecs % 60;
+
+        return String.format("%02d hours, %02d minutes and %02d seconds", hours, minutes, seconds)
+    }
 }

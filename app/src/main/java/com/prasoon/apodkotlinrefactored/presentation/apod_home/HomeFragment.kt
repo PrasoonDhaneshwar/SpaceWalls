@@ -52,6 +52,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
     private var isAddedToDB = false
     var datePickerString: String? = String()
+    var dateFromPendingIntent: String? = null
 
     @Inject
     lateinit var currentApod: Apod
@@ -76,11 +77,17 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         binding.navView.setNavigationItemSelectedListener(this)
         binding.navView.bringToFront()     // Needed for buttons to be clickable
 
-        // Start with an actual date
-        val date =
-            if (DateUtils.currentDate.isEmpty()) DateUtils.getCurrentDateForInitialization() else DateUtils.currentDate
-        viewModel.refresh(date)
+        // Get date from notifications and fetch data from ViewModel
+        dateFromPendingIntent = arguments?.getString("date")
+        Log.d(TAG, "from pendingIntent: $dateFromPendingIntent")
 
+        // Start with an actual date
+        if (!dateFromPendingIntent.isNullOrEmpty()) DateUtils.currentDate = dateFromPendingIntent!!
+        else if (DateUtils.currentDate.isEmpty())  DateUtils.currentDate = DateUtils.getCurrentDateForInitialization()
+
+        Log.d(TAG, "viewModel.refresh date from onViewCreated: DateUtils.currentDate: ${DateUtils.currentDate}")
+
+        viewModel.refresh(DateUtils.currentDate)
         binding.overviewFloatingActionButton.setOnClickListener {
             val datePickerFragment = DatePickerFragment()
             val supportFragmentManager = requireActivity().supportFragmentManager
@@ -98,10 +105,9 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     binding.homeTextViewDatePicker.text = datePickerString
 
                     val dateApiFormat = bundle.getString(Constants.CURRENT_DATE_FOR_API)
-                    if (dateApiFormat != null) {
+                    dateApiFormat?.let {
                         DateUtils.currentDate = dateApiFormat
-                    }
-                    if (dateApiFormat != null) {
+                        Log.d(TAG, "viewModel.refresh date from DatePicker: dateApiFormat: $dateApiFormat")
                         viewModel.refresh(dateApiFormat)
                     }
                 }
@@ -151,12 +157,11 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         binding.homeDownloadImage.setOnClickListener {
             // val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
             if (EasyPermissions.hasPermissions(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
+                saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl!!)
             } else {
                 EasyPermissions.requestPermissions(this, "Grant Storage Permissions to Save Image ",
                     STORAGE_PERMISSION_CODE)
-                saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
-            }
+                saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl!!)            }
         }
 
         binding.homeAddToFavorites.setOnClickListener {
@@ -186,14 +191,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         observeViewModel()
     }
 
-    override fun onResume() {
-        super.onResume()
-        val date =
-            if (datePickerString.isNullOrEmpty() && DateUtils.currentDate.isEmpty()) DateUtils.getCurrentDateForInitialization() else DateUtils.currentDate
-
-        viewModel.refresh(date)
-    }
-
     private fun observeViewModel() {
         viewModel.apodStateLiveData.observe(viewLifecycleOwner) { apodStateLiveData ->
             if (!apodStateLiveData.message.isNullOrEmpty()) {
@@ -204,85 +201,89 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 DateUtils.currentDate =
                     currentApod.date    // Set the date received from the viewModel
 
-                Log.d(TAG, "Apod model received from viewmodel: $currentApod")
-                Log.d(TAG, "Web link : ${DateUtils.createApodUrl(currentApod.date)}")
-                Log.d(TAG, "Api link : ${DateUtils.createApodUrlApi(currentApod.date)}")
+            if (currentApod.date.isEmpty()) {
+                return@observe
+            }
 
-                if (currentApod.addToFavoritesUI) {
-                    binding.homeAddToFavorites.setColorFilter(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.colorAddToFavorites
-                        )
+            Log.d(TAG, "Apod model received from viewmodel: $currentApod")
+            Log.d(TAG, "Web link : ${DateUtils.createApodUrl(currentApod.date)}")
+            Log.d(TAG, "Api link : ${DateUtils.createApodUrlApi(currentApod.date)}")
+
+            if (currentApod.addToFavoritesUI) {
+                binding.homeAddToFavorites.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorAddToFavorites
                     )
-                    isAddedToDB = true
-                } else {
-                    binding.homeAddToFavorites.setColorFilter(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.colorRemovedFromFavorites
-                        )
+                )
+                isAddedToDB = true
+            } else {
+                binding.homeAddToFavorites.setColorFilter(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.colorRemovedFromFavorites
                     )
-                    isAddedToDB = false
-                }
+                )
+                isAddedToDB = false
+            }
 
-                // VIDEO
-                if (currentApod.mediaType == "video") {
-                    // Fit center for maintaining YouTube video's aspect ratio
-                    binding.homeImageViewResult.scaleType = ImageView.ScaleType.FIT_CENTER
+            // VIDEO
+            if (currentApod.mediaType == "video") {
+                // Fit center for maintaining YouTube video's aspect ratio
+                binding.homeImageViewResult.scaleType = ImageView.ScaleType.FIT_CENTER
 
-                    binding.homeVideoViewButton.visibility = View.VISIBLE
-                    binding.homeDownloadImage.visibility = View.INVISIBLE
-                    binding.homeAddToFavorites.visibility = View.INVISIBLE
-                    binding.homeSetWallpaper.visibility = View.INVISIBLE
+                binding.homeVideoViewButton.visibility = View.VISIBLE
+                binding.homeDownloadImage.visibility = View.INVISIBLE
+                binding.homeAddToFavorites.visibility = View.INVISIBLE
+                binding.homeSetWallpaper.visibility = View.INVISIBLE
 
-                    if (currentApod.url.contains("youtube")) {
-                        binding.homeAddToFavorites.visibility = View.VISIBLE
-                        val thumbnailUrl =
-                            VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
-                        Log.d(TAG, "YouTube thumbnailUrl: $thumbnailUrl")
-                        binding.homeImageViewResult.setImageBitmap(
-                            ImageUtils.loadImageUIL(
-                                thumbnailUrl,
-                                binding.homeImageViewResult,
-                                binding.homeProgressImageView,
-                                requireContext(),
-                                false)
-                        )
-                    } else {
-                        // Handling for Apod which is not an image or a YouTube video.
-                        // Open link with browser
-                        ShareActionUtils.performActionIntent(
-                            requireContext(),
-                            currentApod.url,
-                            Constants.INTENT_ACTION_VIEW
-                        )
-                        // todo - Reset to visible needed for next date set?
-                        binding.homeProgressImageView.visibility = View.INVISIBLE
-
-                        binding.homeImageViewResult.setImageResource(R.drawable.handle_another_app)
-                    }
-                }
-                // IMAGE
-                else {
-                    // Fit center crop to fit aspect ratio of imageview
-                    binding.homeImageViewResult.scaleType = ImageView.ScaleType.CENTER_CROP
-                    binding.homeDownloadImage.visibility = View.VISIBLE
-                    binding.homeImageViewResult.visibility = View.VISIBLE
-                    binding.homeVideoViewButton.visibility = View.INVISIBLE
+                if (currentApod.url.contains("youtube")) {
                     binding.homeAddToFavorites.visibility = View.VISIBLE
-                    binding.homeSetWallpaper.visibility = View.VISIBLE
-
+                    val thumbnailUrl =
+                        VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
+                    Log.d(TAG, "YouTube thumbnailUrl: $thumbnailUrl")
                     binding.homeImageViewResult.setImageBitmap(
                         ImageUtils.loadImageUIL(
-                            currentApod.url,
+                            thumbnailUrl,
                             binding.homeImageViewResult,
                             binding.homeProgressImageView,
                             requireContext(),
-                        false)
+                            false)
                     )
+                } else {
+                    // Handling for Apod which is not an image or a YouTube video.
+                    // Open link with browser
+                    ShareActionUtils.performActionIntent(
+                        requireContext(),
+                        currentApod.url,
+                        Constants.INTENT_ACTION_VIEW
+                    )
+                    // todo - Reset to visible needed for next date set?
+                    binding.homeProgressImageView.visibility = View.INVISIBLE
 
+                    binding.homeImageViewResult.setImageResource(R.drawable.handle_another_app)
                 }
+            }
+            // IMAGE
+            else {
+                // Fit center crop to fit aspect ratio of imageview
+                binding.homeImageViewResult.scaleType = ImageView.ScaleType.CENTER_CROP
+                binding.homeDownloadImage.visibility = View.VISIBLE
+                binding.homeImageViewResult.visibility = View.VISIBLE
+                binding.homeVideoViewButton.visibility = View.INVISIBLE
+                binding.homeAddToFavorites.visibility = View.VISIBLE
+                binding.homeSetWallpaper.visibility = View.VISIBLE
+
+                binding.homeImageViewResult.setImageBitmap(
+                    ImageUtils.loadImageUIL(
+                        currentApod.url,
+                        binding.homeImageViewResult,
+                        binding.homeProgressImageView,
+                        requireContext(),
+                    false)
+                )
+
+            }
             var url = ""
             if (currentApod.url.contains("youtube")) url = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
             else if (currentApod.url.contains("jpg")) url = currentApod.url
@@ -290,14 +291,15 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             if (url.isNotEmpty() && SHOW_NOTIFICATION) {
                 CoroutineScope(Dispatchers.IO).launch  {
                     val bitmap = async { createBitmapFromCacheFile(url, requireContext()) }
-                    NotificationUtils.displayNotification(requireContext(), currentApod.title, currentApod.date.toSimpleDateFormat(), false, bitmap.await())
+                    NotificationUtils.displayNotification(requireContext(), currentApod.title, currentApod.date, false, bitmap.await())
                 }
             }
 
-                binding.collapsingToolbarLayout.setTitle(currentApod.title)
-                binding.collapsingToolbarLayout.setCollapsedTitleTypeface(Typeface.DEFAULT_BOLD)
-                binding.homeTextViewDatePicker.text = currentApod.date.toSimpleDateFormat()
-                binding.homeTextViewExplanation.text = currentApod.explanation
+            binding.collapsingToolbarLayout.title = currentApod.title
+            binding.collapsingToolbarLayout.setCollapsedTitleTypeface(Typeface.DEFAULT_BOLD)
+            binding.homeTextViewDatePicker.text = currentApod.date.toSimpleDateFormat()
+            val explanationText = currentApod.explanation + if (currentApod.copyright.isNullOrEmpty()) "" else "\nCopyrights©: ${currentApod.copyright}"
+            binding.homeTextViewExplanation.text = explanationText
             }
 
     }
@@ -351,7 +353,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
+        saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl!!)
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
@@ -363,7 +365,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
-            saveImage(requireContext(), currentApod.url, currentApod.hdUrl!!, currentApod.date)
+            saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl!!)
         }
     }
 }

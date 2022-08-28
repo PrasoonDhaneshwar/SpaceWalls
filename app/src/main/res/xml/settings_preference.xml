@@ -12,7 +12,7 @@
             app:entryValues="@array/theme_values"
             android:dialogTitle="First section"
             android:key="display"
-            android:summary="Select Theme"
+            app:useSimpleSummaryProvider="true"
             android:title="Select Theme" />
 
         <Preference
@@ -24,6 +24,7 @@
 
         <SwitchPreference
             android:icon="@drawable/ic_notifications"
+            app:defaultValue="true"
             android:dialogTitle="First section"
             android:key="notifications"
             android:title="Show notifications" />
@@ -50,7 +51,6 @@
             android:icon="@drawable/ic_baseline_view_list"
             android:key="schedule_favorites"
             android:title="Schedule Wallpaper from favorites " />
-
 
         <ListPreference
             android:icon="@drawable/ic_schedule_archive"

@@ -8,10 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
+import androidx.navigation.NavDeepLinkBuilder
 import com.prasoon.apodkotlinrefactored.MainActivity
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 
 object NotificationUtils {
     val TAG = "NotificationUtils"
@@ -47,14 +50,8 @@ object NotificationUtils {
         notificationManager.notify(Constants.DOWNLOAD_IMAGE_MESSAGE_ID, notification)
     }
 
-    fun cancelNotification(context: Context, title: String, message: String) {
-        val notificationManager: NotificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(Constants.DOWNLOAD_IMAGE_MESSAGE_ID)
-    }
-
     // For Daily Wallpaper
-    fun displayNotification(context: Context, title: String, message: String, indeterminate: Boolean, bitmap: Bitmap?) {
+    fun displayNotification(context: Context, title: String, date: String, indeterminate: Boolean, bitmap: Bitmap?) {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -80,6 +77,14 @@ object NotificationUtils {
                 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
             )
         }
+        val bundle = Bundle()
+        bundle.putString("date", date)
+        val pendingIntentFromNavigationComponent = NavDeepLinkBuilder(context)
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.homeFragment)
+            .setArguments(bundle)
+            .createPendingIntent()
 
         // 2. Create notification UI
         val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(
@@ -87,7 +92,7 @@ object NotificationUtils {
             Constants.DAILY_WALLPAPER_CHANNEL
         ).setProgress(0, 0, indeterminate)
             .setContentTitle(title)
-            .setContentText(message)
+            .setContentText(date.toSimpleDateFormat())
             .setSmallIcon(R.drawable.ic_download)
             .setLargeIcon(bitmap)
             .setStyle(
@@ -95,7 +100,7 @@ object NotificationUtils {
                     .bigPicture(bitmap)
                     .bigLargeIcon(null)
             )
-            .setContentIntent(pendingIntent)
+            .setContentIntent(pendingIntentFromNavigationComponent)
             .setOnlyAlertOnce(true)
 
         // 3. Create the notification
@@ -104,4 +109,11 @@ object NotificationUtils {
         // 4. Notify
         notificationManager.notify(Constants.DAILY_WALLPAPER_MESSAGE_ID, notification)
     }
+
+    fun cancelNotification(context: Context, title: String, message: String) {
+        val notificationManager: NotificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(Constants.DOWNLOAD_IMAGE_MESSAGE_ID)
+    }
+
 }

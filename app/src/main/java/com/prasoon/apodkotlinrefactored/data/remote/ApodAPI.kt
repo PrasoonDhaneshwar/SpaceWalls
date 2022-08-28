@@ -19,20 +19,13 @@ interface ApodAPI {
         @Query("date") date: String?
     ): ApodDto
 
-// Step 1.2: REMOTE:  Create DTO by copying all JSON object and generating data class files.
-// Reduce the Generated classes according to need.
+    // Step 1.2: REMOTE:  Create DTO by copying all JSON object and generating data class files.
+    // Reduce the Generated classes according to need.
 
-// Step 1.3: REMOTE:  *** Finish the function return call when DTO generation is finished.
+    // Step 1.3: REMOTE:  *** Finish the function return call when DTO generation is finished.
 
     // Step 6.8: DEPENDENCY INJECTION: Provide Base URL
     companion object {
         const val BASE_URL = "https://api.nasa.gov/"
-        val instance by lazy {
-            Retrofit.Builder()
-                .baseUrl(ApodAPI.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(ApodAPI::class.java)
-        }
     }
 }

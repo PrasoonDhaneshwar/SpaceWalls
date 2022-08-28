@@ -2,9 +2,9 @@ package com.prasoon.apodkotlinrefactored.core.utils
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.*
-import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
 import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENCY
 import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
@@ -17,6 +17,7 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE_FOR_WORKER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SHOW_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.getTimeInHoursMinutesSeconds
 import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -82,20 +83,22 @@ fun setWorkRequest(context: Context, screenType: Int, wallpaperFrequency: Wallpa
 
     when (scheduleType) {
         SCHEDULE_DAILY_WALLPAPER -> {
-            val hourOfTheDay = 17
+            val hourOfTheDay = 10
             val minute = 0
             val repeatIntervalDays = 1L // days
 
-            val flexTime = calculateFlex(hourOfTheDay, minute, repeatIntervalDays)
-            Log.d("SettingsFragment","flexTime: $flexTime, in hours: ${flexTime / (1000 * 60 * 60)}")
+            val timeDiff = calculateTimeDifferenceForInitialDelay(hourOfTheDay, minute, repeatIntervalDays)
+            Log.d("SettingsFragment","timeDiff will be scheduled in, ${getTimeInHoursMinutesSeconds(timeDiff)}")
+            Toast.makeText(context, "Next wallpaper will be scheduled in, ${getTimeInHoursMinutesSeconds(timeDiff)}", Toast.LENGTH_LONG).show()
 
             myWorkBuilder = PeriodicWorkRequestBuilder<WallpaperWorker>(
                 repeatIntervalDays,
                 TimeUnit.DAYS,
-                flexTime,   // flex interval - worker will run somewhere within this period of time, but at the end of repeating interval
-                TimeUnit.MILLISECONDS
+/*                flexTime,   // flex interval - worker will run somewhere within this period of time, but at the end of repeating interval
+                TimeUnit.MILLISECONDS*/
             )
                 .addTag(WallpaperWorker.WORK_NAME).apply {
+                    setInitialDelay(timeDiff, TimeUnit.MILLISECONDS)
                     setConstraints(constraints)
                 }
             data.putInt(SCHEDULE_FOR_WORKER, SCHEDULE_DAILY_WALLPAPER)
@@ -155,22 +158,18 @@ private fun cancelWorkRequest(context: Context) {
     WorkManager.getInstance(context).cancelUniqueWork(WallpaperWorker.WORK_NAME)
 }
 
-fun calculateFlex(hourOfTheDay: Int, minutes: Int, periodInDays: Long): Long {
+fun calculateTimeDifferenceForInitialDelay(hourOfTheDay: Int, minutes: Int, periodInDays: Long): Long {
     // Initialize the calendar with today and the preferred time to run the job.
-    val cal1 = Calendar.getInstance()
-    cal1[Calendar.HOUR_OF_DAY] = hourOfTheDay
-    cal1[Calendar.MINUTE] = minutes
-    cal1[Calendar.SECOND] = 0
+    val setTime = Calendar.getInstance()
+    setTime[Calendar.HOUR_OF_DAY] = hourOfTheDay
+    setTime[Calendar.MINUTE] = minutes
+    setTime[Calendar.SECOND] = 0
 
     // Initialize a calendar with now.
-    val cal2 = Calendar.getInstance()
+    val currentTime = Calendar.getInstance()
 
-    if (cal2.timeInMillis < cal1.timeInMillis) {
-        // Add the worker periodicity.
-        cal2.timeInMillis = cal2.timeInMillis + TimeUnit.DAYS.toMillis(periodInDays)
+    if (setTime.before(currentTime)) {
+        setTime.add(Calendar.HOUR_OF_DAY, 24)
     }
-
-    val delta = cal2.timeInMillis - cal1.timeInMillis
-
-    return if (delta > PeriodicWorkRequest.MIN_PERIODIC_FLEX_MILLIS) delta else PeriodicWorkRequest.MIN_PERIODIC_FLEX_MILLIS
+    return setTime.timeInMillis - currentTime.timeInMillis
 }

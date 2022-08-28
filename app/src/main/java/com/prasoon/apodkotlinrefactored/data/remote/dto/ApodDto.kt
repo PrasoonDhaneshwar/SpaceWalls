@@ -2,6 +2,7 @@ package com.prasoon.apodkotlinrefactored.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
+import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodArchiveEntity
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodEntity
 
@@ -37,7 +38,7 @@ data class ApodDto(
             dateInt = date.toIntDate(),
             dateString = date,
             title = title,
-            url = url,
+            url = if (url.contains("youtube")) VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(url) else url,
             isAddedToFavorites = processFavoritesDB
         )
     }

@@ -41,12 +41,12 @@ class WallpaperWorker @AssistedInject constructor(
     @Assisted workerParameters: WorkerParameters,
     private val archiveRepository: ApodArchivesRepository,
     private val dbArchive: ApodArchiveDatabase,
+    private val api: ApodAPI,
     ) : CoroutineWorker(appContext, workerParameters) {
     companion object {
         const val TAG = "WallpaperWorker"
         const val WORK_NAME = "WallpaperWorker"
     }
-    //private val db by lazy { ApodArchiveDatabase(appContext).dao }
     private val settingPerf: SharedPreferences? = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val notifications = settingPerf!!.getBoolean("notifications", false)
     override suspend fun doWork(): Result {
@@ -62,7 +62,7 @@ class WallpaperWorker @AssistedInject constructor(
 
                 supervisorScope {
                     try {
-                        val remoteApod = ApodAPI.instance.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
+                        val remoteApod = api.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
                         val apod = remoteApod.toApodEntity().toApod()
                         Log.d(TAG, "doWork apod: $apod")
 
@@ -76,11 +76,15 @@ class WallpaperWorker @AssistedInject constructor(
                             Log.d(TAG, "Bitmap: ${bitmap?.height}")
 
                             if (notifications) {
-                                displayNotification(appContext, apod.title, apod.date.toSimpleDateFormat(), false, bitmap)
+                                if (url.contains("youtube")) {
+                                    displayNotification(appContext, "Can not set wallpaper for YouTube content\n"+ apod.title, apod.date, false, bitmap)
+                                } else {
+                                    displayNotification(appContext, apod.title, apod.date, false, bitmap)
+                                }
                             }
 
                             // Only set wallpaper when url contains an image
-                            if (!url.contains("youtube")) {
+                            if (!url.contains("youtube") && bitmap != null) {
                                 setWallpaper(appContext, null, screenPreference, bitmap)
                             } else {
                                 return@supervisorScope
@@ -112,7 +116,11 @@ class WallpaperWorker @AssistedInject constructor(
                         Log.d(TAG, "doWork apodArchive: $apodArchive")
                         val bitmap = createBitmapFromCacheFile(apodArchive.link, appContext)
                         if (notifications) {
-                            displayNotification(appContext, apodArchive.title, apodArchive.date.toSimpleDateFormat(), false, bitmap)
+                            if (apodArchive.link.contains("youtube")) {
+                                displayNotification(appContext, "Can not set wallpaper for YouTube content\n"+ apodArchive.title, apodArchive.date, false, bitmap)
+                            } else {
+                                displayNotification(appContext, apodArchive.title, apodArchive.date, false, bitmap)
+                            }
                         }
                         // Only set wallpaper when url contains an image
                         if (!apodArchive.link.contains("youtube")) {
@@ -142,7 +150,11 @@ class WallpaperWorker @AssistedInject constructor(
         Log.d(TAG, "Notifications are: $notifications")
 
         if (notifications) {
-            displayNotification(appContext, apodArchive.title, apodArchive.date.toSimpleDateFormat(), false, bitmap)
+            if (apodArchive.link.contains("youtube")) {
+                displayNotification(appContext, "Can not set wallpaper for YouTube content\n"+ apodArchive.title, apodArchive.date, false, bitmap)
+            } else {
+                displayNotification(appContext, apodArchive.title, apodArchive.date, false, bitmap)
+            }
         }
         if (!url.contains("youtube")) {
             setWallpaper(appContext, null, screenPreference, bitmap)

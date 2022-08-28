@@ -48,8 +48,10 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNav.setupWithNavController(navController)
 
         settingPerf = PreferenceManager.getDefaultSharedPreferences(this)
+        // Load default values from layout
+        PreferenceManager.setDefaultValues(this, R.xml.settings_preference, false)
 
-        var scheduleWallpaperType = ""
+        var scheduleWallpaperType = "Not yet selected"
         if (settingPerf.getBoolean("schedule_wallpaper",false)) scheduleWallpaperType = "DAILY WALLPAPER"
         if (settingPerf.getBoolean("schedule_archive",false)) scheduleWallpaperType = "ARCHIVES"
         if (settingPerf.getBoolean("schedule_favorites",false)) scheduleWallpaperType = "FAVORITES"
