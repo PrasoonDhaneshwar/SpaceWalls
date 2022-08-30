@@ -23,7 +23,7 @@ class ApodListViewModel @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
 
-    val apodFavoritesLiveData = MutableLiveData<List<ApodArchive>>()
+    val apodFavoritesLiveData = MutableLiveData<MutableList<ApodArchive>>()
     val loading = MutableLiveData<Boolean>()
 
     // Entry point for view
@@ -36,7 +36,7 @@ class ApodListViewModel @Inject constructor(
         loading.value = true
         coroutineScope.launch {
             val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
-            apodFavoritesLiveData.postValue(apodArchiveList)
+            apodFavoritesLiveData.postValue(apodArchiveList as MutableList<ApodArchive>)
             withContext(Dispatchers.Main) {
                 loading.value = false
             }
@@ -46,7 +46,10 @@ class ApodListViewModel @Inject constructor(
     fun deleteApodModel(apod: ApodArchive) {
         coroutineScope.launch {
             val apodArchive = dbArchive.dao.delete(apod.toApodArchiveEntity())
-            val apod = db.dao.deleteFromList(apod.date.toIntDate())
+            val apodDeleted = db.dao.deleteFromList(apod.date.toIntDate())
+            // If all items are deleted from recyclerView, liveData should also be updated
+            val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
+            apodFavoritesLiveData.postValue(apodArchiveList as MutableList<ApodArchive>)
         }
     }
 

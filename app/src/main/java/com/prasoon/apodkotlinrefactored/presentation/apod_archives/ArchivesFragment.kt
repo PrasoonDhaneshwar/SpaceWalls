@@ -7,14 +7,12 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.databinding.FragmentArchivesBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
 
 @AndroidEntryPoint
 class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction {

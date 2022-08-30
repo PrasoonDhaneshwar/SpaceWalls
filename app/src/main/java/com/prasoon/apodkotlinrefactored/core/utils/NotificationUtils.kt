@@ -102,6 +102,7 @@ object NotificationUtils {
             )
             .setContentIntent(pendingIntentFromNavigationComponent)
             .setOnlyAlertOnce(true)
+            .setAutoCancel(true)
 
         // 3. Create the notification
         val notification = notificationBuilder.build()

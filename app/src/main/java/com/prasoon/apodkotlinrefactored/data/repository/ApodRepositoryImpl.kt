@@ -58,7 +58,7 @@ class ApodRepositoryImpl(
 
                 // Emit data to UI
                 apod = dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod()
-                Log.d(TAG, "Emit apod from remote:  $apod")
+                Log.d(TAG, "Emit apod from remote: $apod")
                 emit(Resource.Success(apod))
 
             } catch (e: HttpException) {

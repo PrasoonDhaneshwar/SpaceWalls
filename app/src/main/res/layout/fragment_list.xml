@@ -22,11 +22,12 @@
             tools:listitem="@layout/item_apod"/>
 
         <TextView
-            android:id="@+id/list_error"
+            android:id="@+id/loading_state"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:gravity="center"
             tools:text="An error has occured while loading data"
+            android:textSize="40sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

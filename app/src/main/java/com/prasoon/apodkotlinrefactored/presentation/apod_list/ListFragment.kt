@@ -55,6 +55,9 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
             binding.listApod.visibility = View.VISIBLE
             //apodListAdapter.updateApods(apodList.sortedByDescending { it.date.toIntDate() })
             apodListAdapter.updateApodListItems(apodList.sortedByDescending { it.date.toIntDate() })
+            if (apodList.size == 0) {
+                binding.loadingState.text = "¯\\_(ツ)_/¯"
+            } else binding.loadingState.text = ""
         }
     }
 

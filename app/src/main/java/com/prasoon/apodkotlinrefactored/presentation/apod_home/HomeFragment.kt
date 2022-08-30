@@ -53,6 +53,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     private var isAddedToDB = false
     var datePickerString: String? = String()
     var dateFromPendingIntent: String? = null
+    var showNotification: Boolean = true
 
     @Inject
     lateinit var currentApod: Apod
@@ -82,7 +83,10 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         Log.d(TAG, "from pendingIntent: $dateFromPendingIntent")
 
         // Start with an actual date
-        if (!dateFromPendingIntent.isNullOrEmpty()) DateUtils.currentDate = dateFromPendingIntent!!
+        if (!dateFromPendingIntent.isNullOrEmpty()) {
+            DateUtils.currentDate = dateFromPendingIntent!!
+            showNotification = false    // If Clicked from notification, no need for notifications again
+        }
         else if (DateUtils.currentDate.isEmpty())  DateUtils.currentDate = DateUtils.getCurrentDateForInitialization()
 
         Log.d(TAG, "viewModel.refresh date from onViewCreated: DateUtils.currentDate: ${DateUtils.currentDate}")
@@ -105,10 +109,11 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     binding.homeTextViewDatePicker.text = datePickerString
 
                     val dateApiFormat = bundle.getString(Constants.CURRENT_DATE_FOR_API)
-                    dateApiFormat?.let {
+                    if (dateApiFormat != null) {
                         DateUtils.currentDate = dateApiFormat
                         Log.d(TAG, "viewModel.refresh date from DatePicker: dateApiFormat: $dateApiFormat")
                         viewModel.refresh(dateApiFormat)
+                        showNotification = true
                     }
                 }
             }
@@ -288,10 +293,11 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             if (currentApod.url.contains("youtube")) url = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
             else if (currentApod.url.contains("jpg")) url = currentApod.url
 
-            if (url.isNotEmpty() && SHOW_NOTIFICATION) {
+            if (url.isNotEmpty() && SHOW_NOTIFICATION && showNotification) {
                 CoroutineScope(Dispatchers.IO).launch  {
                     val bitmap = async { createBitmapFromCacheFile(url, requireContext()) }
                     NotificationUtils.displayNotification(requireContext(), currentApod.title, currentApod.date, false, bitmap.await())
+                    showNotification = false
                 }
             }
 
