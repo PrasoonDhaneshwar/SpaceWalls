@@ -15,8 +15,11 @@ interface ApodArchiveDao {
     @Query("SELECT * FROM ApodArchiveEntity WHERE dateInt = :date")
     suspend fun getApodFromDatePrimaryKey(date: Int): ApodArchiveEntity
 
-    @Query("SELECT * FROM ApodArchiveEntity WHERE isAddedToFavorites = :isFavorite ")
-    suspend fun getAllApods(isFavorite: Boolean): List<ApodArchiveEntity>
+    @Query("SELECT * FROM ApodArchiveEntity WHERE isFavoriteDatabase = :isFavorite ")
+    suspend fun getAllFavoriteArchives(isFavorite: Boolean): List<ApodArchiveEntity>
+
+    @Query("SELECT * FROM ApodArchiveEntity")
+    suspend fun getAllArchives(): List<ApodArchiveEntity>
 
     @Update(entity = ApodArchiveEntity::class)
     fun addOrRemoveFavoritesInArchivesDB(apodDb: ApodArchiveEntity)

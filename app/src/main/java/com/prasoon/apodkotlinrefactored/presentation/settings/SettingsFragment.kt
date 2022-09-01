@@ -143,7 +143,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         var count: Int
         CoroutineScope(Dispatchers.IO).launch {
-            val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
+            val apodArchiveList = dbArchive.dao.getAllFavoriteArchives(true).map { it.toApodArchive() }
             val favoritesSize = apodArchiveList.size
             withContext(Dispatchers.Main) {
                 count = favoritesSize

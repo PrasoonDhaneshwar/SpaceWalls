@@ -15,12 +15,12 @@
             app:useSimpleSummaryProvider="true"
             android:title="Select Theme" />
 
-        <Preference
+<!--        <Preference
             android:icon="@drawable/ic_wallpaper"
             android:dialogTitle="First section"
             android:key="wallpaper_fit_preference"
             android:summary="Change the way wallpaper should fit on screen"
-            android:title="Wallpaper Fit" />
+            android:title="Wallpaper Fit" />-->
 
         <SwitchPreference
             android:icon="@drawable/ic_notifications"

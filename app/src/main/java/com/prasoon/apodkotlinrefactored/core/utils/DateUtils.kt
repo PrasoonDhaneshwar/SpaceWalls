@@ -11,6 +11,8 @@ object DateUtils {
 
     var currentDate: String = String()
     var simpleDateFormat: String? = null
+    var isRefreshNeededForArchives = false
+    var processHomeApodToArchiveFavorites = false
 
     fun convertDateToInteger(date: String): Int {
         val values = date.split("-")

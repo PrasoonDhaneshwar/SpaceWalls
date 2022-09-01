@@ -1,4 +1,4 @@
-# **Astronomy Picture of the Day**
+# **SpaceWalls**
 An Android app which fetches a new wallpaper everyday using NASA's service.
 
 Browse through **thousands** of NASA's archives and learn about the universe.
@@ -6,7 +6,7 @@ Browse through **thousands** of NASA's archives and learn about the universe.
 **Schedule wallpaper** through these archives, your favorites or a new content everyday.
 
 ## **👇 Download** ##
-Click [here](https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-Kotlin/blob/main/Astronomy-Picture-of-the-Day-v1.0.apk) to download **Astronomy Picture Of The Day.**
+Click [here](https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-Kotlin/blob/main/Astronomy-Picture-of-the-Day-v1.0.apk) to download **SpaceWalls.**
 
 ## **✨App Features:** ##
 - Browse archives from **1995** to present day

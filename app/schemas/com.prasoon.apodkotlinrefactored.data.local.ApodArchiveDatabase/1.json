@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fa42ebb9ec3c687ed85dd9a883dd80c0",
+    "identityHash": "4f4c98ae2f9230ba5390fc3427f0bf62",
     "entities": [
       {
         "tableName": "ApodArchiveEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dateInt` INTEGER NOT NULL, `dateString` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `isAddedToFavorites` INTEGER NOT NULL, PRIMARY KEY(`dateInt`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dateInt` INTEGER NOT NULL, `dateString` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `isFavoriteDatabase` INTEGER NOT NULL, PRIMARY KEY(`dateInt`))",
         "fields": [
           {
             "fieldPath": "dateInt",
@@ -33,8 +33,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "isAddedToFavorites",
-            "columnName": "isAddedToFavorites",
+            "fieldPath": "isFavoriteDatabase",
+            "columnName": "isFavoriteDatabase",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -52,7 +52,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fa42ebb9ec3c687ed85dd9a883dd80c0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4f4c98ae2f9230ba5390fc3427f0bf62')"
     ]
   }
 }

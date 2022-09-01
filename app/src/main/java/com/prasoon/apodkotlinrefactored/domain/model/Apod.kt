@@ -41,7 +41,7 @@ data class Apod(
             dateString = date,
             title = title,
             url = if (url.contains("youtube")) VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(url) else url,
-            isAddedToFavorites = processFavoritesDB
+            isFavoriteDatabase = processFavoritesDB
         )
     }
 }

@@ -301,8 +301,8 @@ object ImageUtils {
         }
     }
 
-    fun setWallpaper(context: Context, imageView: ImageView?, screenFlag: Int, inputBitmap: Bitmap?) {
-        Log.d(TAG, "set Wallpaper")
+    suspend fun setWallpaper(context: Context, imageView: ImageView?, screenFlag: Int, inputBitmap: Bitmap?): Boolean {
+        Log.d(TAG, "set Wallpaper on $screenFlag")
         val wallpaperManager = WallpaperManager.getInstance(context)
         val bitmap = if (imageView != null && inputBitmap == null) {
             (imageView.drawable as BitmapDrawable).bitmap
@@ -310,7 +310,7 @@ object ImageUtils {
             inputBitmap
         }
 
-        if (bitmap == null) return
+        if (bitmap == null) return false
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -333,9 +333,11 @@ object ImageUtils {
                 wallpaperManager.setBitmap(scaledBitmap)
             }
             // Imageview will be null from WorkManager, so no toast to be shown
-            if (imageView !=null) Toast.makeText(context, "Wallpaper Set Successfully!!", Toast.LENGTH_SHORT).show()
+            if (imageView !=null) Log.d( TAG, "Wallpaper Set Successfully")
+            return true
         } catch (e: IOException) {
-            if (imageView !=null) Toast.makeText(context, "Setting WallPaper Failed!!", Toast.LENGTH_SHORT).show()
+            if (imageView !=null) Log.d(TAG, "Setting WallPaper Failed!!")
+            return false
         }
     }
     private fun Bitmap.cropHint(desiredHeight: Int): Rect {

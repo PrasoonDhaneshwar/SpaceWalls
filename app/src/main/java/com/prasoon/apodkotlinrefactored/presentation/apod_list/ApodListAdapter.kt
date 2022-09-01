@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
-import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils.getYoutubeThumbnailUrlFromVideoUrl
 import com.prasoon.apodkotlinrefactored.databinding.ItemApodBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.presentation.apod_archives.ArchiveDiffUtilCallback

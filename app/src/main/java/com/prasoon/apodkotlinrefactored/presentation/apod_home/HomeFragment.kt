@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.isNotEmpty
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -24,9 +25,13 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
 import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
 import com.prasoon.apodkotlinrefactored.core.common.Constants.LOCK_SCREEN
+import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SHOW_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.common.Constants.STORAGE_PERMISSION_CODE
+import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.core.utils.*
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.isRefreshNeededForArchives
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.processHomeApodToArchiveFavorites
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.createBitmapFromCacheFile
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.saveImage
@@ -34,10 +39,7 @@ import com.prasoon.apodkotlinrefactored.databinding.FragmentHomeBinding
 import com.prasoon.apodkotlinrefactored.databinding.ScreenMenuBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import javax.inject.Inject
@@ -89,9 +91,9 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         }
         else if (DateUtils.currentDate.isEmpty())  DateUtils.currentDate = DateUtils.getCurrentDateForInitialization()
 
-        Log.d(TAG, "viewModel.refresh date from onViewCreated: DateUtils.currentDate: ${DateUtils.currentDate}")
+        //Log.d(TAG, "viewModel.refresh date from onViewCreated: DateUtils.currentDate: ${DateUtils.currentDate}")
 
-        viewModel.refresh(DateUtils.currentDate)
+        //viewModel.refresh(DateUtils.currentDate)
         binding.overviewFloatingActionButton.setOnClickListener {
             val datePickerFragment = DatePickerFragment()
             val supportFragmentManager = requireActivity().supportFragmentManager
@@ -179,6 +181,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                         R.color.colorAddToFavorites
                     )
                 )
+                processHomeApodToArchiveFavorites = true
             } else if (isAddedToDB && !currentApod.mediaType.isEmpty()) {
                 viewModel.saveApod(currentApod, false)
                 Toast.makeText(activity, "Removed from Favorites!", Toast.LENGTH_SHORT).show()
@@ -188,9 +191,10 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                         R.color.colorRemovedFromFavorites
                     )
                 )
-
+                processHomeApodToArchiveFavorites = false
             }
             isAddedToDB = !isAddedToDB
+            isRefreshNeededForArchives = true
         }
 
         observeViewModel()
@@ -312,28 +316,27 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
     private fun showBackupDialog(imageView: ImageView, context: Context) {
         val bottomSheetDialog = BottomSheetDialog(context)
+        Log.d(TAG, "showBackupDialog")
 
         val mBinding = ScreenMenuBinding.inflate(LayoutInflater.from(context))
         bottomSheetDialog.setContentView(mBinding.root)
+        if (!mBinding.root.isNotEmpty()) bottomSheetDialog.dismiss()
+
         bottomSheetDialog.show()
-        var screenFlag= HOME_SCREEN
         mBinding.homeScreen.setOnClickListener {
-            screenFlag = HOME_SCREEN
-            Log.d(TAG, "homeScreen: $screenFlag")
-            ImageUtils.setWallpaper(requireContext(), imageView, screenFlag, null)
-            bottomSheetDialog.hide()
+            Log.d(TAG, "Change wallpaper on home screen: $HOME_SCREEN")
+            setWallpaperFromBottomSheetDialog(context, imageView, ScreenPreference.HOME_SCREEN)
+            bottomSheetDialog.dismiss()
         }
         mBinding.lockScreen.setOnClickListener {
-            screenFlag = LOCK_SCREEN
-            Log.d(TAG, "lockScreen: $screenFlag")
-            ImageUtils.setWallpaper(requireContext(), imageView, screenFlag, null)
-            bottomSheetDialog.hide()
+            Log.d(TAG, "Change wallpaper on lock screen: $LOCK_SCREEN")
+            setWallpaperFromBottomSheetDialog(context, imageView, ScreenPreference.LOCK_SCREEN)
+            bottomSheetDialog.dismiss()
         }
         mBinding.bothScreens.setOnClickListener {
-            screenFlag = BOTH_SCREENS
-            Log.d(TAG, "bothScreen: $screenFlag")
-            ImageUtils.setWallpaper(requireContext(), imageView, screenFlag, null)
-            bottomSheetDialog.hide()
+            Log.d(TAG, "Change wallpaper on both screens: $BOTH_SCREENS")
+            setWallpaperFromBottomSheetDialog(context, imageView, ScreenPreference.BOTH_SCREENS)
+            bottomSheetDialog.dismiss()
         }
     }
 
@@ -372,6 +375,27 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
             saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl!!)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refresh(DateUtils.currentDate)
+        Log.d(TAG, "viewModel.refresh date from onResume: DateUtils.currentDate: ${DateUtils.currentDate}")
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.apodStateLiveData.removeObservers(viewLifecycleOwner)
+    }
+
+    private fun setWallpaperFromBottomSheetDialog(context: Context, imageView: ImageView, screenPreference: ScreenPreference) {
+        var isSetWallpaper: Boolean
+        CoroutineScope(Dispatchers.IO).launch {
+            isSetWallpaper = ImageUtils.setWallpaper(context, imageView, screenPreference.value, null)
+            withContext(Dispatchers.Main){
+                if (isSetWallpaper) Toast.makeText(context, "Wallpaper set successfully on ${screenPreference.title}", Toast.LENGTH_SHORT).show()
+                else Toast.makeText(requireContext(), "Unable to set Wallpaper. Please try again", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

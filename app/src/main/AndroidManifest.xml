@@ -23,13 +23,18 @@
         android:supportsRtl="true">
         <!--  Enable for splash screen      android:theme="@style/splashScreenTheme">-->
         <activity
-            android:name=".MainActivity"
+            android:theme="@style/splashScreenTheme"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
         <!-- If you want to disable android.startup completely. -->
         <provider
             android:name="androidx.startup.InitializationProvider"

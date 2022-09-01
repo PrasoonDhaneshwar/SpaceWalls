@@ -1,7 +1,6 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_list
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -27,7 +26,7 @@ class ApodListViewModel @Inject constructor(
     val loading = MutableLiveData<Boolean>()
 
     // Entry point for view
-    fun refresh() {
+    fun refreshList() {
         fetchApodFromDB()
     }
 
@@ -35,7 +34,7 @@ class ApodListViewModel @Inject constructor(
         // Loading spinner active. Disabled when information is retrieved.
         loading.value = true
         coroutineScope.launch {
-            val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
+            val apodArchiveList = dbArchive.dao.getAllFavoriteArchives(true).map { it.toApodArchive() }
             apodFavoritesLiveData.postValue(apodArchiveList as MutableList<ApodArchive>)
             withContext(Dispatchers.Main) {
                 loading.value = false
@@ -48,7 +47,7 @@ class ApodListViewModel @Inject constructor(
             val apodArchive = dbArchive.dao.delete(apod.toApodArchiveEntity())
             val apodDeleted = db.dao.deleteFromList(apod.date.toIntDate())
             // If all items are deleted from recyclerView, liveData should also be updated
-            val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
+            val apodArchiveList = dbArchive.dao.getAllFavoriteArchives(true).map { it.toApodArchive() }
             apodFavoritesLiveData.postValue(apodArchiveList as MutableList<ApodArchive>)
         }
     }

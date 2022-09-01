@@ -66,13 +66,14 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
                     }
                     jobAddToDb.join()
                 }
-                apodArchiveList.add(apodArchive)
+                // Don't add if empty archive received
+                if (apodArchive.title.isNotEmpty()) apodArchiveList.add(apodArchive)
             }
             job.join()
         }
 
         todayDate = currentCalendarDate.time
-        Log.d(TAG, "fetchImageArchivesFromCurrentDate with todayDate: $todayDate iteration: ${iteration++}: " + apodArchiveList)
+        Log.d(TAG, "fetchImageArchivesFromCurrentDate with todayDate: $todayDate iteration: ${iteration++}, apodArchiveList: " + apodArchiveList)
 
         return apodArchiveList
     }

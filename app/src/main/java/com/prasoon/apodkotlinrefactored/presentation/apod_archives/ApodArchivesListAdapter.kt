@@ -44,27 +44,27 @@ class ApodArchivesListAdapter(
         private var isAddedToDB = false
 
         // ***Binding between view and data
-        fun bind(apod: ApodArchive, position: Int) {
-            Log.d(TAG, "bind id: ${apod}")
-            itemTitle.text = apod.title
-            itemDate.text = apod.date.toSimpleDateFormat()
-            itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apod.link, itemImageView, progress, itemImageView.context, true))
+        fun bind(apodArchive: ApodArchive, position: Int) {
+            Log.d(TAG, "bind id: ${apodArchive}")
+            itemTitle.text = apodArchive.title
+            itemDate.text = apodArchive.date.toSimpleDateFormat()
+            itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context, true))
 
             addToFavorite.setOnClickListener {
                 if (!isAddedToDB) {
-                    Log.d(TAG, "add to favorites: ${apod.date}")
-                    actions.onItemAddedToFavorites(apod, position, true)
+                    Log.d(TAG, "add to favorites: ${apodArchive.date}")
+                    actions.onItemAddedOrRemovedFromFavorites(apodArchive, position, true)
                     addToFavorite.setImageResource(R.drawable.ic_favorite_fill)
 
                 } else if (isAddedToDB) {
-                    Log.d(TAG, "remove from favorites: ${apod.date}")
-                    actions.onItemAddedToFavorites(apod, position, false)
+                    Log.d(TAG, "remove from favorites: ${apodArchive.date}")
+                    actions.onItemAddedOrRemovedFromFavorites(apodArchive, position, false)
                     addToFavorite.setImageResource(R.drawable.ic_baseline_favorite_border)
 
                 }
                 isAddedToDB = !isAddedToDB
             }
-            if (apod.isAddedToFavorites) {
+            if (apodArchive.isAddedToFavorites) {
                 isAddedToDB = true
                 addToFavorite.setImageResource(R.drawable.ic_favorite_fill)
             } else {
@@ -85,7 +85,7 @@ class ApodArchivesListAdapter(
         notifyDataSetChanged()
     }
 
-    fun addToFavorites(apod: ApodArchive, position: Int, processFavoriteDB: Boolean) {
+    fun addToFavorites(position: Int, processFavoriteDB: Boolean) {
         Log.d(TAG, "addToFavorites")
         apodDateList[position].isAddedToFavorites = processFavoriteDB
     }
@@ -100,4 +100,14 @@ class ApodArchivesListAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
+    fun updateItemFromHomeToArchive(date: String, processFavoriteDB: Boolean) {
+        for (i: Int in 0 until apodDateList.size) {
+            if (apodDateList[i].date == date) {
+                Log.d(TAG, "updateItemFromHomeToArchive : ${apodDateList[i].isAddedToFavorites}")
+                apodDateList[i].isAddedToFavorites = processFavoriteDB
+                Log.d(TAG, "updateItemFromHomeToArchive : ${apodDateList[i].isAddedToFavorites}")
+            }
+        }
+        updateApods(apodDateList)
+    }
 }

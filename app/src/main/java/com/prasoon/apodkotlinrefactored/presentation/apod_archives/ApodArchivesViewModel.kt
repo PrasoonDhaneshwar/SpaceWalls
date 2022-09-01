@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
 import com.prasoon.apodkotlinrefactored.core.common.Resource
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
@@ -31,7 +32,7 @@ class ApodArchivesViewModel @Inject constructor(
     val apodArchivesListLiveData = MutableLiveData<ApodArchivesListState>()
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     // Entry point for view
-    fun refresh() {
+    fun refreshNewItems() {
         getApodFromArchives()
     }
 
@@ -59,11 +60,16 @@ class ApodArchivesViewModel @Inject constructor(
                             apodArchivesListState =
                                 ApodArchivesListState(isLoading = true, message = "Unknown error occurred")
                             apodArchivesListLiveData.postValue(apodArchivesListState)
-                            ApodViewModel.UIEvent.ShowSnackbar(result.message ?: "Unknown error occurred")
                         }
                     }
                 }.launchIn(viewModelScope)
         }
+    }
+
+    var favoritesLiveData = Transformations.switchMap(apodArchivesListLiveData) {
+        it.apodArchivesList.filter {
+            it.isAddedToFavorites == true
+        } as MutableLiveData<List<ApodArchive>>
     }
 
     fun saveApodArchive(apodArchive: ApodArchive, processFavoriteDB: Boolean) {

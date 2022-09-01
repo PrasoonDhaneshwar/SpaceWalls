@@ -11,14 +11,14 @@ data class ApodArchiveEntity(
     val dateString: String,
     val title: String,
     val url: String,
-    val isAddedToFavorites: Boolean
+    val isFavoriteDatabase: Boolean
 ) {
     fun toApodArchive() : ApodArchive {
         return ApodArchive(
             date = dateString,
             title = title,
             link = url,
-            isAddedToFavorites = isAddedToFavorites
+            isAddedToFavorites = isFavoriteDatabase
         )
     }
 }

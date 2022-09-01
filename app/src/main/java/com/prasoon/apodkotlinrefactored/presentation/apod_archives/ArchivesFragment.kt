@@ -6,10 +6,12 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.prasoon.apodkotlinrefactored.R
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.isRefreshNeededForArchives
 import com.prasoon.apodkotlinrefactored.databinding.FragmentArchivesBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,16 +22,16 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
     private lateinit var binding: FragmentArchivesBinding
     private val apodListAdapter = ApodArchivesListAdapter(arrayListOf(), this)
 
-    private val viewModel: ApodArchivesViewModel by viewModels()
+    private val viewModel: SharedArchiveViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().window.apply {
             addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         }
+        Log.d(TAG, "onViewCreated isRefreshed $isRefreshNeededForArchives")
 
         binding = FragmentArchivesBinding.bind(view)
-        viewModel.refresh()
 
         binding.listApod.apply {
             setHasFixedSize(true)
@@ -43,13 +45,13 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!recyclerView.canScrollVertically(1) && dy != 0) {
                     Log.d(TAG, "addOnScrollListener")
-                    viewModel.refresh()
+                    viewModel.refreshArchive()
                 }
             }
         })
 
         binding.listSwipeRefreshLayout.setOnRefreshListener {
-            viewModel.refresh()
+            viewModel.refreshArchive()
             binding.listSwipeRefreshLayout.isRefreshing = false
         }
 
@@ -64,16 +66,16 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
     }
 
     private fun observeViewModel() {
-        viewModel.apodArchivesListLiveData.observe(viewLifecycleOwner) { apodList ->
-            Log.d(TAG, "apodArchivesListLiveData: $apodList")
-            if (apodList.isLoading) binding.loader.show()
+        viewModel.apodArchiveListStateLiveData.observe(viewLifecycleOwner) { archiveList ->
+            Log.d(TAG, "apodArchivesListLiveData: $archiveList")
+            if (archiveList.isLoading) binding.loader.show()
 
-            if (!apodList.isLoading) {
+            if (!archiveList.isLoading) {
                 binding.loader.hide()
-                //apodListAdapter.updateApods(apodList.apodArchivesList)
-                apodListAdapter.updateApodArchiveListItems(apodList.apodArchivesList)
+                //apodListAdapter.updateApods(archiveList.apodArchivesList)
+                apodListAdapter.updateApodArchiveListItems(archiveList.apodArchivesList)
             }
-            if (!apodList.message.isNullOrEmpty()) {
+            if (!archiveList.message.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "Unexpected error occurred", Toast.LENGTH_SHORT).show()
             }
         }
@@ -83,9 +85,18 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
         Log.d(TAG, "onItemClickDetail: $date")
     }
 
-    override fun onItemAddedToFavorites(apodModel: ApodArchive, position: Int, processFavoriteDB: Boolean): Boolean {
-        apodListAdapter.addToFavorites(apodModel, position, processFavoriteDB)  // Update in each item of adapter
-        viewModel.saveApodArchive(apodModel, processFavoriteDB)                 // Update in DB
+    override fun onItemAddedOrRemovedFromFavorites(apodArchiveFromUI: ApodArchive, position: Int, processFavoriteDB: Boolean): Boolean {
+        apodListAdapter.addToFavorites(position, processFavoriteDB)  // Update in each item of adapter
+        viewModel.processFavoriteArchivesInDatabase(apodArchiveFromUI, processFavoriteDB)                 // Update in DB
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshArchive()
+
+        if (isRefreshNeededForArchives)
+            apodListAdapter.updateItemFromHomeToArchive(DateUtils.currentDate, DateUtils.processHomeApodToArchiveFavorites)
+        isRefreshNeededForArchives = false
     }
 }

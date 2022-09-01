@@ -6,13 +6,14 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.databinding.FragmentListBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
+import com.prasoon.apodkotlinrefactored.presentation.apod_archives.SharedArchiveViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,7 +22,7 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
     private lateinit var binding: FragmentListBinding
 
     private val apodListAdapter = ApodListAdapter(arrayListOf(), this)
-    private val viewModel: ApodListViewModel by viewModels()
+    private val viewModel: SharedArchiveViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,7 +32,7 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
         binding = FragmentListBinding.bind(view)
 
         binding.listSwipeRefreshLayout.setOnRefreshListener{
-            viewModel.refresh()
+            viewModel.refreshList()
             binding.listSwipeRefreshLayout.isRefreshing = false
         }
 
@@ -81,7 +82,7 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
                     Log.d(TAG, "onItemClickDeleted: ${apodArchive.date}")
                     isDeleted = true
                     apodListAdapter.deleteApods(position)
-                    viewModel.deleteApodModel(apodArchive)
+                    viewModel.processFavoriteArchivesInDatabase(apodArchive, false)
                     Log.d(TAG, "isDeleted: $isDeleted")
                 }
                 .setNegativeButton("Cancel", null)
@@ -93,6 +94,6 @@ class ListFragment : Fragment(R.layout.fragment_list), ListAction {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refresh()
+        viewModel.refreshList()
     }
 }

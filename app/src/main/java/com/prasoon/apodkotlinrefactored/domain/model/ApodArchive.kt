@@ -18,7 +18,7 @@ data class ApodArchive(
             dateString = date,
             title = title,
             url = link,
-            isAddedToFavorites = processFavoritesDB
+            isFavoriteDatabase = processFavoritesDB
         )
     }
 }

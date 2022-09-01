@@ -6,46 +6,47 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_margin="4dp">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:src="@drawable/ic_wallpaper" />
 
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginStart="12dp"
             android:text="SET WALLPAPER ON"
+            android:gravity="center"
             android:textStyle="bold" />
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/home_screen"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:elevation="4dp"
         android:layout_margin="4dp">
 
         <LinearLayout
-            android:id="@+id/home_screen"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
+            android:layout_height="match_parent"
             android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:src="@drawable/screen_home" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="12dp"
                 android:text="Home screen"
+                android:gravity="center"
                 android:textStyle="italic|bold" />
         </LinearLayout>
 
@@ -53,13 +54,13 @@
 
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/lock_screen"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:elevation="4dp"
         android:layout_margin="4dp">
 
         <LinearLayout
-            android:id="@+id/lock_screen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -67,26 +68,27 @@
 
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:src="@drawable/screen_lock" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="12dp"
                 android:text="Lock screen"
+                android:gravity="center"
                 android:textStyle="italic|bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/both_screens"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:elevation="4dp"
         android:layout_margin="4dp">
 
         <LinearLayout
-            android:id="@+id/both_screens"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -94,14 +96,15 @@
 
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:src="@drawable/screen_both" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="12dp"
                 android:text="Both"
+                android:gravity="center"
                 android:textStyle="italic|bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

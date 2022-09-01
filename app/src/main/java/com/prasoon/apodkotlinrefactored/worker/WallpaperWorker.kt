@@ -22,7 +22,6 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE_FOR_WORKER
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.generateRandomDate
-import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.createBitmapFromCacheFile
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.setWallpaper
 import com.prasoon.apodkotlinrefactored.core.utils.NotificationUtils.displayNotification
@@ -106,7 +105,7 @@ class WallpaperWorker @AssistedInject constructor(
 
             SCHEDULE_FAVORITES_WALLPAPER -> {
                 supervisorScope {
-                    val apodArchiveList = dbArchive.dao.getAllApods(true).map { it.toApodArchive() }
+                    val apodArchiveList = dbArchive.dao.getAllFavoriteArchives(true).map { it.toApodArchive() }
                     val favoritesSize = apodArchiveList.size
                     if (favoritesSize == 0) {
                         return@supervisorScope
