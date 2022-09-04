@@ -58,7 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         selectScreenPref!!.setOnPreferenceChangeListener { _, newValueOfScreen ->
             Log.d(TAG, "selectScreenPref: $newValueOfScreen")
             val screenPreference = screenPreference(newValueOfScreen.toString())
-            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, screenPreference, true, WALLPAPER_FREQUENCY)
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, screenPreference, true, true, WALLPAPER_FREQUENCY)
             true // return status.
         }
 
@@ -67,7 +67,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             Log.d(TAG, "scheduleFrequencyPref: $frequencyArchive")
             val frequency = scheduleFrequency(frequencyArchive.toString())
-            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, true, frequency)
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, true, true, frequency)
             true // return status.
         }
 
@@ -83,7 +83,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleFavoritesPref?.isEnabled = !isChecked && (TOTAL_FAVORITES != 0)
             SCHEDULE_TYPE = SCHEDULE_DAILY_WALLPAPER
             Log.d(TAG, "scheduleDailyWallpaperPref: $isChecked")
-            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, WallpaperFrequency.EVERY_DAY)
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, false, WallpaperFrequency.EVERY_DAY)
             true // return status.
         }
 
@@ -97,7 +97,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleFavoritesPref?.isEnabled = !isChecked && (TOTAL_FAVORITES != 0)
             Log.d(TAG, "scheduleArchivePref: $isChecked")
             SCHEDULE_TYPE = SCHEDULE_ARCHIVE_WALLPAPER
-            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, WALLPAPER_FREQUENCY)
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, false, WALLPAPER_FREQUENCY)
 
             true // return status.
         }
@@ -113,7 +113,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleDailyWallpaperPref.isEnabled = !isChecked
             Log.d(TAG, "scheduleFavoritesPref: $isChecked")
             SCHEDULE_TYPE = SCHEDULE_FAVORITES_WALLPAPER
-            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, WALLPAPER_FREQUENCY)
+            scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, false, WALLPAPER_FREQUENCY)
             true // return status.
         }
 

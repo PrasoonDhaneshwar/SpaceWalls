@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         // Set Screens
         settingPerf.getString("screen", "home_screen")?.let {
             SCREEN_PREFERENCE = screenPreference(it)
-            Log.d(TAG, "Screen Preference : $it")
+            Log.d(TAG, "Screen Preference: $it")
         }
 
         // FREQUENCY_ARCHIVE

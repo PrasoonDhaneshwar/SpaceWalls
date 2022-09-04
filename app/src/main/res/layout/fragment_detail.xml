@@ -25,7 +25,7 @@
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="500dp"
+                android:layout_height="600dp"
                 app:contentScrim="@color/mainBackground"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:collapsedTitleTextAppearance="@style/MyCollapsedTitle"
@@ -131,7 +131,7 @@
         </androidx.core.widget.NestedScrollView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/home_constraint_layout"
+            android:id="@+id/detail_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_anchorGravity="bottom|center">
@@ -149,19 +149,53 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 tools:text="Dec 29, 2021" />
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/detail_constraint_layout_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp"
+            android:background="@color/mainBackground"
+            app:layout_anchor="@+id/attachment_layout"
+            app:layout_anchorGravity="bottom|center">
+
+            <ImageView
+                android:id="@+id/detail_download_image"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_download"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <ImageView
                 android:id="@+id/detail_share_item"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
                 android:src="@drawable/ic_share"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/detail_text_view_date"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/detail_text_view_date" />
+                app:layout_constraintStart_toEndOf="@+id/detail_download_image" />
 
+            <ImageView
+                android:id="@+id/detail_set_wallpaper"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/ic_wallpaper"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/detail_share_item" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:id="@+id/attachment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

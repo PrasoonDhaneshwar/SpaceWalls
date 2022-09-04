@@ -13,20 +13,31 @@ import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.prasoon.apodkotlinrefactored.MainActivity
 import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.common.Constants
+import com.prasoon.apodkotlinrefactored.core.common.Constants.DAILY_WALLPAPER_CHANNEL
+import com.prasoon.apodkotlinrefactored.core.common.Constants.DAILY_WALLPAPER_MESSAGE_ID
+import com.prasoon.apodkotlinrefactored.core.common.Constants.DAILY_WALLPAPER_TASK_NOTIFICATION
+import com.prasoon.apodkotlinrefactored.core.common.Constants.DOWNLOAD_IMAGE_CHANNEL
+import com.prasoon.apodkotlinrefactored.core.common.Constants.DOWNLOAD_IMAGE_MESSAGE_ID
+import com.prasoon.apodkotlinrefactored.core.common.Constants.DOWNLOAD_IMAGE_TASK_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 
 object NotificationUtils {
     val TAG = "NotificationUtils"
+
     // When image is downloaded
-    fun displayNotification(context: Context, title: String, message: String, indeterminate: Boolean) {
+    fun displayNotification(
+        context: Context,
+        title: String,
+        message: String,
+        indeterminate: Boolean
+    ) {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // 1. Create channel
             val channel = NotificationChannel(
-                Constants.DOWNLOAD_IMAGE_CHANNEL,
-                Constants.DOWNLOAD_IMAGE_TASK_NOTIFICATION,
+                DOWNLOAD_IMAGE_CHANNEL,
+                DOWNLOAD_IMAGE_TASK_NOTIFICATION,
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(channel)
@@ -35,7 +46,7 @@ object NotificationUtils {
         // 2. Create notification UI
         val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(
             context,
-            Constants.DOWNLOAD_IMAGE_CHANNEL
+            DOWNLOAD_IMAGE_CHANNEL
         ).setOngoing(indeterminate)
             .setProgress(0, 0, indeterminate)
             .setContentTitle(title)
@@ -47,16 +58,26 @@ object NotificationUtils {
         val notification = notificationBuilder.build()
 
         // 4. Notify
-        notificationManager.notify(Constants.DOWNLOAD_IMAGE_MESSAGE_ID, notification)
+        notificationManager.notify(DOWNLOAD_IMAGE_MESSAGE_ID, notification)
     }
 
     // For Daily Wallpaper
-    fun displayNotification(context: Context, title: String, date: String, indeterminate: Boolean, bitmap: Bitmap?) {
+    fun displayNotification(
+        context: Context,
+        title: String,
+        date: String,
+        indeterminate: Boolean,
+        bitmap: Bitmap?
+    ) {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // 1. Create channel
-            val channel = NotificationChannel(Constants.DAILY_WALLPAPER_CHANNEL, Constants.DAILY_WALLPAPER_TASK_NOTIFICATION, NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(
+                DAILY_WALLPAPER_CHANNEL,
+                DAILY_WALLPAPER_TASK_NOTIFICATION,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             notificationManager.createNotificationChannel(channel)
         }
 
@@ -89,32 +110,37 @@ object NotificationUtils {
         // 2. Create notification UI
         val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(
             context,
-            Constants.DAILY_WALLPAPER_CHANNEL
+            DAILY_WALLPAPER_CHANNEL
         ).setProgress(0, 0, indeterminate)
             .setContentTitle(title)
             .setContentText(date.toSimpleDateFormat())
-            .setSmallIcon(R.drawable.ic_download)
-            .setLargeIcon(bitmap)
-            .setStyle(
-                NotificationCompat.BigPictureStyle()
-                    .bigPicture(bitmap)
-                    .bigLargeIcon(null)
-            )
+            .setSmallIcon(android.R.drawable.star_on)
+            .apply {
+                if (bitmap != null) {
+                    setLargeIcon(bitmap)
+                        .setStyle(
+                            NotificationCompat.BigPictureStyle().bigPicture(bitmap)
+                                .bigLargeIcon(null)
+                        )
+                }
+            }
+
             .setContentIntent(pendingIntentFromNavigationComponent)
             .setOnlyAlertOnce(true)
             .setAutoCancel(true)
+            .setSilent(true)
 
         // 3. Create the notification
         val notification = notificationBuilder.build()
 
         // 4. Notify
-        notificationManager.notify(Constants.DAILY_WALLPAPER_MESSAGE_ID, notification)
+        notificationManager.notify(DAILY_WALLPAPER_MESSAGE_ID, notification)
     }
 
     fun cancelNotification(context: Context, title: String, message: String) {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(Constants.DOWNLOAD_IMAGE_MESSAGE_ID)
+        notificationManager.cancel(DOWNLOAD_IMAGE_MESSAGE_ID)
     }
 
 }

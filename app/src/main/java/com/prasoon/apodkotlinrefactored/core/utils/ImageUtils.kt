@@ -39,6 +39,7 @@ import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
 import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
 import com.prasoon.apodkotlinrefactored.core.common.Constants.LOCK_SCREEN
+import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import kotlinx.coroutines.*
 import org.jsoup.HttpStatusException
@@ -273,6 +274,8 @@ object ImageUtils {
                         return
                     } else if (t is ProtocolException) {
                         return
+                    } else if (t is SocketException) {
+                        return
                     }
                     Toast.makeText(context, "Connection timeout! Image loading failed", Toast.LENGTH_SHORT).show()
                 }
@@ -302,7 +305,7 @@ object ImageUtils {
     }
 
     suspend fun setWallpaper(context: Context, imageView: ImageView?, screenFlag: Int, inputBitmap: Bitmap?): Boolean {
-        Log.d(TAG, "set Wallpaper on $screenFlag")
+        Log.d(TAG, "set Wallpaper on ${ScreenPreference.getTitle(screenFlag)}")
         val wallpaperManager = WallpaperManager.getInstance(context)
         val bitmap = if (imageView != null && inputBitmap == null) {
             (imageView.drawable as BitmapDrawable).bitmap
@@ -352,12 +355,11 @@ object ImageUtils {
     suspend fun createBitmapFromCacheFile(urlString: String, context: Context): Bitmap? {
         Log.d(TAG, "createBitmapFromCacheFile: $urlString")
 
-        //return withContext(Dispatchers.IO) {
         val file = File(context.cacheDir, "apodToday.jpg")
         val outputStream = FileOutputStream(file)
-            var inputStream: InputStream? = null
+        val inputStream: InputStream?
 
-            try {
+        try {
                 inputStream = withContext(Dispatchers.IO) {
                     withContext(Dispatchers.IO) {
                         URL(urlString).openConnection()
@@ -387,6 +389,5 @@ object ImageUtils {
         Objects.requireNonNull(outputStream)?.close()
         Log.d(TAG, "Bitmap dimensions -> height x width: ${bitmap?.height} x ${bitmap?.width}")
         return bitmap
-        //}
     }
 }

@@ -1,5 +1,6 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_detail
 
+import android.Manifest
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,14 +9,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.prasoon.apodkotlinrefactored.R
+import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.DialogUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.loadImage
+import com.prasoon.apodkotlinrefactored.core.utils.ShareActionUtils
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils.getYoutubeThumbnailUrlFromVideoUrl
 import com.prasoon.apodkotlinrefactored.databinding.FragmentDetailBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import dagger.hilt.android.AndroidEntryPoint
+import pub.devrel.easypermissions.EasyPermissions
 import javax.inject.Inject
 
 
@@ -34,6 +39,39 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         binding.detailToolbar.setNavigationOnClickListener (View.OnClickListener { requireActivity().onBackPressed() })
 
         viewModel.getApodDetailFromDb(args.apodDate)
+
+        binding.detailShareItem.setOnClickListener {
+            if (currentApod.mediaType == "image") {
+                ShareActionUtils.performActionIntent(
+                    requireContext(),
+                    currentApod.url,
+                    Constants.INTENT_ACTION_SEND
+                )
+            }
+        }
+
+        binding.detailDownloadImage.setOnClickListener {
+            if (EasyPermissions.hasPermissions(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            ) {
+                ImageUtils.saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl)
+            } else {
+                EasyPermissions.requestPermissions(
+                    this,
+                    "Grant Storage Permissions to Save Image ",
+                    Constants.STORAGE_PERMISSION_CODE
+                )
+                ImageUtils.saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl)
+            }
+        }
+
+        binding.detailSetWallpaper.setOnClickListener {
+            if (currentApod.mediaType == "image") {
+                DialogUtils.showBackupDialog(binding.detailImageView, requireContext())
+            }
+        }
 
         observeViewModel()
     }

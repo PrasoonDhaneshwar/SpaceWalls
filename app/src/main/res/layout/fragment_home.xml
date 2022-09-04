@@ -196,6 +196,26 @@
             tools:ignore="ContentDescription"
             android:visibility="visible"/>
 
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/loader"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/gray"
+            app:layout_anchor="@+id/appBarLayout"
+            app:layout_anchorGravity="bottom|center"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/button_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retry"
+            app:layout_anchor="@+id/loader"
+            app:layout_anchorGravity="top|center" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

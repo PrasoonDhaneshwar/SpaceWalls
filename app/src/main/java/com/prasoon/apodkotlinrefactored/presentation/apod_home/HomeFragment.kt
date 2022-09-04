@@ -121,12 +121,12 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             }
         }
 
-/*        // Swipe to refresh
-        binding.homeSwipeRefreshLayout.setOnRefreshListener {
-            Log.d(TAG, "Swipe refresh for date: ${DateInput.currentDate}")
-            viewModel.refresh(DateInput.currentDate)
-            binding.homeSwipeRefreshLayout.isRefreshing = false
-        }*/
+        // Click to refresh
+        binding.buttonRetry.setOnClickListener {
+            Log.d(TAG, "ButtonRetry refresh for date: ${DateUtils.currentDate}")
+            viewModel.refresh(DateUtils.currentDate)
+            binding.buttonRetry.visibility = View.INVISIBLE
+        }
 
         binding.homeVideoViewButton.setOnClickListener {
             ShareActionUtils.performActionIntent(
@@ -157,7 +157,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
         binding.homeSetWallpaper.setOnClickListener {
             if (currentApod.mediaType == "image") {
-                showBackupDialog(binding.homeImageViewResult, requireContext())
+                DialogUtils.showBackupDialog(binding.homeImageViewResult, requireContext())
             }
         }
 
@@ -205,10 +205,21 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             if (!apodStateLiveData.message.isNullOrEmpty()) {
                 Log.d(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
                 Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
+                binding.buttonRetry.visibility = View.VISIBLE
             }
-                currentApod = apodStateLiveData.apod
+            binding.buttonRetry.visibility = View.INVISIBLE
+
+            currentApod = apodStateLiveData.apod
                 DateUtils.currentDate =
                     currentApod.date    // Set the date received from the viewModel
+
+            if (apodStateLiveData.isLoading) {
+                Log.d(TAG, "Apod model loading true")
+                binding.loader.show()
+            } else {
+                Log.d(TAG, "Apod model loading false")
+                binding.loader.hide()
+            }
 
             if (currentApod.date.isEmpty()) {
                 return@observe
@@ -314,32 +325,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
     }
 
-    private fun showBackupDialog(imageView: ImageView, context: Context) {
-        val bottomSheetDialog = BottomSheetDialog(context)
-        Log.d(TAG, "showBackupDialog")
-
-        val mBinding = ScreenMenuBinding.inflate(LayoutInflater.from(context))
-        bottomSheetDialog.setContentView(mBinding.root)
-        if (!mBinding.root.isNotEmpty()) bottomSheetDialog.dismiss()
-
-        bottomSheetDialog.show()
-        mBinding.homeScreen.setOnClickListener {
-            Log.d(TAG, "Change wallpaper on home screen: $HOME_SCREEN")
-            setWallpaperFromBottomSheetDialog(context, imageView, ScreenPreference.HOME_SCREEN)
-            bottomSheetDialog.dismiss()
-        }
-        mBinding.lockScreen.setOnClickListener {
-            Log.d(TAG, "Change wallpaper on lock screen: $LOCK_SCREEN")
-            setWallpaperFromBottomSheetDialog(context, imageView, ScreenPreference.LOCK_SCREEN)
-            bottomSheetDialog.dismiss()
-        }
-        mBinding.bothScreens.setOnClickListener {
-            Log.d(TAG, "Change wallpaper on both screens: $BOTH_SCREENS")
-            setWallpaperFromBottomSheetDialog(context, imageView, ScreenPreference.BOTH_SCREENS)
-            bottomSheetDialog.dismiss()
-        }
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settings -> {
@@ -386,16 +371,5 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.apodStateLiveData.removeObservers(viewLifecycleOwner)
-    }
-
-    private fun setWallpaperFromBottomSheetDialog(context: Context, imageView: ImageView, screenPreference: ScreenPreference) {
-        var isSetWallpaper: Boolean
-        CoroutineScope(Dispatchers.IO).launch {
-            isSetWallpaper = ImageUtils.setWallpaper(context, imageView, screenPreference.value, null)
-            withContext(Dispatchers.Main){
-                if (isSetWallpaper) Toast.makeText(context, "Wallpaper set successfully on ${screenPreference.title}", Toast.LENGTH_SHORT).show()
-                else Toast.makeText(requireContext(), "Unable to set Wallpaper. Please try again", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 }

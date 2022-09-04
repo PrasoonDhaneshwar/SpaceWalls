@@ -7,6 +7,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.prasoon.apodkotlinrefactored.R
@@ -35,8 +36,8 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
 
         binding.listApod.apply {
             setHasFixedSize(true)
-             //layoutManager = LinearLayoutManager(context)
-            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+             layoutManager = LinearLayoutManager(context)
+            //layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             //layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = apodListAdapter
         }
@@ -68,9 +69,14 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
     private fun observeViewModel() {
         viewModel.apodArchiveListStateLiveData.observe(viewLifecycleOwner) { archiveList ->
             Log.d(TAG, "apodArchivesListLiveData: $archiveList")
-            if (archiveList.isLoading) binding.loader.show()
+            if (archiveList.isLoading) {
+                Log.d(TAG, "archiveList.isLoading: ${archiveList.isLoading}")
+
+                binding.loader.show()
+            }
 
             if (!archiveList.isLoading) {
+                Log.d(TAG, "archiveList.isLoading: ${archiveList.isLoading}")
                 binding.loader.hide()
                 //apodListAdapter.updateApods(archiveList.apodArchivesList)
                 apodListAdapter.updateApodArchiveListItems(archiveList.apodArchivesList)

@@ -6,7 +6,7 @@ Browse through **thousands** of NASA's archives and learn about the universe.
 **Schedule wallpaper** through these archives, your favorites or a new content everyday.
 
 ## **👇 Download** ##
-Click [here](https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-Kotlin/blob/main/Astronomy-Picture-of-the-Day-v1.0.apk) to download **SpaceWalls.**
+Click [here](https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-Kotlin/blob/main/Astronomy-Picture-of-the-Day-v2.0.apk?raw=true) to download **SpaceWalls.**
 
 ## **✨App Features:** ##
 - Browse archives from **1995** to present day
@@ -23,9 +23,9 @@ Click [here](https://github.com/PrasoonDhaneshwar/Astronomy-Picture-of-the-Day-K
   <img src="images/ArchiveLight.JPG" width="266" height="569"/>
   <img src="images/FavoritesLight.JPG" width="266" height="569"/>
   <img src="images/FavoritesDark.JPG" width="266" height="569"/>
-  <img src="images/SettingsLight.JPG" width="266" height="569"/>
-  <img src="images/SettingsFrequencyLight.JPG" width="266" height="569"/>
   <img src="images/SettingsDailyWallpaperLight.JPG" width="266" height="569"/>
+  <img src="images/SettingsFrequencyDark.JPG" width="266" height="569"/>
+  <img src="images/SettingsLight.JPG" width="266" height="569"/>
 </div>
 
 ---

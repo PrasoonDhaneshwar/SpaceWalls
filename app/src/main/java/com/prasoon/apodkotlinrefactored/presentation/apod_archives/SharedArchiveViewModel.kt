@@ -55,7 +55,7 @@ class SharedArchiveViewModel @Inject constructor(
                             apodArchiveListStateLiveData.postValue(apodArchiveListState)
                         }
                         is Resource.Loading -> {
-                            apodArchiveListState = ApodArchivesListState(isLoading = true, message = "Unknown error occurred")
+                            apodArchiveListState = ApodArchivesListState(isLoading = true)
                             apodArchiveListStateLiveData.postValue(apodArchiveListState)
                         }
                     }
