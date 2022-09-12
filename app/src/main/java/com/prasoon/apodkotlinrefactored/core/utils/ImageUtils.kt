@@ -30,9 +30,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration
 import com.nostra13.universalimageloader.core.assist.FailReason
-import com.nostra13.universalimageloader.core.assist.ImageSize
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType
-import com.nostra13.universalimageloader.core.imageaware.ImageViewAware
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener
 import com.prasoon.apodkotlinrefactored.R
@@ -197,7 +195,7 @@ object ImageUtils {
             .into(this)
     }
 
-    fun loadImageUIL(uri: String?, imageView: ImageView, viewProgressBar: RoundedProgressBar, context: Context, isSizeConstraintForList: Boolean): Bitmap? {
+    fun loadImageUIL(uri: String?, imageView: ImageView, viewProgressBar: RoundedProgressBar, context: Context): Bitmap? {
         val imageLoader = ImageLoader.getInstance()
         var bmpImage: Bitmap? = null
 
@@ -209,7 +207,6 @@ object ImageUtils {
         config.tasksProcessingOrder(QueueProcessingType.FIFO)
         config.writeDebugLogs() // Remove for release app
 
-
         val options = DisplayImageOptions.Builder()
             .showImageOnFail(R.drawable.handle_another_app) // resource or drawable
             .resetViewBeforeLoading(true) // default
@@ -219,44 +216,7 @@ object ImageUtils {
             .build()
 
         imageLoader.init(config.build())
-        val imageViewAware = ImageViewAware(imageView)
-        val targetSize = ImageSize(IMAGE_WIDTH, IMAGE_HEIGHT)
-        if (isSizeConstraintForList) {
-            imageLoader.displayImage(uri, imageViewAware, options, targetSize, object : SimpleImageLoadingListener() {
-                override fun onLoadingStarted(imageUri: String?, view: View?) {
-                    Log.d(TAG, "onLoadingStarted: $uri")
-                    viewProgressBar.isVisible = true
-                }
-
-                override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
-                    Log.d(TAG, "onLoadingFailed: $uri")
-                    super.onLoadingFailed(imageUri, view, failReason)
-                    viewProgressBar.isVisible = false
-                }
-
-                override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
-                    Log.d(TAG, "onLoadingComplete: $uri")
-                    viewProgressBar.isVisible = false
-                    bmpImage = loadedImage
-                }
-            }, object : ImageLoadingProgressListener {
-                override fun onProgressUpdate(
-                    imageUri: String?,
-                    view: View?,
-                    current: Int,
-                    total: Int
-                ) {
-                    val downloadProgressPercentage = (100.0f * current / total).roundToInt().toDouble()
-                    viewProgressBar.setProgressPercentage(
-                        downloadProgressPercentage, true
-                    )
-                    Log.d("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
-                }
-            })
-            return bmpImage
-
-        } else {
-            imageLoader.displayImage(uri, imageView, options, object : SimpleImageLoadingListener() {
+        imageLoader.displayImage(uri, imageView, options, object : SimpleImageLoadingListener() {
                 override fun onLoadingStarted(imageUri: String?, view: View?) {
                     Log.d(TAG, "onLoadingStarted: $uri")
                     viewProgressBar.isVisible = true
@@ -267,17 +227,13 @@ object ImageUtils {
                     super.onLoadingFailed(imageUri, view, failReason)
                     viewProgressBar.isVisible = false
 
-                    val t = failReason!!.cause
-                    if (t is FileNotFoundException) {
-                        return
-                    } else if (t is SocketTimeoutException) {
-                        return
-                    } else if (t is ProtocolException) {
-                        return
-                    } else if (t is SocketException) {
-                        return
+                    when (failReason!!.cause) {
+                        is FileNotFoundException -> return
+                        is SocketTimeoutException -> return
+                        is ProtocolException -> return
+                        is SocketException -> return
+                        else -> Toast.makeText(context, "Connection timeout! Image loading failed", Toast.LENGTH_SHORT).show()
                     }
-                    Toast.makeText(context, "Connection timeout! Image loading failed", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
@@ -296,12 +252,11 @@ object ImageUtils {
                     viewProgressBar.setProgressPercentage(
                         downloadProgressPercentage, true
                     )
-                    Log.d("ImageLoader", "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
+                    Log.d(TAG, "Progress: $downloadProgressPercentage% -> ${current / 1024}/${total / 1024} bytes")
                 }
             })
 
         return bmpImage
-        }
     }
 
     suspend fun setWallpaper(context: Context, imageView: ImageView?, screenFlag: Int, inputBitmap: Bitmap?): Boolean {
@@ -356,7 +311,9 @@ object ImageUtils {
         Log.d(TAG, "createBitmapFromCacheFile: $urlString")
 
         val file = File(context.cacheDir, "apodToday.jpg")
-        val outputStream = FileOutputStream(file)
+        val outputStream = withContext(Dispatchers.IO) {
+            FileOutputStream(file)
+        }
         val inputStream: InputStream?
 
         try {

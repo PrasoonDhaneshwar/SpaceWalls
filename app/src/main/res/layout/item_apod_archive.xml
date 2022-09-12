@@ -52,8 +52,16 @@
         android:layout_margin="8dp"
         android:src="@drawable/ic_baseline_favorite_border"
         app:layout_constraintBottom_toTopOf="@id/item_progress_image_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textColor="@drawable/drawable_text_color_favorite" />
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <View
+        android:id="@+id/item_view_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignBottom="@+id/item_apod_image"
+        android:background="@drawable/gradient"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
 
     <com.mackhartley.roundedprogressbar.RoundedProgressBar
         android:id="@+id/item_progress_image_view"

@@ -38,7 +38,6 @@ class SharedArchiveViewModel @Inject constructor(
         getApodFromArchives()
     }
 
-    // todo: update archivesLiveData from listLiveData when delete occurs
     private fun getApodFromArchives() {
         viewModelScope.launch {
             getApodArchives.invoke()

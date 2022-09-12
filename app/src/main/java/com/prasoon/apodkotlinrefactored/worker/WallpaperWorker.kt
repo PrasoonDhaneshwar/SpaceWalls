@@ -78,12 +78,12 @@ class WallpaperWorker @AssistedInject constructor(
                                 if (url.contains("youtube") || url.contains(".gif")) {
                                     displayNotification(appContext, "Can not set wallpaper for YouTube or Web content\n"+ apod.title, apod.date, false, bitmap)
                                 } else {
-                                    displayNotification(appContext, apod.title, apod.date, false, bitmap)
+                                    displayNotification(appContext, "Wallpaper is set for: " + apod.title, apod.date, false, bitmap)
                                 }
                             }
 
                             // Only set wallpaper when url contains an image
-                            if (url.contains("jpeg") || url.contains("jpg") || url.contains("png") && bitmap != null) {
+                            if (url.contains("jpeg") || url.contains("jpg") || url.contains("png") && bitmap != null && !url.contains("youtube")) {
                                 setWallpaper(appContext, null, screenPreference, bitmap)
                             } else {
                                 return@supervisorScope
@@ -118,11 +118,11 @@ class WallpaperWorker @AssistedInject constructor(
                             if (apodArchive.link.contains("youtube") || apodArchive.link.contains(".gif")) {
                                 displayNotification(appContext, "Can not set wallpaper for YouTube or web content\n"+ apodArchive.title, apodArchive.date, false, bitmap)
                             } else {
-                                displayNotification(appContext, apodArchive.title, apodArchive.date, false, bitmap)
+                                displayNotification(appContext, "Wallpaper is set for: " + apodArchive.title, apodArchive.date, false, bitmap)
                             }
                         }
                         // Only set wallpaper when url contains an image
-                        if (apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) {
+                        if ((apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) && !apodArchive.link.contains("youtube")) {
                             setWallpaper(appContext, null, screenPreference, bitmap)
                         } else {
                             return@supervisorScope
@@ -147,14 +147,14 @@ class WallpaperWorker @AssistedInject constructor(
             if (apodArchive.link.contains("youtube")) {
                 displayNotification(appContext, "Can not set wallpaper for YouTube content\n"+ apodArchive.title, apodArchive.date, false, bitmap)
             } else if(apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) {
-                displayNotification(appContext, apodArchive.title, apodArchive.date, false, bitmap)
+                displayNotification(appContext, "Wallpaper is set for: " + apodArchive.title, apodArchive.date, false, bitmap)
             }
         }
-        if ((apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) && bitmap != null) {
+        if ((apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) && bitmap != null && !apodArchive.link.contains("youtube")) {
             setWallpaper(appContext, null, screenPreference, bitmap)
         } else {
             displayNotification(appContext, "Can not set wallpaper for Web content\n"+ apodArchive.title, apodArchive.date, false, bitmap)
-            return Result.success() // todo: Wallpaper can't be set since it's a YouTube Video
+            return Result.success()
         }
         return Result.success()
     }

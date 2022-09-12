@@ -1,12 +1,10 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_home
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -14,21 +12,16 @@ import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.view.isNotEmpty
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants
-import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
-import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
-import com.prasoon.apodkotlinrefactored.core.common.Constants.LOCK_SCREEN
-import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
+import com.prasoon.apodkotlinrefactored.core.common.Constants.PENDING_INTENT_DATE_FROM_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SHOW_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.common.Constants.STORAGE_PERMISSION_CODE
-import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.core.utils.*
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.isRefreshNeededForArchives
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.processHomeApodToArchiveFavorites
@@ -36,17 +29,19 @@ import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.createBitmapFromCacheFile
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.saveImage
 import com.prasoon.apodkotlinrefactored.databinding.FragmentHomeBinding
-import com.prasoon.apodkotlinrefactored.databinding.ScreenMenuBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home),
-    NavigationView.OnNavigationItemSelectedListener,
+    /*NavigationView.OnNavigationItemSelectedListener,*/
     EasyPermissions.PermissionCallbacks{
     private val TAG = "HomeFragment"
     private lateinit var binding: FragmentHomeBinding
@@ -66,24 +61,25 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
-        toggle = ActionBarDrawerToggle(
+/*        toggle = ActionBarDrawerToggle(
             activity,
             binding.drawerLayout,
-            /*binding.homeToolbar,*/
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
+            *//*binding.homeToolbar,*//*
+            *//*R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close*//*
+        )*/
 
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
+/*        binding.drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()*/
 
-        binding.navView.setNavigationItemSelectedListener(this)
-        binding.navView.bringToFront()     // Needed for buttons to be clickable
+/*        binding.navView.setNavigationItemSelectedListener(this)
+        binding.navView.bringToFront()     // Needed for buttons to be clickable*/
 
         // Get date from notifications and fetch data from ViewModel
-        dateFromPendingIntent = arguments?.getString("date")
-        Log.d(TAG, "from pendingIntent: $dateFromPendingIntent")
-
+        dateFromPendingIntent = arguments?.getString(PENDING_INTENT_DATE_FROM_NOTIFICATION)
+        dateFromPendingIntent?.let {
+            Log.d(TAG, "Received date from pendingIntent: $dateFromPendingIntent")
+        }
         // Start with an actual date
         if (!dateFromPendingIntent.isNullOrEmpty()) {
             DateUtils.currentDate = dateFromPendingIntent!!
@@ -91,9 +87,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         }
         else if (DateUtils.currentDate.isEmpty())  DateUtils.currentDate = DateUtils.getCurrentDateForInitialization()
 
-        //Log.d(TAG, "viewModel.refresh date from onViewCreated: DateUtils.currentDate: ${DateUtils.currentDate}")
-
-        //viewModel.refresh(DateUtils.currentDate)
         binding.overviewFloatingActionButton.setOnClickListener {
             val datePickerFragment = DatePickerFragment()
             val supportFragmentManager = requireActivity().supportFragmentManager
@@ -158,6 +151,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         binding.homeSetWallpaper.setOnClickListener {
             if (currentApod.mediaType == "image") {
                 DialogUtils.showBackupDialog(binding.homeImageViewResult, requireContext())
+                Snackbar.make(binding.coordinatorLayout, "this is a test", Snackbar.LENGTH_SHORT).show()
             }
         }
 
@@ -168,7 +162,8 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             } else {
                 EasyPermissions.requestPermissions(this, "Grant Storage Permissions to Save Image ",
                     STORAGE_PERMISSION_CODE)
-                saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl!!)            }
+                saveImage(requireContext(), currentApod.title, currentApod.date, currentApod.url, currentApod.hdUrl!!)
+            }
         }
 
         binding.homeAddToFavorites.setOnClickListener {
@@ -225,7 +220,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 return@observe
             }
 
-            Log.d(TAG, "Apod model received from viewmodel: $currentApod")
+            Log.d(TAG, "Apod model received from viewModel: $currentApod")
             Log.d(TAG, "Web link : ${DateUtils.createApodUrl(currentApod.date)}")
             Log.d(TAG, "Api link : ${DateUtils.createApodUrlApi(currentApod.date)}")
 
@@ -262,14 +257,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     val thumbnailUrl =
                         VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                     Log.d(TAG, "YouTube thumbnailUrl: $thumbnailUrl")
-                    binding.homeImageViewResult.setImageBitmap(
-                        ImageUtils.loadImageUIL(
-                            thumbnailUrl,
-                            binding.homeImageViewResult,
-                            binding.homeProgressImageView,
-                            requireContext(),
-                            false)
-                    )
+                    binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
                 } else {
                     // Handling for Apod which is not an image or a YouTube video.
                     // Open link with browser
@@ -278,7 +266,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                         currentApod.url,
                         Constants.INTENT_ACTION_VIEW
                     )
-                    // todo - Reset to visible needed for next date set?
                     binding.homeProgressImageView.visibility = View.INVISIBLE
 
                     binding.homeImageViewResult.setImageResource(R.drawable.handle_another_app)
@@ -294,14 +281,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 binding.homeAddToFavorites.visibility = View.VISIBLE
                 binding.homeSetWallpaper.visibility = View.VISIBLE
 
-                binding.homeImageViewResult.setImageBitmap(
-                    ImageUtils.loadImageUIL(
-                        currentApod.url,
-                        binding.homeImageViewResult,
-                        binding.homeProgressImageView,
-                        requireContext(),
-                    false)
-                )
+                binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(currentApod.url, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
 
             }
             var url = ""
@@ -325,7 +305,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+/*    override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settings -> {
                 Toast.makeText(activity, "settings clicked!", Toast.LENGTH_SHORT).show()
@@ -335,7 +315,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
-    }
+    }*/
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

@@ -93,29 +93,13 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 Log.d(TAG, "observeViewModel currentApod thumbnailUrl: $thumbnailUrl")
 
                 //binding.detailImageView.loadImage(thumbnailUrl, false, binding.detailProgressImageView)
-                binding.detailImageView.setImageBitmap(
-                    ImageUtils.loadImageUIL(
-                        thumbnailUrl,
-                        binding.detailImageView,
-                        binding.detailProgressImageView,
-                        requireContext(),
-                        false)
-                )
+                binding.detailImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, binding.detailImageView, binding.detailProgressImageView, requireContext()))
 
             } else {
                 binding.detailImageView.visibility = View.VISIBLE
                 Log.d(TAG, "url: ${currentApod.url}")
                 //binding.detailImageView.loadImage(currentApod.url, false, binding.detailProgressImageView)
-
-                binding.detailImageView.setImageBitmap(
-                    ImageUtils.loadImageUIL(
-                        currentApod.url,
-                        binding.detailImageView,
-                        binding.detailProgressImageView,
-                        requireContext(),
-                        false
-                    ))
-
+                binding.detailImageView.setImageBitmap(ImageUtils.loadImageUIL(currentApod.url, binding.detailImageView, binding.detailProgressImageView, requireContext()))
             }
 
             binding.detailTextViewTitle.text = currentApod.title

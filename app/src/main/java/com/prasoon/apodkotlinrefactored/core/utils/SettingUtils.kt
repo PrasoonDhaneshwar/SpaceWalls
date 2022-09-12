@@ -4,10 +4,13 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.*
+import com.prasoon.apodkotlinrefactored.core.common.Constants
+import com.prasoon.apodkotlinrefactored.core.common.Constants.ALARM_ONE_TIME_REQUEST_CODE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.ALARM_REQUEST_CODE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.BOTH_SCREENS
 import com.prasoon.apodkotlinrefactored.core.common.Constants.HOME_SCREEN
@@ -25,8 +28,9 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENC
 import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.getTimeInHoursMinutesSeconds
-import com.prasoon.apodkotlinrefactored.worker.AlertReceiver
+import com.prasoon.apodkotlinrefactored.worker.AlarmReceiver
 import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -70,6 +74,16 @@ fun scheduleFrequency(frequencyArchive: String): WallpaperFrequency {
 
 
 fun scheduleWallpaper(context: Context, scheduleType: Int, screenType: Int, isSet: Boolean, isSetFromScreenOrFrequency: Boolean, wallpaperFrequency: WallpaperFrequency) {
+    val alarmPreference: SharedPreferences = context.getSharedPreferences(
+        Constants.ALARM_PREFERENCE,
+        Context.MODE_PRIVATE
+    )
+    val alarmPreferencesEditor: SharedPreferences.Editor = alarmPreference.edit()
+    alarmPreferencesEditor.putInt(SCHEDULE_TYPE_ALARM, scheduleType)
+    alarmPreferencesEditor.putInt(SCREEN_PREFERENCE_FOR_WORKER, screenType)
+    alarmPreferencesEditor.putLong(WALLPAPER_FREQUENCY_ALARM, wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval))
+    alarmPreferencesEditor.apply()
+
     if (isSetFromScreenOrFrequency) {
         processAlarm(context, screenType, wallpaperFrequency, scheduleType, !isSet)
         processAlarm(context, screenType, wallpaperFrequency, scheduleType, isSet)
@@ -188,10 +202,11 @@ fun processAlarm(context: Context, screenFlag: Int, wallpaperFrequency: Wallpape
     val alarmManager: AlarmManager =
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    val intent = Intent(context, AlertReceiver::class.java)
+    val intent = Intent(context, AlarmReceiver::class.java)
     intent.action = "com.prasoon.apod.START_ALARM"
     intent.putExtra(SCREEN_PREFERENCE_FOR_WORKER, screenFlag)
     intent.putExtra(SCHEDULE_TYPE_ALARM, scheduleType)
+    intent.putExtra(WALLPAPER_FREQUENCY_ALARM, wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval))
     val pendingIntent = PendingIntent.getBroadcast(context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE or  PendingIntent.FLAG_UPDATE_CURRENT)
 
     val repeatInterval = wallpaperFrequency.interval
@@ -205,12 +220,24 @@ fun processAlarm(context: Context, screenFlag: Int, wallpaperFrequency: Wallpape
             tenAM.set(Calendar.HOUR_OF_DAY, 10)
             tenAM.set(Calendar.MINUTE, 0)
             tenAM.set(Calendar.SECOND, 0)
-            Toast.makeText(context, "Next wallpaper will be scheduled at 10:00 AM tomorrow", Toast.LENGTH_LONG).show()
+            val sdf = SimpleDateFormat("HH:mm aa")
+            val tenAMFormat = sdf.format(tenAM.time)
 
             if (isSet) {
+                val timeNow = Calendar.getInstance()
+
+                if (timeNow.timeInMillis > tenAM.timeInMillis) {
+                    // Set daily wallpaper
+                    val oneTimePendingIntent = PendingIntent.getBroadcast(context, ALARM_ONE_TIME_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE or  PendingIntent.FLAG_UPDATE_CURRENT)
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, timeNow.timeInMillis + 1000*60*1, oneTimePendingIntent)
+                    Log.d("AlertReceiver","alarmManager set for one time: $alarmManager")
+                    Log.d("AlertReceiver","Alarm set for one time at: ${sdf.format(timeNow.time)}")
+                    Toast.makeText(context, "Today's Wallpaper will be changing in a minute...", Toast.LENGTH_LONG).show()
+                }
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, tenAM.timeInMillis, AlarmManager.INTERVAL_DAY , pendingIntent)
-                Log.d("AlertReceiver","alarmManager set: $alarmManager")
-                Log.d("AlertReceiver","setWorkRequest: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
+                Log.d("AlertReceiver","alarmManager set for repeating: $alarmManager")
+                Log.d("AlertReceiver","Alarm set for: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
+                Toast.makeText(context, "Next wallpaper is scheduled for $tenAMFormat tomorrow", Toast.LENGTH_LONG).show()
             } else {
                 Log.d("AlertReceiver","alarmManager: cancelled: $alarmManager")
                 alarmManager.cancel(pendingIntent)
@@ -222,7 +249,7 @@ fun processAlarm(context: Context, screenFlag: Int, wallpaperFrequency: Wallpape
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + 5000, wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent); // Millisec * Second * Minute
                 //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + 5000, 1000*60*1 , pendingIntent); // Millisec * Second * Minute
                 Log.d("AlertReceiver","alarmManager set: $alarmManager")
-                Log.d("AlertReceiver","setWorkRequest: ${WallpaperWorker.WORK_NAME}, from Archives for every $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
+                Log.d("AlertReceiver","Alarm set for: ${WallpaperWorker.WORK_NAME}, from Archives for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
             } else {
                 Log.d("AlertReceiver","alarmManager cancelled: $alarmManager")
                 alarmManager.cancel(pendingIntent)
@@ -233,7 +260,7 @@ fun processAlarm(context: Context, screenFlag: Int, wallpaperFrequency: Wallpape
             if (isSet) {
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + 5000, wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent); // Millisec * Second * Minute
                 Log.d("AlertReceiver","alarmManager set: $alarmManager")
-                Log.d("AlertReceiver","setWorkRequest: ${WallpaperWorker.WORK_NAME}, from Favorites for every $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
+                Log.d("AlertReceiver","Alarm set for: ${WallpaperWorker.WORK_NAME}, from Favorites for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
             } else {
                 Log.d("AlertReceiver","alarmManager, cancelled: $alarmManager")
                 alarmManager.cancel(pendingIntent)

@@ -18,7 +18,6 @@ class ApodListAdapter(var apodModelList: ArrayList<ApodArchive>, val actions: Li
     private val TAG = "ApodListAdapter"
 
     // 3. Override methods
-    // todo: view may not be val
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApodViewHolder {
         Log.d(TAG, "onCreateViewHolder")
         val apodBinding = ItemApodBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -53,12 +52,12 @@ class ApodListAdapter(var apodModelList: ArrayList<ApodArchive>, val actions: Li
                 //itemImageView.loadImage(thumbnailUrl, true, progress)
 
                 //val context = itemImageView.context
-                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, itemImageView, progress, itemImageView.context, true))
+                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, itemImageView, progress, itemImageView.context))
 
             } else {
                 itemImageView.visibility = View.VISIBLE
                 //itemImageView.loadImage(apod.url, true, progress)
-                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context, true))
+                itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context))
             }
 
             itemTitle.text = apodArchive.title

@@ -10,6 +10,7 @@ object Constants {
 
     const val SELECTED_SIMPLE_DATE_FORMAT = "SELECTED_SIMPLE_DATE_FORMAT"
     const val CURRENT_DATE_FOR_API = "CURRENT_DATE_FOR_API"
+    const val PENDING_INTENT_DATE_FROM_NOTIFICATION = "PENDING_INTENT_DATE_FROM_NOTIFICATION"
 
     var INTENT_ACTION_VIEW = 1
     var INTENT_ACTION_SEND = 2
@@ -18,11 +19,11 @@ object Constants {
 
     const val DOWNLOAD_IMAGE_MESSAGE_ID = 1001
     const val DOWNLOAD_IMAGE_CHANNEL = "image_download_channel"
-    const val DOWNLOAD_IMAGE_TASK_NOTIFICATION = "image_download_task_notification"
+    const val DOWNLOAD_IMAGE_CHANNEL_NAME = "Download Images"
 
     const val DAILY_WALLPAPER_MESSAGE_ID = 1002
-    const val DAILY_WALLPAPER_CHANNEL = "image_download_channel"
-    const val DAILY_WALLPAPER_TASK_NOTIFICATION = "image_download_task_notification"
+    const val WALLPAPER_CHANNEL = "wallpaper_channel"
+    const val WALLPAPER_CHANNEL_NAME = "Wallpapers"
 
     const val HOME_SCREEN = 1
     const val LOCK_SCREEN = 2
@@ -42,6 +43,8 @@ object Constants {
     var TOTAL_FAVORITES = 0
 
     const val ALARM_REQUEST_CODE = 2000
+    const val ALARM_ONE_TIME_REQUEST_CODE = 2001
     const val SCHEDULE_TYPE_ALARM = "SCHEDULE_TYPE_ALARM"
     const val WALLPAPER_FREQUENCY_ALARM = "WALLPAPER_FREQUENCY_ALARM"
+    const val ALARM_PREFERENCE = "ALARM_PREFERENCE"
 }

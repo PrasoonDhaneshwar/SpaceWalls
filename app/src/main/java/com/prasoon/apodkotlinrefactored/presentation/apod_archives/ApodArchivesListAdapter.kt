@@ -48,7 +48,7 @@ class ApodArchivesListAdapter(
             Log.d(TAG, "bind id: ${apodArchive}")
             itemTitle.text = apodArchive.title
             itemDate.text = apodArchive.date.toSimpleDateFormat()
-            itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context, true))
+            itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context))
 
             addToFavorite.setOnClickListener {
                 if (!isAddedToDB) {

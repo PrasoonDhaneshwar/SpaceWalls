@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.isNotEmpty
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.databinding.ScreenMenuBinding
 import kotlinx.coroutines.CoroutineScope
@@ -46,9 +47,13 @@ object DialogUtils {
         var isSetWallpaper: Boolean
         CoroutineScope(Dispatchers.IO).launch {
             isSetWallpaper = ImageUtils.setWallpaper(context, imageView, screenPreference.value, null)
-            withContext(Dispatchers.Main){
-                if (isSetWallpaper) Toast.makeText(context, "Wallpaper set successfully on ${screenPreference.title}", Toast.LENGTH_SHORT).show()
-                else Toast.makeText(context, "Unable to set Wallpaper. Please try again", Toast.LENGTH_SHORT).show()
+            withContext(Dispatchers.Main.immediate){
+                if (isSetWallpaper) {
+                    Toast.makeText(context, "Wallpaper set successfully on ${screenPreference.title}", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    Toast.makeText(context, "Unable to set Wallpaper. Please try again", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

@@ -29,6 +29,7 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
         super.onViewCreated(view, savedInstanceState)
         requireActivity().window.apply {
             addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+            addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
         Log.d(TAG, "onViewCreated isRefreshed $isRefreshNeededForArchives")
 
@@ -47,6 +48,9 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
                 if (!recyclerView.canScrollVertically(1) && dy != 0) {
                     Log.d(TAG, "addOnScrollListener")
                     viewModel.refreshArchive()
+                    binding.loader.show()
+                } else {
+                    binding.loader.hide()
                 }
             }
         })
@@ -63,6 +67,7 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
         super.onDetach()
         requireActivity().window.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+            clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
     }
 
@@ -71,7 +76,6 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
             Log.d(TAG, "apodArchivesListLiveData: $archiveList")
             if (archiveList.isLoading) {
                 Log.d(TAG, "archiveList.isLoading: ${archiveList.isLoading}")
-
                 binding.loader.show()
             }
 

@@ -118,7 +118,7 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         } else if (youTubeLink.isNotEmpty() && youTubeLink.contains("youtube")) {
             link = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(youTubeLink)
         } else {
-            link = webLink  // todo: Don't handle it in app
+            link = webLink
         }
         Log.d(TAG, "createArchiveLinksWithDate title: $title")
         Log.d(TAG, "createArchiveLinksWithDate for date: $date: IMG SRC: $png")

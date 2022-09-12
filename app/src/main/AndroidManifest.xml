@@ -44,7 +44,7 @@
             tools:node="remove">
         </provider>
         <receiver
-            android:name=".worker.AlertReceiver"
+            android:name=".worker.AlarmReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

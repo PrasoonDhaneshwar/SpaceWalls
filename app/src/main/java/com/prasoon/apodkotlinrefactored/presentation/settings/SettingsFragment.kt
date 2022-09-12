@@ -84,6 +84,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             SCHEDULE_TYPE = SCHEDULE_DAILY_WALLPAPER
             Log.d(TAG, "scheduleDailyWallpaperPref: $isChecked")
             scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, false, WallpaperFrequency.EVERY_DAY)
+
+            scheduleDailyWallpaperPref.isChecked = isChecked
+            if (scheduleDailyWallpaperPref.isChecked) scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for 10:00 AM tomorrow" else scheduleDailyWallpaperPref.summaryOff = ""
             true // return status.
         }
 
@@ -117,12 +120,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true // return status.
         }
 
+        // Set initial state when Fragment starts
         if (scheduleDailyWallpaperPref.isChecked) {
             SCHEDULE_TYPE = SCHEDULE_DAILY_WALLPAPER
             scheduleArchivePref.isEnabled = false
             scheduleFavoritesPref.isEnabled = false
             scheduleFrequencyPref.isEnabled =false
-        }
+            scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for 10:00 AM tomorrow"
+        } else scheduleDailyWallpaperPref.summaryOff = ""
 
         if (scheduleArchivePref.isChecked) {
             SCHEDULE_TYPE = SCHEDULE_ARCHIVE_WALLPAPER
@@ -148,7 +153,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             withContext(Dispatchers.Main) {
                 count = favoritesSize
                 TOTAL_FAVORITES = count
-                Log.d(TAG, "count.value: $count TOTAL_FAVORITES: $TOTAL_FAVORITES")
+                Log.d(TAG, "Total Favorites: $TOTAL_FAVORITES")
                 if (TOTAL_FAVORITES == 0) scheduleFavoritesPref.isEnabled = false
                 //else if (TOTAL_FAVORITES != 0 && !(scheduleDailyWallpaperPref.isEnabled) && (!scheduleArchivePref.isEnabled))scheduleFavoritesPref.isEnabled = true
             }

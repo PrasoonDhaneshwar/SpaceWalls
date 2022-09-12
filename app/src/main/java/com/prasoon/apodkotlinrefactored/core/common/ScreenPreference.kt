@@ -12,7 +12,7 @@ enum class ScreenPreference(
         fun getTitle(value: Int): String {
             for (i in ScreenPreference.values()) {
                 if (i.value == value) {
-                    return i.title
+                    return i.title.uppercase()
                 }
             }
             return ""

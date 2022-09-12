@@ -12,6 +12,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:scaleType="centerCrop"
+        tools:layout_editor_absoluteX="-58dp"
+        tools:layout_editor_absoluteY="-16dp"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <TextView
@@ -20,14 +22,12 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/item_apod_image"
-        android:layout_margin="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
         android:ellipsize="end"
         android:gravity="start"
         android:maxLines="1"
         android:textColor="#fff"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/item_date"
         app:layout_constraintStart_toStartOf="@+id/item_apod_image"
         tools:text="Some huge title will come here and take the space" />
 
@@ -38,19 +38,20 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/item_apod_image"
         android:layout_alignParentEnd="true"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
         android:textColor="#fff"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/item_view_gradient"
+        app:layout_constraintStart_toStartOf="@+id/item_view_gradient"
         tools:text="Date taken on " />
 
     <View
         android:id="@+id/item_view_gradient"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="20dp"
         android:layout_alignBottom="@+id/item_apod_image"
         android:background="@drawable/gradient"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -58,20 +59,21 @@
 
     <ImageView
         android:id="@+id/item_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_gravity="end"
         android:layout_margin="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/ic_baseline_delete_outline" />
+        android:src="@drawable/ic_baseline_delete_outline"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.mackhartley.roundedprogressbar.RoundedProgressBar
         android:id="@+id/item_progress_image_view"
         android:layout_width="match_parent"
         android:layout_height="32dp"
+        tools:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/item_apod_image"
         app:rpbBackgroundColor="#DFD8D8"
         app:rpbBackgroundTextColor="#070600"
