@@ -151,7 +151,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         binding.homeSetWallpaper.setOnClickListener {
             if (currentApod.mediaType == "image") {
                 DialogUtils.showBackupDialog(binding.homeImageViewResult, requireContext())
-                Snackbar.make(binding.coordinatorLayout, "this is a test", Snackbar.LENGTH_SHORT).show()
+                // Snackbar.make(binding.coordinatorLayout, "this is a test", Snackbar.LENGTH_SHORT).show()
             }
         }
 
