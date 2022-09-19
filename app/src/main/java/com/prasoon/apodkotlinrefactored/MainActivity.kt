@@ -16,10 +16,11 @@ import androidx.work.WorkManager
 import com.google.common.util.concurrent.ListenableFuture
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENCY
-import com.prasoon.apodkotlinrefactored.core.utils.scheduleFrequency
-import com.prasoon.apodkotlinrefactored.core.utils.screenPreference
-import com.prasoon.apodkotlinrefactored.core.utils.setAppTheme
-import com.prasoon.apodkotlinrefactored.core.utils.showNotification
+import com.prasoon.apodkotlinrefactored.core.utils.*
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.scheduleFrequency
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.screenPreference
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.setAppTheme
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.showNotification
 import com.prasoon.apodkotlinrefactored.databinding.ActivityMainBinding
 import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
 import dagger.hilt.android.AndroidEntryPoint

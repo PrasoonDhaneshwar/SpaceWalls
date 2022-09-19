@@ -6,15 +6,20 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENCY
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_ARCHIVE_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_DAILY_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_FAVORITES_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_TYPE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.TOTAL_FAVORITES
+import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENCY
 import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
-import com.prasoon.apodkotlinrefactored.core.utils.*
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.getTenAMFormat
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.scheduleFrequency
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.scheduleWallpaper
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.screenPreference
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.setAppTheme
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.showNotification
 import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -86,7 +91,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, false, WallpaperFrequency.EVERY_DAY)
 
             scheduleDailyWallpaperPref.isChecked = isChecked
-            if (scheduleDailyWallpaperPref.isChecked) scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for 10:00 AM tomorrow" else scheduleDailyWallpaperPref.summaryOff = ""
+            if (scheduleDailyWallpaperPref.isChecked) scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for ${getTenAMFormat()} tomorrow" else scheduleDailyWallpaperPref.summaryOff = ""
             true // return status.
         }
 
@@ -126,7 +131,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleArchivePref.isEnabled = false
             scheduleFavoritesPref.isEnabled = false
             scheduleFrequencyPref.isEnabled =false
-            scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for 10:00 AM tomorrow"
+            scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for ${getTenAMFormat()} tomorrow"
         } else scheduleDailyWallpaperPref.summaryOff = ""
 
         if (scheduleArchivePref.isChecked) {
@@ -146,16 +151,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
             selectScreenPref.isEnabled =false
         }
 
-        var count: Int
         CoroutineScope(Dispatchers.IO).launch {
             val apodArchiveList = dbArchive.dao.getAllFavoriteArchives(true).map { it.toApodArchive() }
             val favoritesSize = apodArchiveList.size
             withContext(Dispatchers.Main) {
-                count = favoritesSize
-                TOTAL_FAVORITES = count
+                TOTAL_FAVORITES = favoritesSize
                 Log.d(TAG, "Total Favorites: $TOTAL_FAVORITES")
                 if (TOTAL_FAVORITES == 0) scheduleFavoritesPref.isEnabled = false
-                //else if (TOTAL_FAVORITES != 0 && !(scheduleDailyWallpaperPref.isEnabled) && (!scheduleArchivePref.isEnabled))scheduleFavoritesPref.isEnabled = true
             }
         }
     }

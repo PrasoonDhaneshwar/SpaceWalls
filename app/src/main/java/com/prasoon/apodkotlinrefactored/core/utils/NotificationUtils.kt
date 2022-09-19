@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.prasoon.apodkotlinrefactored.MainActivity
@@ -19,7 +20,9 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.DOWNLOAD_IMAGE_MES
 import com.prasoon.apodkotlinrefactored.core.common.Constants.DOWNLOAD_IMAGE_CHANNEL_NAME
 import com.prasoon.apodkotlinrefactored.core.common.Constants.PENDING_INTENT_DATE_FROM_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_CHANNEL
+import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
 
 object NotificationUtils {
     val TAG = "NotificationUtils"
@@ -110,7 +113,9 @@ object NotificationUtils {
         val notification = notificationBuilder.build()
 
         // 4. Notify with different id to show multiple notifications
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        val notifyId = System.currentTimeMillis() / (1000*60*1)
+        Log.d(TAG,"displayNotification: notifyId $notifyId for: $title, ${date.toSimpleDateFormat()}")
+        notificationManager.notify(notifyId.toInt(), notification)
     }
 
     fun cancelNotification(context: Context, title: String, message: String) {

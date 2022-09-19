@@ -100,4 +100,16 @@ object DateUtils {
 
         return String.format("%02d hours, %02d minutes and %02d seconds", hours, minutes, seconds)
     }
+
+    fun getTenAM(): GregorianCalendar {
+        val tenAM =  GregorianCalendar()
+        tenAM.set(Calendar.HOUR_OF_DAY, 10)
+        tenAM.set(Calendar.MINUTE, 0)
+        tenAM.set(Calendar.SECOND, 0)
+        return tenAM
+    }
+
+    fun getTenAMFormat(): String = getSimpleDateFormatAMPM().format(getTenAM().time)
+
+    fun getSimpleDateFormatAMPM() = SimpleDateFormat("HH:mm aa", Locale.getDefault())
 }

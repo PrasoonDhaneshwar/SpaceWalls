@@ -21,8 +21,7 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENC
 import com.prasoon.apodkotlinrefactored.core.common.ScheduleType
 import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
-import com.prasoon.apodkotlinrefactored.core.utils.processAlarm
-
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.processAlarm
 
 class AlarmReceiver: BroadcastReceiver() {
     val TAG = "AlertReceiver"
@@ -39,7 +38,6 @@ class AlarmReceiver: BroadcastReceiver() {
                 Log.d(TAG, "Alarm is already active")
             }
             Log.d(TAG, "Intent info: $intent")
-
 
             if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
                 Log.d(TAG, "System boot occurred, reset alarm preferences")
@@ -61,6 +59,10 @@ class AlarmReceiver: BroadcastReceiver() {
                 val frequency = intent.getLongExtra(WALLPAPER_FREQUENCY_ALARM, AlarmManager.INTERVAL_DAY)
                 Log.d(TAG, "Received setWorkRequest for scheduleType: ${ScheduleType.getTitle(scheduleType)} screenType: ${ScreenPreference.getTitle(screenType)} for every: ${WallpaperFrequency.getEnum(frequency)}")
                 setWorkRequest(context, screenType, scheduleType)
+
+                // Restart Alarms
+                val wallpaperFrequency = WallpaperFrequency.getEnum(frequency)
+                processAlarm(context, screenType, wallpaperFrequency, scheduleType, true)
             }
         }
     }

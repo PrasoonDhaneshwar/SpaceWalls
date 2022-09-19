@@ -145,16 +145,15 @@ class WallpaperWorker @AssistedInject constructor(
 
         if (notifications) {
             if (apodArchive.link.contains("youtube")) {
-                displayNotification(appContext, "Can not set wallpaper for YouTube content\n"+ apodArchive.title, apodArchive.date, false, bitmap)
+                displayNotification(appContext, "Can not set wallpaper for YouTube content.\n"+ apodArchive.title, apodArchive.date, false, bitmap)
             } else if(apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) {
-                displayNotification(appContext, "Wallpaper is set for: " + apodArchive.title, apodArchive.date, false, bitmap)
+                displayNotification(appContext, "Wallpaper is set: " + apodArchive.title, apodArchive.date, false, bitmap)
             }
         }
         if ((apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) && bitmap != null && !apodArchive.link.contains("youtube")) {
             setWallpaper(appContext, null, screenPreference, bitmap)
         } else {
-            displayNotification(appContext, "Can not set wallpaper for Web content\n"+ apodArchive.title, apodArchive.date, false, bitmap)
-            return Result.success()
+            displayNotification(appContext, "Can not set wallpaper for Web content."+ apodArchive.title, apodArchive.date, false, bitmap)
         }
         return Result.success()
     }
