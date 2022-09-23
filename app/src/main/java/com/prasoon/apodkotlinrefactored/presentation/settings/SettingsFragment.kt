@@ -91,7 +91,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleWallpaper(requireContext(), SCHEDULE_TYPE, SCREEN_PREFERENCE, isChecked, false, WallpaperFrequency.EVERY_DAY)
 
             scheduleDailyWallpaperPref.isChecked = isChecked
-            if (scheduleDailyWallpaperPref.isChecked) scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for ${getTenAMFormat()} tomorrow" else scheduleDailyWallpaperPref.summaryOff = ""
+            if (scheduleDailyWallpaperPref.isChecked) scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for ${getTenAMFormat()}" else scheduleDailyWallpaperPref.summaryOff = ""
             true // return status.
         }
 
@@ -131,7 +131,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             scheduleArchivePref.isEnabled = false
             scheduleFavoritesPref.isEnabled = false
             scheduleFrequencyPref.isEnabled =false
-            scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for ${getTenAMFormat()} tomorrow"
+            scheduleDailyWallpaperPref.summaryOn = "Next Wallpaper is scheduled for ${getTenAMFormat()}"
         } else scheduleDailyWallpaperPref.summaryOff = ""
 
         if (scheduleArchivePref.isChecked) {

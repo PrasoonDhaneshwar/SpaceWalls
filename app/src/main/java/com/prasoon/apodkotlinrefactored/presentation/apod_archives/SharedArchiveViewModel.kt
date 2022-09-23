@@ -84,7 +84,8 @@ class SharedArchiveViewModel @Inject constructor(
                 }
             }
             apodArchiveListLiveData.postValue(apodArchiveListUI)
-            apodArchiveListStateLiveData.postValue(ApodArchivesListState(apodArchivesList = apodArchiveListUI as List<ApodArchive>, false) )
+            if (!apodArchiveListUI.isNullOrEmpty()) apodArchiveListStateLiveData.postValue(ApodArchivesListState(apodArchivesList = apodArchiveListUI as List<ApodArchive>, false) )
+            refreshList()
             Log.d(TAG, "processFavorites for ${apodArchiveListStateLiveData.value}: $processFavoriteDB")
 
         }

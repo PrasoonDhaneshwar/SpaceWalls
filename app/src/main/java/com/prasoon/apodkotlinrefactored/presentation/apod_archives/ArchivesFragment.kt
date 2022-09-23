@@ -72,20 +72,20 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
     }
 
     private fun observeViewModel() {
-        viewModel.apodArchiveListStateLiveData.observe(viewLifecycleOwner) { archiveList ->
-            Log.d(TAG, "apodArchivesListLiveData: $archiveList")
-            if (archiveList.isLoading) {
-                Log.d(TAG, "archiveList.isLoading: ${archiveList.isLoading}")
+        viewModel.apodArchiveListStateLiveData.observe(viewLifecycleOwner) { archiveListState ->
+            Log.d(TAG, "apodArchivesListLiveData: $archiveListState")
+            if (archiveListState.isLoading) {
+                Log.d(TAG, "archiveListState.isLoading: ${archiveListState.isLoading}")
                 binding.loader.show()
             }
 
-            if (!archiveList.isLoading) {
-                Log.d(TAG, "archiveList.isLoading: ${archiveList.isLoading}")
+            if (!archiveListState.isLoading) {
+                Log.d(TAG, "archiveListState.isLoading: ${archiveListState.isLoading}")
                 binding.loader.hide()
-                //apodListAdapter.updateApods(archiveList.apodArchivesList)
-                apodListAdapter.updateApodArchiveListItems(archiveList.apodArchivesList)
+                //apodListAdapter.updateApods(archiveListState.apodArchivesList)
+                apodListAdapter.updateApodArchiveListItems(archiveListState.apodArchivesList)
             }
-            if (!archiveList.message.isNullOrEmpty()) {
+            if (!archiveListState.message.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "Unexpected error occurred", Toast.LENGTH_SHORT).show()
             }
         }

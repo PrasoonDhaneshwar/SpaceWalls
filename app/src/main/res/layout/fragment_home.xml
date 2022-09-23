@@ -58,6 +58,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/home_image_view_result"
                     app:layout_constraintStart_toStartOf="@+id/home_image_view_result"
                     app:layout_constraintTop_toTopOf="@+id/home_image_view_result"
+                    android:contentDescription="Today's content is a YouTube video, click here to play"
                     tools:visibility="visible" />
 
                 <com.mackhartley.roundedprogressbar.RoundedProgressBar
@@ -93,15 +94,15 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/home_text_view_explanation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text= "Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras."
+                tools:text= "Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras."
                 tools:visibility="visible"/>
         </androidx.core.widget.NestedScrollView>
 
@@ -194,7 +195,7 @@
             android:focusable="true"
             app:backgroundTint="@color/floatingActionColor"
             app:rippleColor="@android:color/holo_orange_light"
-            tools:ignore="ContentDescription"
+            android:contentDescription="Select date to get today's content"
             android:visibility="visible"/>
 
         <androidx.core.widget.ContentLoadingProgressBar
@@ -209,12 +210,15 @@
             app:layout_anchorGravity="bottom|center"
             tools:visibility="visible" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_retry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Retry"
+            android:elevation="8dp"
             app:layout_anchor="@+id/loader"
+            android:backgroundTint="@color/retryButtonBackground"
+            android:textColor="@color/retryButtonTextColor"
             app:layout_anchorGravity="top|center" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

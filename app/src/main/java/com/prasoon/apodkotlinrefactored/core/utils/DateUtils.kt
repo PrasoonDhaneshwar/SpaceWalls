@@ -109,7 +109,9 @@ object DateUtils {
         return tenAM
     }
 
+    fun currentTime() = GregorianCalendar()
+
     fun getTenAMFormat(): String = getSimpleDateFormatAMPM().format(getTenAM().time)
 
-    fun getSimpleDateFormatAMPM() = SimpleDateFormat("HH:mm aa", Locale.getDefault())
+    private fun getSimpleDateFormatAMPM() = SimpleDateFormat("HH:mm aa", Locale.getDefault())
 }

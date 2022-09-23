@@ -4,6 +4,7 @@ import android.util.Log
 import com.prasoon.apodkotlinrefactored.BuildConfig
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.core.common.Resource
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.data.ApodArchiveDao
 import com.prasoon.apodkotlinrefactored.data.ApodDao
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
@@ -57,14 +58,21 @@ class ApodRepositoryImpl(
                 daoArchive.insertApod(remoteApod.convertToApodArchiveEntity())   // Update in Archive DB
 
                 // Emit data to UI
-                apod = dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod()
-                Log.d(TAG, "Emit apod from remote: $apod")
-                emit(Resource.Success(apod))
-
+                if (dao.getApodFromDatePrimaryKey(date.toIntDate()) != null) {
+                    apod = dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod()
+                    Log.d(TAG, "Emit apod from remote: $apod")
+                    emit(Resource.Success(apod))
+                }
             } catch (e: HttpException) {
                 Log.d(TAG, "Exception occurred: $e")
                 if (e.code() == 400) return@flow    // Don't handle bad requests
-                emit(Resource.Error(message = "Oops, something went wrong!", data = Apod("", "", "", "", "", "", "")))
+                if (e.code() == 404) {
+                    Log.d(TAG, "404 occurred")
+                    emit(Resource.Error(message = "No data available for $date", data = Apod(date, "", "No data available for ${date.toSimpleDateFormat()}.\nPlease try for another date", "", "", "", "")))
+                }
+                else {
+                    emit(Resource.Error(message = "Oops, something went wrong!", data = Apod("", "", "", "", "", "", "")))
+                }
 
             } catch (e: IOException) {
                 emit(Resource.Error(message = "Couldn't reach server, please try after sometime", data = Apod("", "", "", "", "", "", "")))

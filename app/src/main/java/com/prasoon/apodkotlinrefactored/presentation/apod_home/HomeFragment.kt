@@ -23,6 +23,11 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.PENDING_INTENT_DAT
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SHOW_NOTIFICATION
 import com.prasoon.apodkotlinrefactored.core.common.Constants.STORAGE_PERMISSION_CODE
 import com.prasoon.apodkotlinrefactored.core.utils.*
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.currentTime
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.generateRandomDate
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.getCurrentDateForInitialization
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.getTenAM
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.getTimeInHoursMinutesSeconds
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.isRefreshNeededForArchives
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.processHomeApodToArchiveFavorites
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
@@ -37,6 +42,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import java.lang.Math.abs
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,6 +56,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     private var isAddedToDB = false
     var datePickerString: String? = String()
     var dateFromPendingIntent: String? = null
+    var dateToRetry: String = String()
     var showNotification: Boolean = true
 
     @Inject
@@ -85,7 +92,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             DateUtils.currentDate = dateFromPendingIntent!!
             showNotification = false    // If Clicked from notification, no need for notifications again
         }
-        else if (DateUtils.currentDate.isEmpty())  DateUtils.currentDate = DateUtils.getCurrentDateForInitialization()
+        else if (DateUtils.currentDate.isEmpty())  DateUtils.currentDate = getCurrentDateForInitialization()
 
         binding.overviewFloatingActionButton.setOnClickListener {
             val datePickerFragment = DatePickerFragment()
@@ -117,7 +124,12 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         // Click to refresh
         binding.buttonRetry.setOnClickListener {
             Log.d(TAG, "ButtonRetry refresh for date: ${DateUtils.currentDate}")
-            viewModel.refresh(DateUtils.currentDate)
+            if (dateToRetry.isEmpty()) {
+                dateToRetry = DateUtils.currentDate
+                viewModel.refresh(dateToRetry)
+            } else {
+                viewModel.refresh(dateToRetry)
+            }
             binding.buttonRetry.visibility = View.INVISIBLE
         }
 
@@ -199,14 +211,32 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         viewModel.apodStateLiveData.observe(viewLifecycleOwner) { apodStateLiveData ->
             if (!apodStateLiveData.message.isNullOrEmpty()) {
                 Log.d(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
-                Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
+
                 binding.buttonRetry.visibility = View.VISIBLE
+                if (apodStateLiveData.message.contains("No data available for")) {
+                    val currentDate = getCurrentDateForInitialization()
+                    Log.d(TAG, "Apod model currentDate: $currentDate apodStateLiveData.apod.date: ${apodStateLiveData.apod.date}")
+
+                    if (currentDate == apodStateLiveData.apod.date) {
+                        val tenAM = getTenAM()
+                        val timeNow = currentTime()
+                        val timeDiff = tenAM.timeInMillis - timeNow.timeInMillis
+                        Log.d(TAG, "Apod model timeDiff: $timeDiff")
+                        if (timeDiff > 0) Toast.makeText(context, "Today's content will be available in ${getTimeInHoursMinutesSeconds(abs(timeDiff))}", Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        Toast.makeText(context, apodStateLiveData.message, Toast.LENGTH_SHORT).show()
+                    }
+                    dateToRetry = generateRandomDate()
+                    binding.buttonRetry.text = "Retry for any random date?"
+                }
             }
-            binding.buttonRetry.visibility = View.INVISIBLE
+            else {
+                if (apodStateLiveData.apod.title.isEmpty()) binding.buttonRetry.visibility = View.INVISIBLE
+            }
 
             currentApod = apodStateLiveData.apod
-                DateUtils.currentDate =
-                    currentApod.date    // Set the date received from the viewModel
+            DateUtils.currentDate = currentApod.date    // Set the date received from the viewModel
 
             if (apodStateLiveData.isLoading) {
                 Log.d(TAG, "Apod model loading true")
@@ -301,8 +331,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             binding.homeTextViewDatePicker.text = currentApod.date.toSimpleDateFormat()
             val explanationText = currentApod.explanation + if (currentApod.copyright.isNullOrEmpty()) "" else "\nCopyrights©: ${currentApod.copyright}"
             binding.homeTextViewExplanation.text = explanationText
-            }
-
+        }
     }
 
 /*    override fun onNavigationItemSelected(item: MenuItem): Boolean {

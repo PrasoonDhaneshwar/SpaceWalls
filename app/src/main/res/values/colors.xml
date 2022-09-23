@@ -29,5 +29,8 @@
 
     <color name="favoriteOutlineTint">#C4C5C6</color>
 
+    <color name="retryButtonTextColor">#DC353232</color>
+    <color name="retryButtonBackground">#C4C5C6</color>
+
 
 </resources>

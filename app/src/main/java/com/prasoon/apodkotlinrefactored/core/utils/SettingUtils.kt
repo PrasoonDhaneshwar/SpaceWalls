@@ -32,6 +32,7 @@ import java.util.*
 
 object SettingUtils {
     val TAG = "SettingUtils"
+
     fun setAppTheme(mode: String) {
         when (mode) {
             "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -42,6 +43,7 @@ object SettingUtils {
     fun showNotification(isSet: Boolean) {
         SHOW_NOTIFICATION = isSet
     }
+
     fun screenPreference(screenPreference: String): Int {
         when (screenPreference) {
             "home_screen" -> SCREEN_PREFERENCE = HOME_SCREEN
@@ -64,6 +66,7 @@ object SettingUtils {
         Log.d(TAG, "frequencyArchive: $WALLPAPER_FREQUENCY")
         return WALLPAPER_FREQUENCY
     }
+
     fun scheduleWallpaper(context: Context, scheduleType: Int, screenType: Int, isSet: Boolean, isSetFromScreenOrFrequency: Boolean, wallpaperFrequency: WallpaperFrequency) {
         val alarmPreference: SharedPreferences = context.getSharedPreferences(
             Constants.ALARM_PREFERENCE,
@@ -95,6 +98,7 @@ object SettingUtils {
             }
         }
     }
+
     private fun scheduleAlarmForDailyWallpaper(context: Context, screenFlag: Int, triggerAtMillis: Long, scheduleType: Int, isSet: Boolean) {
         val alarmManager: AlarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -110,7 +114,7 @@ object SettingUtils {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis , pendingIntent)
             Log.d(TAG,"alarmManager set for repeating: $alarmManager")
             Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every: DAY on screen: ${ScreenPreference.getTitle(screenFlag)}")
-            Toast.makeText(context, "Next wallpaper is scheduled for ${getTenAMFormat()} tomorrow", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Next wallpaper is scheduled for ${getTenAMFormat()}", Toast.LENGTH_LONG).show()
         } else {
             Log.d(TAG,"alarmManager cancelled: $alarmManager")
             alarmManager.cancel(pendingIntent)

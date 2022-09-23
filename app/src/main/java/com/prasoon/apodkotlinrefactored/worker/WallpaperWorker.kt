@@ -27,6 +27,7 @@ import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.setWallpaper
 import com.prasoon.apodkotlinrefactored.core.utils.NotificationUtils.displayNotification
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
+import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
 import dagger.assisted.Assisted
@@ -39,8 +40,9 @@ class WallpaperWorker @AssistedInject constructor(
     @Assisted val appContext: Context,
     @Assisted workerParameters: WorkerParameters,
     private val archiveRepository: ApodArchivesRepository,
-    private val dbArchive: ApodArchiveDatabase,
     private val api: ApodAPI,
+    private val dbArchive: ApodArchiveDatabase,
+    private val db: ApodDatabase,
     ) : CoroutineWorker(appContext, workerParameters) {
     companion object {
         const val TAG = "WallpaperWorker"
@@ -62,12 +64,12 @@ class WallpaperWorker @AssistedInject constructor(
                 supervisorScope {
                     try {
                         val remoteApod = api.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
+                        db.dao.insertApod(remoteApod.toApodEntity())   // Update in DB
                         val apod = remoteApod.toApodEntity().toApod()
                         Log.d(TAG, "doWork apod: $apod")
 
                         var url = ""
-                        if (apod.url.contains("youtube")) url = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(apod.url)
-                        else if (apod.url.contains("jpg")) url = apod.url
+                        url = if (apod.url.contains("youtube")) VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(apod.url) else apod.url
 
                         val bitmap: Bitmap?
                         if (url.isNotEmpty()) {

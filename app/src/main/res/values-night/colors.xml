@@ -29,4 +29,7 @@
 
     <color name="favoriteOutlineTint">#e2e2e2</color>
 
+    <color name="retryButtonTextColor">#DC353232</color>
+    <color name="retryButtonBackground">#e2e2e2</color>
+
 </resources>
