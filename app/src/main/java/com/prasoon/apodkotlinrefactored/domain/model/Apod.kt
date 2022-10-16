@@ -1,5 +1,6 @@
 package com.prasoon.apodkotlinrefactored.domain.model
 
+import android.graphics.Bitmap
 import android.os.Parcelable
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
@@ -17,7 +18,9 @@ data class Apod(
     val mediaType: String,
     val title: String,
     val url: String,
-    val addToFavoritesUI: Boolean = false
+    val addToFavoritesUI: Boolean = false,
+    val imageBitmapUI: Bitmap? = null,
+    val isSetWallpaperUI: Boolean = false
 ) : Parcelable {
     // Convert domain/UI Apod component to DB entity
     fun toApodEntity(processFavoritesDB: Boolean = false): ApodEntity {

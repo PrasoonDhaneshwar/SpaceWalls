@@ -102,6 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
+                android:textIsSelectable="true"
                 tools:text= "Why, sometimes, does part of the Sun's atmosphere leap into space? The reason lies in changing magnetic fields that thread through the Sun's surface.  Regions of strong surface magnetism, known as active regions, are usually marked by dark sunspots.  Active regions can channel charged gas along arching or sweeping magnetic fields -- gas that sometimes falls back, sometimes escapes, and sometimes not only escapes but impacts our Earth.  The featured one-hour time-lapse video -- taken with a small telescope in France -- captured an eruptive filament that appeared to leap off the Sun late last month. The filament is huge: for comparison, the size of the Earth is shown on the upper left. Just after the filament lifted off, the Sun emitted a powerful X-class flare while the surface rumbled with a tremendous solar tsunami. A result was a cloud of charged particles that rushed into our Solar System but mostly missed our Earth -- this time. However, enough solar plasma did impact our Earth's magnetosphere to create a few faint auroras."
                 tools:visibility="visible"/>
         </androidx.core.widget.NestedScrollView>
@@ -137,7 +138,6 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="10dp"
                 android:src="@drawable/ic_baseline_favorite_border"
-                android:textColor="@drawable/drawable_text_color_favorite"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -215,6 +215,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Retry"
+            android:visibility="invisible"
             android:elevation="8dp"
             app:layout_anchor="@+id/loader"
             android:backgroundTint="@color/retryButtonBackground"
@@ -222,13 +223,5 @@
             app:layout_anchorGravity="top|center" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-<!--    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_menu" />-->
 
 </androidx.drawerlayout.widget.DrawerLayout>

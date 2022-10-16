@@ -1,5 +1,6 @@
 package com.prasoon.apodkotlinrefactored.data.repository
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
@@ -8,15 +9,10 @@ import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.ApodArchiveDao
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
-import java.net.ConnectException
-import java.net.ProtocolException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
+import java.net.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,20 +50,45 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
             var apodArchive: ApodArchive
 
             val job = CoroutineScope(Dispatchers.IO).launch {
-                val isDateExistInDB = daoArchive.isRowIsExist(parsedDate.toIntDate())
+                val isDateExistInDB = daoArchive.isRowExist(parsedDate.toIntDate())
                 if (isDateExistInDB) {
-                    apodArchive = daoArchive.getApodFromDatePrimaryKey(parsedDate.toIntDate()).toApodArchive()
+                    apodArchive = daoArchive.getApodArchiveFromDatePrimaryKey(parsedDate.toIntDate()).toApodArchive()
                     Log.d(TAG, "Fetch from DB -> apodArchive: $apodArchive")
+                    Log.d(TAG, "Fetch from DB -> apodArchive bitmap size in bytes: ${(apodArchive.imageBitmapUI?.byteCount)}, Mb: ${(apodArchive.imageBitmapUI?.byteCount)?.div(1024f * 1024)}")
+                    // Store bitmap in DB
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if (apodArchive.imageBitmapUI == null) {
+                            val bitmap = BitmapFactory.decodeStream(withContext(Dispatchers.IO) {
+                                withContext(Dispatchers.IO) {
+                                    URL(apodArchive.link).openConnection()
+                                }.getInputStream()
+                            })
+                            if (bitmap!= null) daoArchive.updateApodArchiveImage(parsedDate.toIntDate(), bitmap)
+                        }
+                    }
 
                 } else {
                     apodArchive = createArchiveLinksWithDate(parsedDate)   // Wait for it to finish
                     Log.d(TAG, "Fetch from Network -> apodArchive: $apodArchive")
 
-                    val jobAddToDb = CoroutineScope(Dispatchers.IO).launch {
-                        if (apodArchive.link.contains("youtube") || apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png"))
-                            daoArchive.insertApod(apodArchive.toApodArchiveEntity())
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if (apodArchive.link.contains("youtube") || apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) {
+                            daoArchive.insertApodArchive(apodArchive.toApodArchiveEntity())
+
+                            // can be added in another thread, since the job waits for jobAddToDb to finish
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val bitmap = async {
+                                    BitmapFactory.decodeStream(withContext(Dispatchers.IO) {
+                                        withContext(Dispatchers.IO) {
+                                            URL(apodArchive.link).openConnection()
+                                        }.getInputStream()
+                                    })
+                                }
+                                if (bitmap.await() != null) daoArchive.updateApodArchiveImage(parsedDate.toIntDate(), bitmap.await())
+                            }
+
+                        }
                     }
-                    jobAddToDb.join()
                 }
                 // Don't add if empty archive received
                 if (apodArchive.title.isNotEmpty()) apodArchiveList.add(apodArchive)

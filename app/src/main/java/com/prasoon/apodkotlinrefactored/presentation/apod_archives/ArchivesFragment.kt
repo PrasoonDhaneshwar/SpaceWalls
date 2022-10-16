@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.isRefreshNeededForArchives
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.databinding.FragmentArchivesBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,7 +84,7 @@ class ArchivesFragment : Fragment(R.layout.fragment_archives), ArchiveListAction
                 Log.d(TAG, "archiveListState.isLoading: ${archiveListState.isLoading}")
                 binding.loader.hide()
                 //apodListAdapter.updateApods(archiveListState.apodArchivesList)
-                apodListAdapter.updateApodArchiveListItems(archiveListState.apodArchivesList)
+                apodListAdapter.updateApodArchiveListItems(archiveListState.apodArchivesList.sortedByDescending { it.date.toIntDate() })
             }
             if (!archiveListState.message.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "Unexpected error occurred", Toast.LENGTH_SHORT).show()

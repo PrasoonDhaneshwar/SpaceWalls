@@ -4,16 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.prasoon.apodkotlinrefactored.BuildConfig
-import com.prasoon.apodkotlinrefactored.R
-import com.prasoon.apodkotlinrefactored.core.common.Constants
-import com.prasoon.apodkotlinrefactored.core.common.Constants.DOWNLOAD_IMAGE_MESSAGE_ID
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_ARCHIVE_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_DAILY_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_FAVORITES_WALLPAPER
@@ -22,6 +17,7 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCREEN_PREFERENCE_FOR_WORKER
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.generateRandomDate
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.createBitmapFromCacheFile
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.setWallpaper
 import com.prasoon.apodkotlinrefactored.core.utils.NotificationUtils.displayNotification
@@ -51,8 +47,6 @@ class WallpaperWorker @AssistedInject constructor(
     private val settingPerf: SharedPreferences? = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val notifications = settingPerf!!.getBoolean("notifications", false)
     override suspend fun doWork(): Result {
-        //startForegroundService()
-
         var date = ""
 
         val scheduleType = inputData.getInt(SCHEDULE_FOR_WORKER, SCHEDULE_DAILY_WALLPAPER)
@@ -67,6 +61,9 @@ class WallpaperWorker @AssistedInject constructor(
                         db.dao.insertApod(remoteApod.toApodEntity())   // Update in DB
                         val apod = remoteApod.toApodEntity().toApod()
                         Log.d(TAG, "doWork apod: $apod")
+
+                        val apodArchiveEntity = remoteApod.convertToApodArchiveEntity()
+                        dbArchive.dao.insertApodArchive(apodArchiveEntity)   // Update in Archive DB
 
                         var url = ""
                         url = if (apod.url.contains("youtube")) VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(apod.url) else apod.url
@@ -85,8 +82,11 @@ class WallpaperWorker @AssistedInject constructor(
                             }
 
                             // Only set wallpaper when url contains an image
-                            if (url.contains("jpeg") || url.contains("jpg") || url.contains("png") && bitmap != null && !url.contains("youtube")) {
+                            if ((url.contains("jpeg") || url.contains("jpg") || url.contains("png")) && bitmap != null && !url.contains("youtube")) {
                                 setWallpaper(appContext, null, screenPreference, bitmap)
+                                db.dao.updateApodImage(date.toIntDate(), bitmap)
+                                dbArchive.dao.updateApodArchiveImage(date.toIntDate(), bitmap)
+                                dbArchive.dao.setWallpaperField(date.toIntDate(), true)
                             } else {
                                 return@supervisorScope
                             }
@@ -139,7 +139,7 @@ class WallpaperWorker @AssistedInject constructor(
     private suspend fun processApodArchiveForWorker(date: String, screenPreference: Int): Result {
         val apodArchive = archiveRepository.fetchArchiveFromDate(date)
         Log.d(TAG, "doWork apodArchive: $apodArchive")
-
+        dbArchive.dao.insertApodArchive(apodArchive.toApodArchiveEntity())
         val bitmap = createBitmapFromCacheFile(apodArchive.link, appContext)
 
         Log.d(TAG, "Bitmap dimensions -> height x width: ${bitmap?.height} x ${bitmap?.width}")
@@ -154,18 +154,11 @@ class WallpaperWorker @AssistedInject constructor(
         }
         if ((apodArchive.link.contains("jpeg") || apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) && bitmap != null && !apodArchive.link.contains("youtube")) {
             setWallpaper(appContext, null, screenPreference, bitmap)
+            dbArchive.dao.updateApodArchiveImage(date.toIntDate(), bitmap)
+            dbArchive.dao.setWallpaperField(date.toIntDate(), true)
         } else {
             displayNotification(appContext, "Can not set wallpaper for Web content."+ apodArchive.title, apodArchive.date, false, bitmap)
         }
         return Result.success()
-    }
-
-    private suspend fun startForegroundService() {
-        val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(
-            appContext,
-            Constants.DOWNLOAD_IMAGE_CHANNEL
-        ).setContentTitle("Astronomy Picture of the Day")
-            .setSmallIcon(R.drawable.ic_download)
-        setForeground(ForegroundInfo(DOWNLOAD_IMAGE_MESSAGE_ID, notificationBuilder.build()))
     }
 }

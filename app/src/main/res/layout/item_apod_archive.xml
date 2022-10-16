@@ -44,6 +44,20 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Date taken on " />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_extension"
+        style="@style/Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:ellipsize="end"
+        android:gravity="start"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="YouTube" />
+
     <ImageView
         android:id="@+id/add_to_favorites"
         android:layout_width="40dp"
@@ -53,6 +67,18 @@
         android:src="@drawable/ic_baseline_favorite_border"
         app:layout_constraintBottom_toTopOf="@id/item_progress_image_view"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/set_wallpaper"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="4dp"
+        android:src="@drawable/ic_wallpaper"
+        app:tint="@color/favoriteOutlineTint"
+        app:layout_constraintBottom_toTopOf="@id/item_progress_image_view"
+        app:layout_constraintEnd_toStartOf="@+id/add_to_favorites" />
 
     <View
         android:id="@+id/item_view_gradient"

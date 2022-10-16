@@ -1,22 +1,23 @@
 package com.prasoon.apodkotlinrefactored.data.repository
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.prasoon.apodkotlinrefactored.BuildConfig
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.core.common.Resource
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.ApodArchiveDao
 import com.prasoon.apodkotlinrefactored.data.ApodDao
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.URL
 
 // Step 3.2: REPOSITORY: Create actual implementations in "data" layer
 // Have single source of truth. In this case, data will be fetched from api
@@ -47,6 +48,27 @@ class ApodRepositoryImpl(
             // Data loaded
             emit(Resource.Success(data = apod))
 
+            // Store bitmap in DB
+            if (apod.imageBitmapUI == null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    var bitmapUrl = ""
+                    if (apod.url.contains("youtube")) {
+                        bitmapUrl = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(apod.url)
+                    } else if(apod.url.contains("jpeg") || apod.url.contains("jpg") || apod.url.contains("png") || apod.url.contains("gif")) {
+                        bitmapUrl = apod.url
+                    } else return@launch
+                    val bitmap =
+                        BitmapFactory.decodeStream(withContext(Dispatchers.IO) {
+                            withContext(Dispatchers.IO) {
+                                URL(bitmapUrl).openConnection()
+                            }.getInputStream()
+                        })
+                    if (bitmap != null) {
+                        daoArchive.updateApodArchiveImage(date.toIntDate(), bitmap)
+                        dao.updateApodImage(date.toIntDate(), bitmap)
+                    }
+                }
+            }
         }
         // Otherwise, make a network call and add it into DB
         else {
@@ -55,7 +77,35 @@ class ApodRepositoryImpl(
             try {
                 val remoteApod = api.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
                 dao.insertApod(remoteApod.toApodEntity())   // Update in DB
-                daoArchive.insertApod(remoteApod.convertToApodArchiveEntity())   // Update in Archive DB
+                val apodArchiveEntity = remoteApod.convertToApodArchiveEntity()
+                daoArchive.insertApodArchive(apodArchiveEntity)   // Update in Archive DB
+
+                if (apod.url.isNotEmpty()) {
+                    // Store bitmap in DB
+                    CoroutineScope(Dispatchers.IO).launch {
+                        var bitmapUrl = ""
+                        if (apod.url.contains("youtube")) {
+                            Log.d(TAG, "bitmapUrl: $bitmapUrl")
+                            bitmapUrl = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(apod.url)
+                        } else if(apod.url.contains("jpeg") || apod.url.contains("jpg") || apod.url.contains("png") || apod.url.contains("gif")) {
+                            Log.d(TAG, "bitmapUrl: $bitmapUrl")
+                            bitmapUrl = apod.url
+                        } else return@launch
+                        Log.d(TAG, "bitmapUrl: $bitmapUrl")
+
+                        val bitmap =
+                            BitmapFactory.decodeStream(withContext(Dispatchers.IO) {
+                                withContext(Dispatchers.IO) {
+                                    URL(bitmapUrl).openConnection()
+                                }.getInputStream()
+                            })
+                        if (bitmap != null) {
+                            daoArchive.updateApodArchiveImage(date.toIntDate(), bitmap)
+                            dao.updateApodImage(date.toIntDate(), bitmap)
+                        }
+                        bitmapUrl = ""
+                    }
+                }
 
                 // Emit data to UI
                 if (dao.getApodFromDatePrimaryKey(date.toIntDate()) != null) {

@@ -5,18 +5,13 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.common.Constants
 import com.prasoon.apodkotlinrefactored.core.common.Constants.PENDING_INTENT_DATE_FROM_NOTIFICATION
@@ -32,6 +27,7 @@ import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.isRefreshNeededForA
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.processHomeApodToArchiveFavorites
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.createBitmapFromCacheFile
+import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.imageLoadingFailReason
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils.saveImage
 import com.prasoon.apodkotlinrefactored.databinding.FragmentHomeBinding
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
@@ -47,7 +43,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home),
-    /*NavigationView.OnNavigationItemSelectedListener,*/
     EasyPermissions.PermissionCallbacks{
     private val TAG = "HomeFragment"
     private lateinit var binding: FragmentHomeBinding
@@ -58,29 +53,16 @@ class HomeFragment : Fragment(R.layout.fragment_home),
     var dateFromPendingIntent: String? = null
     var dateToRetry: String = String()
     var showNotification: Boolean = true
+    var actionNonImageContent: Boolean = true
 
     @Inject
     lateinit var currentApod: Apod
-
-    lateinit var toggle: ActionBarDrawerToggle
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
-/*        toggle = ActionBarDrawerToggle(
-            activity,
-            binding.drawerLayout,
-            *//*binding.homeToolbar,*//*
-            *//*R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close*//*
-        )*/
-
-/*        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()*/
-
-/*        binding.navView.setNavigationItemSelectedListener(this)
-        binding.navView.bringToFront()     // Needed for buttons to be clickable*/
+        actionNonImageContent = true
 
         // Get date from notifications and fetch data from ViewModel
         dateFromPendingIntent = arguments?.getString(PENDING_INTENT_DATE_FROM_NOTIFICATION)
@@ -117,6 +99,19 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                         viewModel.refresh(dateApiFormat)
                         showNotification = true
                     }
+                }
+            }
+        }
+
+        CoroutineScope(Dispatchers.Main).launch  {
+            imageLoadingFailReason.observe(viewLifecycleOwner) { reason ->
+                if (!reason.isNullOrEmpty()) {
+                        binding.buttonRetry.visibility = View.VISIBLE
+                    if (reason.contains("Exception")) {
+                        Toast.makeText(context, "Connection timeout! Check your internet connection", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    binding.buttonRetry.visibility = View.INVISIBLE
                 }
             }
         }
@@ -212,8 +207,8 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             if (!apodStateLiveData.message.isNullOrEmpty()) {
                 Log.d(TAG, "Apod model loading state: ${apodStateLiveData.isLoading}")
 
-                binding.buttonRetry.visibility = View.VISIBLE
                 if (apodStateLiveData.message.contains("No data available for")) {
+                    binding.buttonRetry.visibility = View.VISIBLE
                     val currentDate = getCurrentDateForInitialization()
                     Log.d(TAG, "Apod model currentDate: $currentDate apodStateLiveData.apod.date: ${apodStateLiveData.apod.date}")
 
@@ -232,7 +227,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 }
             }
             else {
-                if (apodStateLiveData.apod.title.isEmpty()) binding.buttonRetry.visibility = View.INVISIBLE
+                if (apodStateLiveData.apod.title.isNotEmpty()) binding.buttonRetry.visibility = View.INVISIBLE
             }
 
             currentApod = apodStateLiveData.apod
@@ -255,20 +250,10 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             Log.d(TAG, "Api link : ${DateUtils.createApodUrlApi(currentApod.date)}")
 
             if (currentApod.addToFavoritesUI) {
-                binding.homeAddToFavorites.setColorFilter(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorAddToFavorites
-                    )
-                )
+                binding.homeAddToFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorAddToFavorites))
                 isAddedToDB = true
             } else {
-                binding.homeAddToFavorites.setColorFilter(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorRemovedFromFavorites
-                    )
-                )
+                binding.homeAddToFavorites.setColorFilter(ContextCompat.getColor(requireContext(), R.color.colorRemovedFromFavorites))
                 isAddedToDB = false
             }
 
@@ -287,7 +272,11 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     val thumbnailUrl =
                         VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
                     Log.d(TAG, "YouTube thumbnailUrl: $thumbnailUrl")
-                    binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
+                    if (currentApod.imageBitmapUI != null) {
+                        binding.homeImageViewResult.setImageBitmap(currentApod.imageBitmapUI)
+                        binding.homeProgressImageView.visibility = View.INVISIBLE
+                    }
+                    else binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(thumbnailUrl, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
                 } else {
                     // Handling for Apod which is not an image or a YouTube video.
                     // Open link with browser
@@ -299,6 +288,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     binding.homeProgressImageView.visibility = View.INVISIBLE
 
                     binding.homeImageViewResult.setImageResource(R.drawable.handle_another_app)
+                    actionNonImageContent = false
                 }
             }
             // IMAGE
@@ -311,7 +301,11 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 binding.homeAddToFavorites.visibility = View.VISIBLE
                 binding.homeSetWallpaper.visibility = View.VISIBLE
 
-                binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(currentApod.url, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
+                if (currentApod.imageBitmapUI != null) {
+                    binding.homeImageViewResult.setImageBitmap(currentApod.imageBitmapUI)
+                    binding.homeProgressImageView.visibility = View.INVISIBLE
+                }
+                else binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(currentApod.url, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
 
             }
             var url = ""
@@ -320,7 +314,13 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
             if (url.isNotEmpty() && SHOW_NOTIFICATION && showNotification) {
                 CoroutineScope(Dispatchers.IO).launch  {
-                    val bitmap = async { createBitmapFromCacheFile(url, requireContext()) }
+                    val bitmap = async {
+                        if (currentApod.imageBitmapUI == null) {
+                            createBitmapFromCacheFile(url, requireContext())
+                        } else {
+                            currentApod.imageBitmapUI
+                        }
+                    }
                     NotificationUtils.displayNotification(requireContext(), currentApod.title, currentApod.date, false, bitmap.await())
                     showNotification = false
                 }
@@ -333,18 +333,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             binding.homeTextViewExplanation.text = explanationText
         }
     }
-
-/*    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.settings -> {
-                Toast.makeText(activity, "settings clicked!", Toast.LENGTH_SHORT).show()
-                val action = HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
-                findNavController().navigate(action)
-            }
-        }
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }*/
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -374,9 +362,10 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
     override fun onResume() {
         super.onResume()
-        viewModel.refresh(DateUtils.currentDate)
+        if (actionNonImageContent) viewModel.refresh(DateUtils.currentDate)
         Log.d(TAG, "viewModel.refresh date from onResume: DateUtils.currentDate: ${DateUtils.currentDate}")
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.apodStateLiveData.removeObservers(viewLifecycleOwner)

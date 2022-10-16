@@ -17,6 +17,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.lifecycle.MutableLiveData
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -55,6 +56,7 @@ object ImageUtils {
     private val COLUMN_HEIGHT = SCREEN_HEIGHT / 2
     private val IMAGE_WIDTH = COLUMN_WIDTH
     private val IMAGE_HEIGHT = COLUMN_WIDTH * COLUMN_HEIGHT / COLUMN_WIDTH
+    val imageLoadingFailReason = MutableLiveData<String?>()
 
     fun saveImage(context: Context, title: String, date: String, url: String, hdUrl: String?) {
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -226,7 +228,8 @@ object ImageUtils {
                     Log.d(TAG, "onLoadingFailed: $uri")
                     super.onLoadingFailed(imageUri, view, failReason)
                     viewProgressBar.isVisible = false
-
+                    imageLoadingFailReason.postValue(failReason?.cause.toString())
+                    Log.d(TAG, "onLoadingFailed with failReason: ${failReason?.cause}, imageLoadingFailReason: ${imageLoadingFailReason.value}")
                     when (failReason!!.cause) {
                         is FileNotFoundException -> return
                         is SocketTimeoutException -> return
@@ -290,7 +293,6 @@ object ImageUtils {
                 val scaledBitmap = Bitmap.createScaledBitmap(bitmap ,SCREEN_WIDTH, SCREEN_HEIGHT, true)
                 wallpaperManager.setBitmap(scaledBitmap)
             }
-            // Imageview will be null from WorkManager, so no toast to be shown
             if (imageView !=null) Log.d( TAG, "Wallpaper Set Successfully")
             return true
         } catch (e: IOException) {
@@ -303,8 +305,11 @@ object ImageUtils {
         Log.d(TAG, "screenRatio -> $screenRatio")
 
         val desiredWidth = SCREEN_WIDTH * height / desiredHeight
-        val offsetX = (width - desiredWidth) / 2
-        return Rect(offsetX, 0, width - offsetX, height)
+        var offsetX = (width - desiredWidth) / 2
+        // potential IllegalArgumentException, Ex: Invalid crop rect supplied: Rect(-127, 0 - 1087, 1942) fixed for bigger screens
+        if (offsetX < 0) offsetX = 0
+        return if ((width - offsetX) < 0) Rect(offsetX, 0, width , height)
+        else Rect(offsetX, 0, width - offsetX, height)
     }
 
     suspend fun createBitmapFromCacheFile(urlString: String, context: Context): Bitmap? {

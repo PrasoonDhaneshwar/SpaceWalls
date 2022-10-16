@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/favorites"
+        android:icon="@drawable/ic_wallpaper_history"
+        android:title="Favorites"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/listview"
+        android:icon="@drawable/ic_view_carousel"
+        android:title="Change to List/Grid"
+        app:showAsAction="always"/>
+
+</menu>

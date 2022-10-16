@@ -49,6 +49,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.prasoon.apodkotlinrefactored'
 }
 
 dependencies {

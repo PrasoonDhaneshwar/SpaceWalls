@@ -17,7 +17,6 @@ class GetApodArchives(
     operator fun invoke(): Flow<Resource<List<ApodArchive>>> = flow {
         // Emit a list of apods
         val apodDates = archiveRepository.fetchArchivesFromCurrentDate()
-        // val apodDates = archiveRepository.fetchImageArchivesFromCurrentDateN()
         apodList.addAll(apodDates)
         emit(Resource.Success(apodList))
     }

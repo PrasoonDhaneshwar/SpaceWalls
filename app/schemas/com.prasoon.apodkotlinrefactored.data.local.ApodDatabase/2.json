@@ -1,0 +1,96 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "f5384dd0b26ac4ee653b4eb14465c37b",
+    "entities": [
+      {
+        "tableName": "ApodEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dateInt` INTEGER NOT NULL, `dateString` TEXT NOT NULL, `explanation` TEXT NOT NULL, `hdUrl` TEXT, `mediaType` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `copyright` TEXT, `addToFavoritesDB` INTEGER NOT NULL, `imageBitmap` BLOB DEFAULT NULL, `isSetWallpaper` INTEGER NOT NULL DEFAULT false, PRIMARY KEY(`dateInt`))",
+        "fields": [
+          {
+            "fieldPath": "dateInt",
+            "columnName": "dateInt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateString",
+            "columnName": "dateString",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "explanation",
+            "columnName": "explanation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hdUrl",
+            "columnName": "hdUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mediaType",
+            "columnName": "mediaType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "copyright",
+            "columnName": "copyright",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addToFavoritesDB",
+            "columnName": "addToFavoritesDB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageBitmap",
+            "columnName": "imageBitmap",
+            "affinity": "BLOB",
+            "notNull": false,
+            "defaultValue": "NULL"
+          },
+          {
+            "fieldPath": "isSetWallpaper",
+            "columnName": "isSetWallpaper",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "false"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "dateInt"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f5384dd0b26ac4ee653b4eb14465c37b')"
+    ]
+  }
+}

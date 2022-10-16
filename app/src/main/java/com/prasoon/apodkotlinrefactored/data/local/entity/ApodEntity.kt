@@ -1,5 +1,7 @@
 package com.prasoon.apodkotlinrefactored.data.local.entity
 
+import android.graphics.Bitmap
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
@@ -16,7 +18,11 @@ data class ApodEntity(
     val title: String,
     val url: String,
     val copyright: String?,
-    val addToFavoritesDB: Boolean = false
+    val addToFavoritesDB: Boolean = false,
+    @ColumnInfo(name = "imageBitmap", defaultValue = "NULL")
+    val imageBitmap: Bitmap? = null,
+    @ColumnInfo(name = "isSetWallpaper", defaultValue = "false")
+    val isSetWallpaper: Boolean = false
 ) {
     // Step 2.2: DATABASE: Create normal Apod for domain layer
     fun toApod() : Apod {
@@ -28,7 +34,9 @@ data class ApodEntity(
             hdUrl = hdUrl,
             mediaType = mediaType,
             copyright = copyright,
-            addToFavoritesUI = addToFavoritesDB
+            addToFavoritesUI = addToFavoritesDB,
+            imageBitmapUI = imageBitmap,
+            isSetWallpaperUI = isSetWallpaper
         )
     }
 }

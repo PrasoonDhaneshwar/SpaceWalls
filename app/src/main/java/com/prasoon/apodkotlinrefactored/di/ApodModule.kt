@@ -53,7 +53,8 @@ object ApodModule {
     fun provideApodDatabase(app: Application): ApodDatabase {
         return Room.databaseBuilder(
             app, ApodDatabase::class.java, "apod_db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 
     // Step 6.7: DEPENDENCY INJECTION: Provide Retrofit instance and use it as "api"
@@ -141,6 +142,7 @@ object ApodModule {
     fun provideApodArchiveDatabase(app: Application): ApodArchiveDatabase {
         return Room.databaseBuilder(
             app, ApodArchiveDatabase::class.java, "apod_archive_db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 }

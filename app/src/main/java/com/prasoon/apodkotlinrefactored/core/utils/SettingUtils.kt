@@ -140,7 +140,6 @@ object SettingUtils {
 
             SCHEDULE_DAILY_WALLPAPER -> {
                 if (isSet) {
-                    val tenAM = getTenAM()
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent)
                     Log.d(TAG,"alarmManager set for repeating: $alarmManager")
                     Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")

@@ -2,11 +2,13 @@ package com.prasoon.apodkotlinrefactored.presentation.apod_archives
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.prasoon.apodkotlinrefactored.R
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toSimpleDateFormat
+import com.prasoon.apodkotlinrefactored.core.utils.DialogUtils
 import com.prasoon.apodkotlinrefactored.core.utils.ImageUtils
 import com.prasoon.apodkotlinrefactored.databinding.ItemApodArchiveBinding
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
@@ -40,15 +42,21 @@ class ApodArchivesListAdapter(
         private val itemImageView = itemApodArchiveBinding.itemApodImage
         private val progress = itemApodArchiveBinding.itemProgressImageView
         private val addToFavorite = itemApodArchiveBinding.addToFavorites
+        private val setWallpaper = itemApodArchiveBinding.setWallpaper
+        private val itemExtension = itemApodArchiveBinding.itemExtension
 
         private var isAddedToDB = false
 
         // ***Binding between view and data
         fun bind(apodArchive: ApodArchive, position: Int) {
-            Log.d(TAG, "bind id: ${apodArchive}")
+            Log.d(TAG, "bind id: $apodArchive")
             itemTitle.text = apodArchive.title
             itemDate.text = apodArchive.date.toSimpleDateFormat()
-            itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context))
+            if (apodArchive.imageBitmapUI != null) {
+                itemImageView.setImageBitmap(apodArchive.imageBitmapUI)
+                progress.visibility = View.GONE
+            }
+            else itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context))
 
             addToFavorite.setOnClickListener {
                 if (!isAddedToDB) {
@@ -70,6 +78,21 @@ class ApodArchivesListAdapter(
             } else {
                 isAddedToDB = false
                 addToFavorite.setImageResource(R.drawable.ic_baseline_favorite_border)
+            }
+
+            if (apodArchive.link.contains("jpg") || apodArchive.link.contains("png")) {
+                setWallpaper.visibility = View.VISIBLE
+                if (apodArchive.link.contains("youtube")) {
+                    itemExtension.text = "YouTube"
+                }
+                setWallpaper.setOnClickListener {
+                    DialogUtils.showBackupDialog(itemImageView, itemImageView.context)
+                }
+            } else {
+                if (apodArchive.link.contains("gif")) {
+                    itemExtension.text = "GIF"
+                }
+                setWallpaper.visibility = View.GONE
             }
         }
     }

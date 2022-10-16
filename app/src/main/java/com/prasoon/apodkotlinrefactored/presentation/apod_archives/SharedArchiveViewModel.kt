@@ -1,6 +1,7 @@
 package com.prasoon.apodkotlinrefactored.presentation.apod_archives
 
 import android.app.Application
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.net.URL
 import javax.inject.Inject
 
 @HiltViewModel
@@ -102,10 +104,22 @@ class SharedArchiveViewModel @Inject constructor(
         fetchFavoriteArchivesFromDatabase()
     }
 
+    fun refreshWallpaperHistory() {
+        fetchWallpaperHistoryFromDatabase()
+    }
+
     private fun fetchFavoriteArchivesFromDatabase() {
         coroutineScope.launch {
             val apodArchiveList = dbArchive.dao.getAllFavoriteArchives(true).map { it.toApodArchive() }
             apodFavoritesLiveData.postValue(apodArchiveList as MutableList<ApodArchive>)
+        }
+    }
+
+    val apodWallpaperHistoryLiveData = MutableLiveData<MutableList<ApodArchive>>()
+    private fun fetchWallpaperHistoryFromDatabase() {
+        coroutineScope.launch {
+            val apodArchiveList = dbArchive.dao.getWallpaperHistory(true).map { it.toApodArchive() }
+            apodWallpaperHistoryLiveData.postValue(apodArchiveList as MutableList<ApodArchive>)
         }
     }
 }

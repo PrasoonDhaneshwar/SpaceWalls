@@ -1,5 +1,6 @@
 package com.prasoon.apodkotlinrefactored.data
 
+import android.graphics.Bitmap
 import androidx.room.*
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodEntity
 
@@ -42,4 +43,7 @@ interface ApodDao {
 
     @Query("SELECT EXISTS(SELECT * FROM ApodEntity WHERE dateInt = :id)")
     fun isRowIsExist(id : Int) : Boolean
+
+    @Query("UPDATE ApodEntity SET imageBitmap = :imageBitmap WHERE dateInt = :id")
+    fun updateApodImage(id: Int, imageBitmap: Bitmap)
 }

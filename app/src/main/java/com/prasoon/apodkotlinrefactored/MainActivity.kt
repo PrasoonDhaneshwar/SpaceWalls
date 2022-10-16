@@ -2,10 +2,10 @@ package com.prasoon.apodkotlinrefactored
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.database.CursorWindow
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -24,7 +24,9 @@ import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.showNotification
 import com.prasoon.apodkotlinrefactored.databinding.ActivityMainBinding
 import com.prasoon.apodkotlinrefactored.worker.WallpaperWorker
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.reflect.Field
 import java.util.concurrent.ExecutionException
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -76,6 +78,16 @@ class MainActivity : AppCompatActivity() {
             WALLPAPER_FREQUENCY = scheduleFrequency(it)
         }
         isWorkScheduled(WallpaperWorker.WORK_NAME, this)
+
+        // Increase cursor size for each row
+        try {
+            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
+            field.isAccessible = true
+            field.set(null, 100 * 1024 * 1024) //the 100MB is the new size
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
     private fun isWorkScheduled(tag: String, context: Context): Boolean {
         val instance = WorkManager.getInstance(context)
