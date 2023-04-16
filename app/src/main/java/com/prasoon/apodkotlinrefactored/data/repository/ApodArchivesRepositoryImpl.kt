@@ -60,7 +60,9 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
                         if (apodArchive.imageBitmapUI == null) {
                             val bitmap = BitmapFactory.decodeStream(withContext(Dispatchers.IO) {
                                 withContext(Dispatchers.IO) {
-                                    URL(apodArchive.link).openConnection()
+                                    val cleanUrl = if (!apodArchive.link.startsWith("https://") && !apodArchive.link.startsWith("http://"))
+                                        "https:$apodArchive.link" else apodArchive.link
+                                    URL(cleanUrl).openConnection()
                                 }.getInputStream()
                             })
                             if (bitmap!= null) daoArchive.updateApodArchiveImage(parsedDate.toIntDate(), bitmap)

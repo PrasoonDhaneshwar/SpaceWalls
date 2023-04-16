@@ -21,7 +21,11 @@ import com.prasoon.apodkotlinrefactored.core.common.Constants.WALLPAPER_FREQUENC
 import com.prasoon.apodkotlinrefactored.core.common.ScheduleType
 import com.prasoon.apodkotlinrefactored.core.common.ScreenPreference
 import com.prasoon.apodkotlinrefactored.core.common.WallpaperFrequency
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils
 import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.processAlarm
+import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.scheduleAlarmForDailyWallpaper
+import java.util.Calendar
 
 class AlarmReceiver: BroadcastReceiver() {
     val TAG = "AlertReceiver"
@@ -49,9 +53,24 @@ class AlarmReceiver: BroadcastReceiver() {
                 val wallpaperFrequency = WallpaperFrequency.getEnum(frequency)
                 Log.d(TAG, "SharedPreferences screenType: ${ScreenPreference.getTitle(screenType)}, scheduleType: ${ScheduleType.getTitle(scheduleType)}, wallpaperFrequency: $wallpaperFrequency")
 
-                // Reset alarms
-                processAlarm(context, screenType, wallpaperFrequency, scheduleType, false)
-                processAlarm(context, screenType, wallpaperFrequency, scheduleType, true)
+                if (scheduleType == SCHEDULE_DAILY_WALLPAPER) {
+                    // Reset alarm
+                    processAlarm(context, screenType, wallpaperFrequency, scheduleType, false)
+                    val timeNow = Calendar.getInstance()
+                    val tenAM = DateUtils.getTenAM()
+
+                    if (timeNow.timeInMillis / (1000 * 60 * 1) > tenAM.timeInMillis / (1000 * 60 * 1)) {    // Compare with minutes (Millisecond * Second * Minute)
+                        val adjustedTimeInMillis =  tenAM.timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval)
+                        scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, true, false)
+                    } else {
+                        val adjustedTimeInMillis =  tenAM.timeInMillis
+                        scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, true, false)
+                    }
+                } else {
+                    // Reset alarms
+                    processAlarm(context, screenType, wallpaperFrequency, scheduleType, false)
+                    processAlarm(context, screenType, wallpaperFrequency, scheduleType, true)
+                }
 
             } else {
                 val scheduleType = intent.getIntExtra(SCHEDULE_TYPE_ALARM, SCHEDULE_DAILY_WALLPAPER)

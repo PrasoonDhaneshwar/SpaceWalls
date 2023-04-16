@@ -60,7 +60,9 @@ class ApodRepositoryImpl(
                     val bitmap =
                         BitmapFactory.decodeStream(withContext(Dispatchers.IO) {
                             withContext(Dispatchers.IO) {
-                                URL(bitmapUrl).openConnection()
+                                val cleanUrl = if (!apod.url.startsWith("https://") && !apod.url.startsWith("http://"))
+                                    "https:$apod.link" else apod.url
+                                URL(cleanUrl).openConnection()
                             }.getInputStream()
                         })
                     if (bitmap != null) {

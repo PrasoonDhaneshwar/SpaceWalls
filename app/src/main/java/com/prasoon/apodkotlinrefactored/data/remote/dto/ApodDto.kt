@@ -26,19 +26,27 @@ data class ApodDto(
             dateString = date,
             explanation = explanation,
             title = title,
-            url = url,
+            url = if (!url.startsWith("https://") && !url.startsWith("http://"))
+                "https:$url" else url,
             mediaType = mediaType,
             hdUrl = hdurl,
             copyright = copyright
         )
     }
+
     // Convert remote Apod response to DB archive entity
     fun convertToApodArchiveEntity(processFavoritesDB: Boolean = false): ApodArchiveEntity {
         return ApodArchiveEntity(
             dateInt = date.toIntDate(),
             dateString = date,
             title = title,
-            url = if (url.contains("youtube")) VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(url) else url,
+            url = if (url.contains("youtube")) {
+                VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(url)
+            } else if (!url.startsWith("https://") && !url.startsWith("http://")) {
+                "https:$url"
+            } else {
+                url
+            },
             isFavoriteDatabase = processFavoritesDB
         )
     }

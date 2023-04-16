@@ -91,15 +91,15 @@ object SettingUtils {
 
             if (timeNow.timeInMillis / (1000 * 60 * 1) > tenAM.timeInMillis / (1000 * 60 * 1)) {    // Compare with minutes (Millisecond * Second * Minute)
                 val adjustedTimeInMillis =  tenAM.timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval)
-                scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, isSet)
+                scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, isSet, true)
             } else {
                 val adjustedTimeInMillis =  tenAM.timeInMillis
-                scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, isSet)
+                scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, isSet, true)
             }
         }
     }
 
-    private fun scheduleAlarmForDailyWallpaper(context: Context, screenFlag: Int, triggerAtMillis: Long, scheduleType: Int, isSet: Boolean) {
+    fun scheduleAlarmForDailyWallpaper(context: Context, screenFlag: Int, triggerAtMillis: Long, scheduleType: Int, isSet: Boolean, isScheduledFromUi: Boolean) {
         val alarmManager: AlarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -113,8 +113,10 @@ object SettingUtils {
         if (isSet) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis , pendingIntent)
             Log.d(TAG,"alarmManager set for repeating: $alarmManager")
-            Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every: DAY on screen: ${ScreenPreference.getTitle(screenFlag)}")
-            Toast.makeText(context, "Next wallpaper is scheduled for ${getTenAMFormat()}", Toast.LENGTH_LONG).show()
+            Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every: DAY on screen: ${ScreenPreference.getTitle(screenFlag)}, at ${getTenAMFormat()}")
+            if (isScheduledFromUi) {
+                Toast.makeText(context, "Next wallpaper is scheduled for ${getTenAMFormat()}", Toast.LENGTH_LONG).show()
+            }
         } else {
             Log.d(TAG,"alarmManager cancelled: $alarmManager")
             alarmManager.cancel(pendingIntent)
