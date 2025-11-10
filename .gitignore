@@ -16,3 +16,7 @@ local.properties
 .idea/compiler.xml
 .idea/misc.xml
 .idea/kotlinc.xml
+gradlew.bat
+gradlew
+gradle/wrapper/gradle-wrapper.jar
+/.idea/gradle.xml

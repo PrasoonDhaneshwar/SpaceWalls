@@ -1,9 +1,13 @@
 package com.prasoon.apodkotlinrefactored
 
+import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.database.CursorWindow
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -35,6 +39,18 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
     private lateinit var settingPerf: SharedPreferences
+
+    override fun onStart() {
+        super.onStart()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                // Prompt user to grant exact alarm permission
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                startActivity(intent)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         settingPerf.getString("frequency", "two_hours")?.let {
             WALLPAPER_FREQUENCY = scheduleFrequency(it)
         }
-        isWorkScheduled(WallpaperWorker.WORK_NAME, this)
+        isWorkScheduled(this)
 
         // Increase cursor size for each row
         try {
@@ -89,9 +105,9 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    private fun isWorkScheduled(tag: String, context: Context): Boolean {
+    private fun isWorkScheduled(context: Context): Boolean {
         val instance = WorkManager.getInstance(context)
-        val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
+        val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(WallpaperWorker.WORK_NAME)
         return try {
             var running = false
             val workInfoList: List<WorkInfo> = statuses.get()

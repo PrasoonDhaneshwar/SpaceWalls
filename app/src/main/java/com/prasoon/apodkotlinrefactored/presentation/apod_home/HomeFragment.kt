@@ -302,7 +302,10 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                 binding.homeSetWallpaper.visibility = View.VISIBLE
 
                 if (currentApod.imageBitmapUI != null) {
-                    binding.homeImageViewResult.setImageBitmap(currentApod.imageBitmapUI)
+                    Log.d(TAG, "currentApod.imageBitmapUI: ${currentApod.imageBitmapUI}")
+                    // todo, currentApod.imageBitmapUI does not refresh with updated currentApod.url
+//                    binding.homeImageViewResult.setImageBitmap(currentApod.imageBitmapUI)
+                    binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(currentApod.url, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
                     binding.homeProgressImageView.visibility = View.INVISIBLE
                 }
                 else binding.homeImageViewResult.setImageBitmap(ImageUtils.loadImageUIL(currentApod.url, binding.homeImageViewResult, binding.homeProgressImageView, requireContext()))
@@ -311,6 +314,8 @@ class HomeFragment : Fragment(R.layout.fragment_home),
             var url = ""
             if (currentApod.url.contains("youtube")) url = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(currentApod.url)
             else if (currentApod.url.contains("jpg")) url = currentApod.url
+            Log.d(TAG, "currentApod.url: ${currentApod.url}")
+
 
             if (url.isNotEmpty() && SHOW_NOTIFICATION && showNotification) {
                 CoroutineScope(Dispatchers.IO).launch  {
@@ -353,6 +358,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {

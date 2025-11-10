@@ -93,7 +93,9 @@ object ImageUtils {
                 val image = File(imagesDir, "$imageName.jpg")
                 fos = FileOutputStream(image)
             }
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            if (fos != null) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            }
             Objects.requireNonNull(fos)?.close()
 
             withContext(Dispatchers.Main) {
@@ -115,7 +117,7 @@ object ImageUtils {
             val uri = URL(url)
             urlConnection = uri.openConnection()
             urlConnection!!.connect()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 return urlConnection.contentLengthLong
             val contentLengthStr = urlConnection.getHeaderField("content-length")
             return if (contentLengthStr.isNullOrEmpty()) -1 else contentLengthStr.toLong()
@@ -138,7 +140,7 @@ object ImageUtils {
                 val uri = URL(url)
                 urlConnection = uri.openConnection()
                 urlConnection!!.connect()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                     size = urlConnection!!.contentLengthLong
                 val contentLengthStr = urlConnection!!.getHeaderField("content-length")
                 size = if (contentLengthStr.isNullOrEmpty()) -1 else contentLengthStr.toLong()
@@ -263,6 +265,7 @@ object ImageUtils {
     }
 
     suspend fun setWallpaper(context: Context, imageView: ImageView?, screenFlag: Int, inputBitmap: Bitmap?): Boolean {
+        return withContext(Dispatchers.IO){
         Log.d(TAG, "set Wallpaper on ${ScreenPreference.getTitle(screenFlag)}")
         val wallpaperManager = WallpaperManager.getInstance(context)
         val bitmap = if (imageView != null && inputBitmap == null) {
@@ -271,10 +274,9 @@ object ImageUtils {
             inputBitmap
         }
 
-        if (bitmap == null) return false
-
+        if (bitmap != null) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val cropHint = bitmap.cropHint(wallpaperManager.desiredMinimumHeight)
 
                 Log.d(TAG, "Screen size -> height x width: $SCREEN_HEIGHT x $SCREEN_WIDTH")
@@ -284,6 +286,8 @@ object ImageUtils {
 
                 // Rect(left, top, right, bottom)
                 // val rect = Rect(0, 0, bitmap.height, bitmap.width)
+                // Check which thread wallpaperManager is running in.
+                Log.i(TAG, " thread name: ${Thread.currentThread().name}; thread ID: ${Thread.currentThread().id}")
                 when (screenFlag) {
                     HOME_SCREEN -> wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_SYSTEM)
                     LOCK_SCREEN ->  wallpaperManager.setBitmap(bitmap, cropHint, true, WallpaperManager.FLAG_LOCK)
@@ -294,10 +298,13 @@ object ImageUtils {
                 wallpaperManager.setBitmap(scaledBitmap)
             }
             if (imageView !=null) Log.d( TAG, "Wallpaper Set Successfully")
-            return true
+             true
         } catch (e: IOException) {
             if (imageView !=null) Log.d(TAG, "Setting WallPaper Failed!!")
-            return false
+             false
+        }
+        } else
+            false
         }
     }
     private fun Bitmap.cropHint(desiredHeight: Int): Rect {

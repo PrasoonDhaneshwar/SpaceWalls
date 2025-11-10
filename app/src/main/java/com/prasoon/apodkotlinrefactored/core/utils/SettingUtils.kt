@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
@@ -103,6 +105,24 @@ object SettingUtils {
         val alarmManager: AlarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            // Inform the user first
+            Toast.makeText(
+                context,
+                "To schedule precise alarms, please allow 'Schedule exact alarms' in system settings.",
+                Toast.LENGTH_LONG
+            ).show()
+
+            // Open the system permission screen
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            // If calling from outside an Activity, must add FLAG_ACTIVITY_NEW_TASK
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+
+            // Optionally return to avoid trying to schedule the alarm before permission is granted
+            return
+        }
+
         val intent = Intent(context, AlarmReceiver::class.java)
         intent.action = "com.prasoon.apod.START_ALARM"
         intent.putExtra(SCREEN_PREFERENCE_FOR_WORKER, screenFlag)
@@ -128,52 +148,99 @@ object SettingUtils {
         val alarmManager: AlarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        val intent = Intent(context, AlarmReceiver::class.java)
-        intent.action = "com.prasoon.apod.START_ALARM"
-        intent.putExtra(SCREEN_PREFERENCE_FOR_WORKER, screenFlag)
-        intent.putExtra(SCHEDULE_TYPE_ALARM, scheduleType)
-        intent.putExtra(WALLPAPER_FREQUENCY_ALARM, wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval))
-        val pendingIntent = PendingIntent.getBroadcast(context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE or  PendingIntent.FLAG_UPDATE_CURRENT)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            // Inform the user first
+            Toast.makeText(
+                context,
+                "To schedule precise alarms, please allow 'Schedule exact alarms' in system settings.",
+                Toast.LENGTH_LONG
+            ).show()
 
-        val repeatInterval = wallpaperFrequency.interval
-        val timeUnit = wallpaperFrequency.timeUnit
+            // Open the system permission screen
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            // If calling from outside an Activity, must add FLAG_ACTIVITY_NEW_TASK
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
 
-        when (scheduleType) {
-
-            SCHEDULE_DAILY_WALLPAPER -> {
-                if (isSet) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent)
-                    Log.d(TAG,"alarmManager set for repeating: $alarmManager")
-                    Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
-                } else {
-                    Log.d("AlertReceiver","alarmManager cancelled: $alarmManager")
-                    alarmManager.cancel(pendingIntent)
-                    pendingIntent.cancel()
-                }
-            }
-            SCHEDULE_ARCHIVE_WALLPAPER -> {
-                if (isSet) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent); // Millisecond * Second * Minute
-                    //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + 5000, 1000*60*1 , pendingIntent); // Millisec * Second * Minute
-                    Log.d(TAG,"alarmManager set: $alarmManager")
-                    Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, from Archives for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
-                } else {
-                    Log.d(TAG,"alarmManager cancelled: $alarmManager")
-                    alarmManager.cancel(pendingIntent)
-                    pendingIntent.cancel()
-                }
-            }
-            SCHEDULE_FAVORITES_WALLPAPER -> {
-                if (isSet) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent); // Millisecond * Second * Minute
-                    Log.d(TAG,"alarmManager set: $alarmManager")
-                    Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, from Favorites for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
-                } else {
-                    Log.d(TAG,"alarmManager cancelled: $alarmManager")
-                    alarmManager.cancel(pendingIntent)
-                    pendingIntent.cancel()
-                }
-            }
+            // Optionally return to avoid trying to schedule the alarm before permission is granted
+            return
         }
+
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            action = "com.prasoon.apod.START_ALARM"
+            putExtra(SCREEN_PREFERENCE_FOR_WORKER, screenFlag)
+            putExtra(SCHEDULE_TYPE_ALARM, scheduleType)
+            putExtra(WALLPAPER_FREQUENCY_ALARM, wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval))
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val repeatIntervalMillis = wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval)
+
+        //val repeatInterval = wallpaperFrequency.interval
+        //val timeUnit = wallpaperFrequency.timeUnit
+        if (isSet) {
+            val triggerAtMillis = when (scheduleType) {
+                SCHEDULE_DAILY_WALLPAPER -> {
+                    // Calculate next upcoming 10AM in local timezone
+                    val tenAM = DateUtils.getTenAM()
+                    val now = Calendar.getInstance()
+                    if (now.timeInMillis > tenAM.timeInMillis) {
+                        tenAM.apply { add(Calendar.DATE, 1) }.timeInMillis
+                    } else {
+                        tenAM.timeInMillis
+                    }
+                }
+                else -> {
+                    // For other schedules, use now + interval
+                    Calendar.getInstance().timeInMillis + repeatIntervalMillis
+                }
+            }
+
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+
+            Log.d(TAG, "Alarm set: $scheduleType for every ${wallpaperFrequency.interval} ${wallpaperFrequency.timeUnit} on screen: ${ScreenPreference.getTitle(screenFlag)} at ${Date(triggerAtMillis)}")
+        } else {
+            alarmManager.cancel(pendingIntent)
+            pendingIntent.cancel()
+            Log.d(TAG, "Alarm cancelled: $scheduleType for screen: ${ScreenPreference.getTitle(screenFlag)}")
+        }
+//        when (scheduleType) {
+//
+//            SCHEDULE_DAILY_WALLPAPER -> {
+//                if (isSet) {
+//                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent)
+//                    Log.d(TAG,"alarmManager set for repeating: $alarmManager")
+//                    Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, Daily Wallpaper for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
+//                } else {
+//                    Log.d("AlertReceiver","alarmManager cancelled: $alarmManager")
+//                    alarmManager.cancel(pendingIntent)
+//                    pendingIntent.cancel()
+//                }
+//            }
+//            SCHEDULE_ARCHIVE_WALLPAPER -> {
+//                if (isSet) {
+//                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent); // Millisecond * Second * Minute
+//                    //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + 5000, 1000*60*1 , pendingIntent); // Millisec * Second * Minute
+//                    Log.d(TAG,"alarmManager set: $alarmManager")
+//                    Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, from Archives for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
+//                } else {
+//                    Log.d(TAG,"alarmManager cancelled: $alarmManager")
+//                    alarmManager.cancel(pendingIntent)
+//                    pendingIntent.cancel()
+//                }
+//            }
+//            SCHEDULE_FAVORITES_WALLPAPER -> {
+//                if (isSet) {
+//                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval) , pendingIntent); // Millisecond * Second * Minute
+//                    Log.d(TAG,"alarmManager set: $alarmManager")
+//                    Log.d(TAG,"Alarm set for: ${WallpaperWorker.WORK_NAME}, from Favorites for every: $repeatInterval $timeUnit on screen: ${ScreenPreference.getTitle(screenFlag)}")
+//                } else {
+//                    Log.d(TAG,"alarmManager cancelled: $alarmManager")
+//                    alarmManager.cancel(pendingIntent)
+//                    pendingIntent.cancel()
+//                }
+//            }
+//        }
     }
 }

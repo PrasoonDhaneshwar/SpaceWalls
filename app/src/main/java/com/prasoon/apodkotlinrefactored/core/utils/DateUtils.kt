@@ -62,6 +62,7 @@ object DateUtils {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")     // change format of date to "2022-01-10"
         val timeZone = TimeZone.getTimeZone("UTC")  // Explicit set UTC TimeZone
         dateFormat.timeZone = timeZone
+        Log.d(TAG, "getCurrentDateForInitialization: ${dateFormat.format(currentCalendarDateForInitialization.time)}")
         return dateFormat.format(currentCalendarDateForInitialization.time)
     }
 
@@ -103,13 +104,19 @@ object DateUtils {
     }
 
     fun getTenAM(): GregorianCalendar {
-        val tenAM =  GregorianCalendar()
+        val tenAM = GregorianCalendar()
         tenAM.set(Calendar.HOUR_OF_DAY, 10)
         tenAM.set(Calendar.MINUTE, 0)
         tenAM.set(Calendar.SECOND, 0)
+        tenAM.set(Calendar.MILLISECOND, 0)
+
+        val now = GregorianCalendar()
+        if (now.after(tenAM)) {
+            tenAM.add(Calendar.DATE, 1)
+        }
+
         return tenAM
     }
-
     fun currentTime() = GregorianCalendar()
 
     fun getTenAMFormat(): String = getSimpleDateFormatAMPM().format(getTenAM().time)

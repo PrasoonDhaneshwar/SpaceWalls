@@ -100,7 +100,7 @@ object NotificationUtils {
             .apply {
                 if (bitmap != null) {
                     setLargeIcon(bitmap)
-                        .setStyle(NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null))
+                        .setStyle(NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null as Bitmap?))
                 }
             }
 

@@ -2,7 +2,9 @@ package com.prasoon.apodkotlinrefactored.di
 
 import android.app.Application
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.room.Room
+import androidx.work.Configuration
 import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
@@ -143,6 +145,16 @@ object ApodModule {
         return Room.databaseBuilder(
             app, ApodArchiveDatabase::class.java, "apod_archive_db"
         ).fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkManagerConfiguration(
+        workerFactory: HiltWorkerFactory
+    ): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
             .build()
     }
 }

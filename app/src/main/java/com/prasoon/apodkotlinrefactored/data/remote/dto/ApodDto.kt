@@ -11,7 +11,7 @@ data class ApodDto(
     val date: String,
     val explanation: String,
     // Can be null, when video is received
-    val hdurl: String?,
+    val hdUrl: String?,
     // Since member variable needs to be changed, serialized is used
     @SerializedName("media_type")
     val mediaType: String,
@@ -29,7 +29,7 @@ data class ApodDto(
             url = if (!url.startsWith("https://") && !url.startsWith("http://"))
                 "https:$url" else url,
             mediaType = mediaType,
-            hdUrl = hdurl,
+            hdUrl = hdUrl,
             copyright = copyright
         )
     }
