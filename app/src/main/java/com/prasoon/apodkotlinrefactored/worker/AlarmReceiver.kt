@@ -42,30 +42,27 @@ class AlarmReceiver: BroadcastReceiver() {
                 Log.d(TAG, "Alarm is already active")
             }
             Log.d(TAG, "Intent info: $intent")
+            val action = intent.action
+            val alarmPreference: SharedPreferences = context.getSharedPreferences(ALARM_PREFERENCE, Context.MODE_PRIVATE)
+            val screenType = alarmPreference.getInt(SCREEN_PREFERENCE_FOR_WORKER, BOTH_SCREENS)
+            val scheduleType = alarmPreference.getInt(SCHEDULE_TYPE_ALARM, SCHEDULE_DAILY_WALLPAPER)
+            val frequency = alarmPreference.getLong(WALLPAPER_FREQUENCY_ALARM, AlarmManager.INTERVAL_DAY)
+            val wallpaperFrequency = WallpaperFrequency.getEnum(frequency)
 
-            if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
-                Log.d(TAG, "System boot occurred, reset alarm preferences")
-                val alarmPreference: SharedPreferences = context.getSharedPreferences(ALARM_PREFERENCE, Context.MODE_PRIVATE)
-
-                val screenType = alarmPreference.getInt(SCREEN_PREFERENCE_FOR_WORKER, BOTH_SCREENS)
-                val scheduleType = alarmPreference.getInt(SCHEDULE_TYPE_ALARM, SCHEDULE_DAILY_WALLPAPER)
-                val frequency = alarmPreference.getLong(WALLPAPER_FREQUENCY_ALARM, AlarmManager.INTERVAL_DAY)
-                val wallpaperFrequency = WallpaperFrequency.getEnum(frequency)
+            if (action == Intent.ACTION_BOOT_COMPLETED || action == Intent.ACTION_TIMEZONE_CHANGED) {
+                Log.d(TAG, "System event $action received, resetting  alarm preferences")
                 Log.d(TAG, "SharedPreferences screenType: ${ScreenPreference.getTitle(screenType)}, scheduleType: ${ScheduleType.getTitle(scheduleType)}, wallpaperFrequency: $wallpaperFrequency")
 
                 if (scheduleType == SCHEDULE_DAILY_WALLPAPER) {
-                    // Reset alarm
-                    processAlarm(context, screenType, wallpaperFrequency, scheduleType, false)
-                    val timeNow = Calendar.getInstance()
                     val tenAM = DateUtils.getTenAM()
-
-                    if (timeNow.timeInMillis / (1000 * 60 * 1) > tenAM.timeInMillis / (1000 * 60 * 1)) {    // Compare with minutes (Millisecond * Second * Minute)
-                        val adjustedTimeInMillis =  tenAM.timeInMillis + wallpaperFrequency.timeUnit.toMillis(wallpaperFrequency.interval)
-                        scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, true, false)
+                    val now = Calendar.getInstance()
+                    val triggerTime = if (action == Intent.ACTION_BOOT_COMPLETED && now.timeInMillis > tenAM.timeInMillis) {
+                        tenAM.apply { add(Calendar.DATE, 1) }.timeInMillis
                     } else {
-                        val adjustedTimeInMillis =  tenAM.timeInMillis
-                        scheduleAlarmForDailyWallpaper(context, screenType, adjustedTimeInMillis, scheduleType, true, false)
+                        tenAM.timeInMillis
                     }
+                    processAlarm(context, screenType, wallpaperFrequency, scheduleType, false)
+                    scheduleAlarmForDailyWallpaper(context, screenType, triggerTime, scheduleType, true, false)
                 } else {
                     // Reset alarms
                     processAlarm(context, screenType, wallpaperFrequency, scheduleType, false)
@@ -73,34 +70,33 @@ class AlarmReceiver: BroadcastReceiver() {
                 }
 
             } else {
-                val scheduleType = intent.getIntExtra(SCHEDULE_TYPE_ALARM, SCHEDULE_DAILY_WALLPAPER)
-                val screenType = intent.getIntExtra(SCREEN_PREFERENCE_FOR_WORKER, BOTH_SCREENS)
-                val frequency = intent.getLongExtra(WALLPAPER_FREQUENCY_ALARM, AlarmManager.INTERVAL_DAY)
-                Log.d(TAG, "Received setWorkRequest for scheduleType: ${ScheduleType.getTitle(scheduleType)} screenType: ${ScreenPreference.getTitle(screenType)} for every: ${WallpaperFrequency.getEnum(frequency)}")
-                setWorkRequest(context, screenType, scheduleType)
+                val scheduleTypeIntent = intent.getIntExtra(SCHEDULE_TYPE_ALARM, SCHEDULE_DAILY_WALLPAPER)
+                val screenTypeIntent = intent.getIntExtra(SCREEN_PREFERENCE_FOR_WORKER, BOTH_SCREENS)
+                val frequencyIntent = intent.getLongExtra(WALLPAPER_FREQUENCY_ALARM, AlarmManager.INTERVAL_DAY)
 
-                // Restart Alarms
-                val wallpaperFrequency = WallpaperFrequency.getEnum(frequency)
-                processAlarm(context, screenType, wallpaperFrequency, scheduleType, true)
+                Log.d(TAG, "Received setWorkRequest for scheduleType: ${ScheduleType.getTitle(scheduleTypeIntent)}" +
+                        "screenType: ${ScreenPreference.getTitle(screenTypeIntent)} frequency: ${WallpaperFrequency.getEnum(frequencyIntent)}")
+
+                setWorkRequest(context, screenTypeIntent, scheduleTypeIntent)
+
+                val wallpaperFrequencyIntent = WallpaperFrequency.getEnum(frequencyIntent)
+                processAlarm(context, screenTypeIntent, wallpaperFrequencyIntent, scheduleTypeIntent, true)
             }
         }
     }
 
     private fun setWorkRequest(context: Context, screenType: Int, scheduleType: Int) {
-        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
         val data = Data.Builder()
-        data.putInt(SCREEN_PREFERENCE_FOR_WORKER, screenType)
+            .putInt(SCREEN_PREFERENCE_FOR_WORKER, screenType)
+            .putInt(SCHEDULE_FOR_WORKER, scheduleType)
+            .build()
 
-        when (scheduleType) {
-            SCHEDULE_DAILY_WALLPAPER -> data.putInt(SCHEDULE_FOR_WORKER, SCHEDULE_DAILY_WALLPAPER)
-            SCHEDULE_ARCHIVE_WALLPAPER -> data.putInt(SCHEDULE_FOR_WORKER, SCHEDULE_ARCHIVE_WALLPAPER)
-            SCHEDULE_FAVORITES_WALLPAPER -> data.putInt(SCHEDULE_FOR_WORKER, SCHEDULE_FAVORITES_WALLPAPER)
-        }
-
-        val myWorkBuilder = OneTimeWorkRequest
-            .Builder(WallpaperWorker::class.java)
-            .setInputData(data.build())
+        val workRequest = OneTimeWorkRequest.Builder(WallpaperWorker::class.java)
+            .setInputData(data)
             .setConstraints(constraints)
             .addTag(WallpaperWorker.WORK_NAME)
             .build()
@@ -108,7 +104,7 @@ class AlarmReceiver: BroadcastReceiver() {
         WorkManager.getInstance(context).enqueueUniqueWork(
             WallpaperWorker.WORK_NAME,
             ExistingWorkPolicy.REPLACE,
-            myWorkBuilder
+            workRequest
         )
     }
 }

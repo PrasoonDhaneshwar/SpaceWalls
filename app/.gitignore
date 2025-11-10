@@ -18,3 +18,5 @@
 /captures
 .externalNativeBuild
 .cxx
+gradle/wrapper/gradle-wrapper.properties
+gradle/wrapper/gradle-wrapper.jar

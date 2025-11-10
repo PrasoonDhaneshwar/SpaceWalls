@@ -115,7 +115,15 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         var url = String()
         try {
             url = DateUtils.createApodUrl(date)
-            document = Jsoup.connect(url).get() // Network call, to be performed in separate thread
+            Log.d(TAG, "Jsoup link $url for: $date")
+            document = Jsoup.connect(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+                .header("Accept-Language", "en-US,en;q=0.5")
+                .header("Connection", "keep-alive")
+                .timeout(10000)
+                .followRedirects(true)
+                .get() // Network call, to be performed in separate thread
 
             png = document.select("img[src]").attr("src")
             youTubeLink = document.select("iframe[width]").attr("src")
@@ -125,6 +133,8 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
             if (title.isEmpty()) title = document.select("b").first()?.text() ?: ""
 
         } catch (e: UnknownHostException) {
+            e.printStackTrace();
+        } catch (e: SocketException) {
             e.printStackTrace();
         } catch (e: ProtocolException) {
             e.printStackTrace();
@@ -143,9 +153,7 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         } else {
             link = webLink
         }
-        Log.d(TAG, "createArchiveLinksWithDate title: $title")
-        Log.d(TAG, "createArchiveLinksWithDate for date: $date: IMG SRC: $png")
-        Log.d(TAG, "createArchiveLinksWithDate link: $link")
+        Log.d(TAG, "createArchiveLinksWithDate for title: $title, date: $date: IMG SRC: $png, source: $link")
 
         archive = ApodArchive(date, title, link, false)
 

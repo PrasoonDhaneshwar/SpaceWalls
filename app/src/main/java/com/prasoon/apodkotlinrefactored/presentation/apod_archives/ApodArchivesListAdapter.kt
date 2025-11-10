@@ -55,6 +55,8 @@ class ApodArchivesListAdapter(
             if (apodArchive.imageBitmapUI != null) {
                 itemImageView.setImageBitmap(apodArchive.imageBitmapUI)
                 progress.visibility = View.GONE
+            } else if (apodArchive.link.isEmpty()) {
+                itemImageView.setImageResource(R.drawable.handle_another_app_media)
             }
             else itemImageView.setImageBitmap(ImageUtils.loadImageUIL(apodArchive.link, itemImageView, progress, itemImageView.context))
 
@@ -64,7 +66,7 @@ class ApodArchivesListAdapter(
                     actions.onItemAddedOrRemovedFromFavorites(apodArchive, position, true)
                     addToFavorite.setImageResource(R.drawable.ic_favorite_fill)
 
-                } else if (isAddedToDB) {
+                } else {
                     Log.d(TAG, "remove from favorites: ${apodArchive.date}")
                     actions.onItemAddedOrRemovedFromFavorites(apodArchive, position, false)
                     addToFavorite.setImageResource(R.drawable.ic_baseline_favorite_border)

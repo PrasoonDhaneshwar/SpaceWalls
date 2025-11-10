@@ -9,13 +9,12 @@ import javax.inject.Inject
 // Step 6.1: DEPENDENCY INJECTION: Create entry point of the app
 
 @HiltAndroidApp
-class ApodApp: Application() , Configuration.Provider {
+class ApodApp : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+    @Inject
+    override lateinit var workManagerConfiguration: Configuration
+
 }
