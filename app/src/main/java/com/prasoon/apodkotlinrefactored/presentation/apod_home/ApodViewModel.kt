@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.prasoon.apodkotlinrefactored.core.common.Resource
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
@@ -79,8 +80,13 @@ class ApodViewModel @Inject constructor(
     fun saveApod(apod: Apod, processFavoriteDB: Boolean) {
         Log.d(TAG, "saveApod for ${apod.date}: $processFavoriteDB")
         coroutineScope.launch {
-            db.dao.addOrRemoveFavoritesInApodDB(apod.toApodEntity(processFavoriteDB))
-            dbArchiveDatabase.dao.addOrRemoveFavoritesInArchivesDB(apod.convertToApodArchiveEntity(processFavoriteDB))
+            // Home loads from the website, so this date may not have a saved row yet.
+            // Insert ignores existing rows; the updates then change only the favourite flag.
+            val dateInt = apod.date.toIntDate()
+            db.dao.insertApod(apod.toApodEntity())
+            db.dao.updateFavorites(dateInt, processFavoriteDB)
+            dbArchiveDatabase.dao.insertApodArchive(apod.convertToApodArchiveEntity())
+            dbArchiveDatabase.dao.updateFavorite(dateInt, processFavoriteDB)
         }
     }
 

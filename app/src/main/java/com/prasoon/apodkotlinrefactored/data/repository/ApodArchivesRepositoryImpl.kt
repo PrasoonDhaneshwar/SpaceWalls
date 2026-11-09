@@ -339,5 +339,6 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         return archive
     }
 
-    override suspend fun fetchArchiveFromDate(date: String) = createArchiveLinksWithDate(date)
+    override suspend fun fetchArchiveFromDate(date: String) =
+        createArchiveLinksWithDate(date).copy(isAddedToFavorites = daoArchive.isFavorite(date.toIntDate()))
 }

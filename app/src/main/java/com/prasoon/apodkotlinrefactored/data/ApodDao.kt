@@ -35,9 +35,6 @@ interface ApodDao {
     @Query("SELECT COUNT() FROM ApodEntity WHERE dateString = :date")
     fun count(date: String): Int
 
-    @Update(entity = ApodEntity::class)
-    fun addOrRemoveFavoritesInApodDB(apodDb: ApodEntity)
-
     @Query("UPDATE ApodEntity SET addToFavoritesDB = :isFavorite WHERE dateInt = :id")
     suspend fun updateFavorites(id : Int, isFavorite: Boolean)
 

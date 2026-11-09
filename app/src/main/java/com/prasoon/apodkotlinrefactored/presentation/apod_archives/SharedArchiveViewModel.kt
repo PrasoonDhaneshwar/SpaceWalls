@@ -68,7 +68,7 @@ class SharedArchiveViewModel @Inject constructor(
     fun processFavoriteArchivesInDatabase(apodArchiveFromUI: ApodArchive, isFavoriteInDatabase: Boolean) {
         Log.d(TAG, "processFavoriteArchivesInDatabase for ${apodArchiveFromUI.date}: $isFavoriteInDatabase")
         coroutineScope.launch {
-            dbArchive.dao.addOrRemoveFavoritesInArchivesDB(apodArchiveFromUI.toApodArchiveEntity((isFavoriteInDatabase)))
+            dbArchive.dao.updateFavorite(apodArchiveFromUI.date.toIntDate(), isFavoriteInDatabase)
             db.dao.updateFavorites(apodArchiveFromUI.date.toIntDate(), isFavoriteInDatabase)
             processFavoritesInUI(apodArchiveFromUI, isFavoriteInDatabase)
         }

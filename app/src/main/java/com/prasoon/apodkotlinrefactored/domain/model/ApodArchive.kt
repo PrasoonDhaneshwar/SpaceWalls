@@ -38,7 +38,7 @@ data class ApodArchive(
             mediaType = mediaType ?: "",
             title = title,
             url = link,
-            addToFavoritesUI = false,
+            addToFavoritesUI = isAddedToFavorites,
             imageBitmapUI = imageBitmapUI,
             isSetWallpaperUI = isSetWallpaperUI,
             noticeMessage = noticeMessage

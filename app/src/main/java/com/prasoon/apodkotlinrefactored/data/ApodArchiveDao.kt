@@ -6,7 +6,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import com.prasoon.apodkotlinrefactored.data.local.entity.ApodArchiveEntity
 
 @Dao
@@ -27,9 +26,6 @@ interface ApodArchiveDao {
     @Query("SELECT * FROM ApodArchiveEntity")
     suspend fun getAllArchives(): List<ApodArchiveEntity>
 
-    @Update(entity = ApodArchiveEntity::class)
-    fun addOrRemoveFavoritesInArchivesDB(apodDb: ApodArchiveEntity)
-
     @Query("SELECT EXISTS(SELECT * FROM ApodArchiveEntity WHERE dateInt = :id)")
     fun isRowExist(id : Int) : Boolean
 
@@ -44,4 +40,11 @@ interface ApodArchiveDao {
 
     @Query("UPDATE ApodArchiveEntity SET title = :title, url = :url, imageBitmap = NULL WHERE dateInt = :id")
     suspend fun repairArchive(id: Int, title: String, url: String)
+
+    // Only touches the favourite flag, so the saved bitmap and wallpaper history are kept
+    @Query("UPDATE ApodArchiveEntity SET isFavoriteDatabase = :isFavorite WHERE dateInt = :id")
+    suspend fun updateFavorite(id: Int, isFavorite: Boolean)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM ApodArchiveEntity WHERE dateInt = :id AND isFavoriteDatabase = 1)")
+    suspend fun isFavorite(id: Int): Boolean
 }
