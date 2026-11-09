@@ -10,10 +10,14 @@ import com.prasoon.apodkotlinrefactored.data.ApodArchiveDao
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
 import kotlinx.coroutines.*
+import org.json.JSONArray
+import org.json.JSONException
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.io.IOException
 import java.net.*
+import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -128,8 +132,11 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
             val intDate = parsedDate.toIntDate()
             currentCalendarDate.add(Calendar.DAY_OF_MONTH, -1)
 
-            val apodArchive: ApodArchive = if (daoArchive.isRowExist(intDate)) {
-                val archive = daoArchive.getApodArchiveFromDatePrimaryKey(intDate).toApodArchive()
+            val cached = if (daoArchive.isRowExist(intDate))
+                daoArchive.getApodArchiveFromDatePrimaryKey(intDate).toApodArchive() else null
+
+            val apodArchive: ApodArchive = if (cached != null && !cached.link.isBrokenApodLink()) {
+                val archive = cached
                 Log.d(TAG, "Fetch from DB -> apodArchive: $archive")
                 Log.d(TAG, "Fetch from DB -> apodArchive bitmap size in bytes: ${(archive.imageBitmapUI?.byteCount)}, Mb: ${(archive.imageBitmapUI?.byteCount)?.div(1024f * 1024)}")
                 if (archive.imageBitmapUI == null) {
@@ -140,10 +147,14 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
                 val archive = createArchiveLinksWithDate(parsedDate)
                 Log.d(TAG, "Fetch from Network -> apodArchive: $archive")
                 if (archive.title.isNotEmpty()) {
-                    daoArchive.insertApodArchive(archive.toApodArchiveEntity())
+                    if (cached == null) daoArchive.insertApodArchive(archive.toApodArchiveEntity())
+                    else daoArchive.repairArchive(intDate, archive.title, archive.link)
                     launchBitmapFetchAndUpdate(intDate, archive.link)
                 }
-                archive
+                archive.copy(
+                    isAddedToFavorites = cached?.isAddedToFavorites ?: false,
+                    isSetWallpaperUI = cached?.isSetWallpaperUI ?: false
+                )
             }
 
             // Don't add if empty archive received
@@ -203,6 +214,45 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         }
     }
 
+    // Entries saved after NASA moved APOD to science.nasa.gov can point at the site logo or a doubled URL
+    private fun String.isBrokenApodLink() =
+        contains("nasa-logo") || contains("/apod/https:")
+
+    // Old apYYMMDD.html addresses still redirect to the article for older dates; newer dates need a search
+    private suspend fun resolveApodDocument(date: String): Document? {
+        val legacy = fetchDocumentFromUrl(DateUtils.createApodUrl(date))
+        if (legacy?.location()?.contains("/image-article/") == true) return legacy
+        val articleUrl = findArticleUrl(date) ?: return null
+        return fetchDocumentFromUrl(articleUrl)
+    }
+
+    private suspend fun findArticleUrl(date: String): String? = withContext(Dispatchers.IO) {
+        try {
+            val (year, month, day) = date.split("-")
+            val monthName = DateFormatSymbols(Locale.ENGLISH).months[month.toInt() - 1]
+                .lowercase(Locale.ENGLISH)
+            val slug = "apod-$year-$monthName-${day.toInt()}"
+            val body = Jsoup.connect("https://science.nasa.gov/wp-json/wp/v2/search")
+                .data("search", slug)
+                .data("per_page", "10")
+                .data("subtype", "image-article")
+                .ignoreContentType(true)
+                .timeout(10000)
+                .execute()
+                .body()
+            val results = JSONArray(body)
+            (0 until results.length())
+                .map { results.getJSONObject(it).getString("url") }
+                .firstOrNull { it.contains("/$slug-") }   // trailing "-" keeps november-1 from matching november-10
+        } catch (e: IOException) {
+            Log.e(TAG, "Article search failed for $date", e)
+            null
+        } catch (e: JSONException) {
+            Log.e(TAG, "Article search returned bad JSON for $date", e)
+            null
+        }
+    }
+
     private suspend fun createArchiveLinksWithDate(date: String): ApodArchive {
         val archive: ApodArchive
         val document: Document?
@@ -221,45 +271,22 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
         try {
             url = DateUtils.createApodUrl(date)
             Log.d(TAG, "Jsoup link $url for: $date")
-            document = fetchDocumentFromUrl(url)
+            document = resolveApodDocument(date)
             if (document != null) {
-                png = document.select("img[src]").attr("src")
-                youTubeLink = document.select("iframe[width]").attr("src")
-                webLink = document.select("iframe[src]").attr("src")
+                val media = document.selectFirst(".media-detail-hero__media")
+                png = media?.selectFirst("img[src]")?.absUrl("src").orEmpty()
+                youTubeLink = media?.selectFirst("iframe[src*=youtube]")?.attr("src").orEmpty()
+                webLink = media?.selectFirst("video source[src]")?.absUrl("src")
+                    ?: media?.selectFirst("iframe[src]")?.absUrl("src").orEmpty()
 
-                title = document.select("center").select("b").first()?.text() ?: ""
-                if (title.isEmpty()) title = document.select("b").first()?.text() ?: ""
+                title = document.selectFirst("h1")?.text().orEmpty()
 
-                // Extract copyright (tries after "Image Credit" or "Image Credit & Copyright")
-                val copyrightText = document.select("b:contains(Credit)").parents().firstOrNull()?.ownText()
-                copyright = copyrightText?.trim()?.takeIf { it.isNotEmpty() }
+                copyright = document.select(".media-detail-hero__meta-row")
+                    .firstOrNull { it.selectFirst("th")?.text()?.contains("Credit") == true }
+                    ?.selectFirst("td")?.text()?.takeIf { it.isNotEmpty() }
 
-                // After finding the explanationElem as in your code:
-                val explanationElem = document.select("b:contains(Explanation:)").first()
-                val parent = explanationElem?.parent()
-                val explanationBuilder = StringBuilder()
-
-                if (explanationElem != null && parent != null) {
-                    var found = false
-                    for (node in parent.childNodes()) {
-                        // Start collecting after the explanation <b> tag
-                        if (found) {
-                            // Make a fragment of just this node, so we can use Jsoup features
-                            val fragment = Jsoup.parseBodyFragment(node.outerHtml())
-                            // Remove all anchor tags BUT preserve their text
-                            fragment.select("a").unwrap()
-                            explanationBuilder.append(fragment.text())
-                        }
-                        // Check for <b> with "Explanation:"
-                        if (node is org.jsoup.nodes.Element
-                            && node.tagName() == "b"
-                            && node.text().contains("Explanation:")) {
-                            found = true
-                        }
-                    }
-                    // Collapse whitespace, trim as desired
-                    explanationText = explanationBuilder.toString().replace(Regex("\\s+"), " ").trim()
-                }
+                explanationText = document.selectFirst(".media-detail-hero__description")
+                    ?.text().orEmpty().removePrefix("Explanation:").trim()
 
                 noticeMessage = document.select("center:contains(Due to the lapse in federal government funding)")
                     .firstOrNull()
@@ -289,7 +316,7 @@ class ApodArchivesRepositoryImpl(private val daoArchive: ApodArchiveDao) : ApodA
             e.printStackTrace();
         }
         if (png.contains("jpeg") || png.contains("jpg") || png.contains("gif") || png.contains("png")) {
-            mediaLink = "https://apod.nasa.gov/apod/$png"
+            mediaLink = png
         } else if (youTubeLink.isNotEmpty() && youTubeLink.contains("youtube")) {
             mediaLink = VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(youTubeLink)
             mediaType = "video"

@@ -41,4 +41,7 @@ interface ApodArchiveDao {
 
     @Query("SELECT * FROM ApodArchiveEntity WHERE isSetWallpaper = :isSetWallpaper ")
     suspend fun getWallpaperHistory(isSetWallpaper: Boolean): List<ApodArchiveEntity>
+
+    @Query("UPDATE ApodArchiveEntity SET title = :title, url = :url, imageBitmap = NULL WHERE dateInt = :id")
+    suspend fun repairArchive(id: Int, title: String, url: String)
 }

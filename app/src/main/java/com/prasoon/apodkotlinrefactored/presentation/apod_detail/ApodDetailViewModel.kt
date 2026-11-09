@@ -9,7 +9,7 @@ import com.prasoon.apodkotlinrefactored.core.common.Resource
 import com.prasoon.apodkotlinrefactored.core.utils.DateUtils.toIntDate
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
-import com.prasoon.apodkotlinrefactored.domain.use_case.GetApod
+import com.prasoon.apodkotlinrefactored.domain.use_case.GetApodArchives
 import com.prasoon.apodkotlinrefactored.presentation.apod_home.ApodState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class ApodDetailViewModel @Inject constructor(
     private val db: ApodDatabase,
     application: Application,
-    private val getApod: GetApod,
+    private val getApod: GetApodArchives,
     ) : AndroidViewModel(application) {
 
     private val TAG = "ApodDetailViewModel"
@@ -42,14 +42,15 @@ class ApodDetailViewModel @Inject constructor(
             }
             job.join()
 
-            if (isDateExistInDB) {
-                val apod = db.dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod()
+            val saved = if (isDateExistInDB) db.dao.getApodFromDatePrimaryKey(date.toIntDate()).toApod() else null
+            if (saved != null && !saved.url.contains("nasa-logo")) {
+                val apod = saved
 
                 apodState = ApodState(apod = apod, isLoading = false)
                 apodStateLiveData.postValue(apodState)
 
             } else {
-                getApod.invoke(date = date)
+                getApod.getApodArchiveFromDate(date = date)
                     .onEach { result ->
                         when (result) {
                             is Resource.Success -> {

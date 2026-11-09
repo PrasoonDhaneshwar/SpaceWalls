@@ -55,54 +55,12 @@ class WallpaperWorker @AssistedInject constructor(
             SCHEDULE_DAILY_WALLPAPER -> {
                 date = DateUtils.currentDate.ifEmpty { DateUtils.getCurrentDateForInitialization() }
 
-                supervisorScope {
-                    try {
-                        val remoteApod = api.getApodCustomDate(BuildConfig.APOD_API_KEY, date)
-                        db.dao.insertApod(remoteApod.toApodEntity())   // Update in DB
-                        val apod = remoteApod.toApodEntity().toApod()
-                        Log.d(TAG, "doWork apod: $apod")
-
-                        val apodArchiveEntity = remoteApod.convertToApodArchiveEntity()
-                        dbArchive.dao.insertApodArchive(apodArchiveEntity)   // Update in Archive DB
-
-                        var url = ""
-                        url = if (apod.url.contains("youtube")) VideoUtils.getYoutubeThumbnailUrlFromVideoUrl(apod.url) else apod.url
-
-                        val bitmap: Bitmap?
-                        if (url.isNotEmpty()) {
-                            bitmap = createBitmapFromCacheFile(url, appContext)
-                            Log.d(TAG, "Bitmap: ${bitmap?.height}")
-
-                            if (notifications) {
-                                if (url.contains("youtube") || url.contains(".gif")) {
-                                    displayNotification(appContext, "Can not set wallpaper for YouTube or Web content\n"+ apod.title, apod.date, false, bitmap)
-                                } else {
-                                    displayNotification(appContext, "Wallpaper is set for: " + apod.title, apod.date, false, bitmap)
-                                }
-                            }
-
-                            // Only set wallpaper when url contains an image
-                            if ((url.contains("jpeg") || url.contains("jpg") || url.contains("png")) && bitmap != null && !url.contains("youtube")) {
-                                setWallpaper(appContext, null, screenPreference, bitmap)
-                                db.dao.updateApodImage(date.toIntDate(), bitmap)
-                                dbArchive.dao.updateApodArchiveImage(date.toIntDate(), bitmap)
-                                dbArchive.dao.setWallpaperField(date.toIntDate(), true)
-                            } else {
-                                return@supervisorScope
-                            }
-                        }
-
-                    } catch (e: java.lang.Exception) {
-                        Result.failure()
-                        Result.retry()
-                    }
-                }
-                return Result.success()
+                return processApodArchiveForWorker(date, screenPreference)
             }
 
             SCHEDULE_ARCHIVE_WALLPAPER -> {
                 date = generateRandomDate()
-                processApodArchiveForWorker(date, screenPreference)
+                return processApodArchiveForWorker(date, screenPreference)
             }
 
             SCHEDULE_FAVORITES_WALLPAPER -> {
@@ -138,6 +96,8 @@ class WallpaperWorker @AssistedInject constructor(
 
     private suspend fun processApodArchiveForWorker(date: String, screenPreference: Int): Result {
         val apodArchive = archiveRepository.fetchArchiveFromDate(date)
+        // Network failure, or today's page isn't published yet
+        if (apodArchive.link.isEmpty()) return Result.retry()
         Log.d(TAG, "doWork apodArchive: $apodArchive")
         dbArchive.dao.insertApodArchive(apodArchive.toApodArchiveEntity())
         val bitmap = createBitmapFromCacheFile(apodArchive.link, appContext)
