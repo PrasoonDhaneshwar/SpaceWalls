@@ -6,7 +6,7 @@ object Constants {
 
     var SHOW_NOTIFICATION: Boolean = false
 
-    val LOAD_APOD_ARCHIVE_FACTOR = 10
+    const val LOAD_APOD_ARCHIVE_FACTOR = 5
 
     const val SELECTED_SIMPLE_DATE_FORMAT = "SELECTED_SIMPLE_DATE_FORMAT"
     const val CURRENT_DATE_FOR_API = "CURRENT_DATE_FOR_API"

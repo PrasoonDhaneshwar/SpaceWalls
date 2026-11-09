@@ -9,7 +9,7 @@ import com.prasoon.apodkotlinrefactored.core.common.Resource
 import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
-import com.prasoon.apodkotlinrefactored.domain.use_case.GetApod
+import com.prasoon.apodkotlinrefactored.domain.use_case.GetApodArchives
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,7 @@ import javax.inject.Inject
 // Step 5.1: PRESENTATION/UI: Create ViewModels by using the "use cases".
 @HiltViewModel
 class ApodViewModel @Inject constructor(
-    private val getApod: GetApod,
+    private val getApod: GetApodArchives,
     private val db: ApodDatabase,
     private val dbArchiveDatabase: ApodArchiveDatabase,
     application: Application
@@ -43,7 +43,7 @@ class ApodViewModel @Inject constructor(
     private fun getApod(date: String) {
 
         coroutineScope.launch {
-            getApod.invoke(date = date)
+            getApod.getApodArchiveFromDate(date = date)
                 .onEach { result ->
                     when (result) {
                         is Resource.Success -> {

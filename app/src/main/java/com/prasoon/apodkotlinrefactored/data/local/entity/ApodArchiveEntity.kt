@@ -27,7 +27,11 @@ data class ApodArchiveEntity(
             link = url,
             isAddedToFavorites = isFavoriteDatabase,
             imageBitmapUI = imageBitmap,
-            isSetWallpaperUI = isSetWallpaper
+            isSetWallpaperUI = isSetWallpaper,
+            copyright = null,
+            explanation = null,
+            mediaType = null,
+            noticeMessage = null
         )
     }
 }

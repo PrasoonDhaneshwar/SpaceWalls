@@ -124,7 +124,7 @@ object ApodModule {
 
     @Provides
     @Singleton
-    fun providesApod() = Apod("", "", "", "", "", "", "")
+    fun providesApod() = Apod("", "", "", "", "", "", "", noticeMessage = "")
 
     @Provides
     @Singleton

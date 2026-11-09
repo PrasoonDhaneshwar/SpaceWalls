@@ -12,8 +12,12 @@ data class ApodArchive(
     val title: String,
     val link: String,
     var isAddedToFavorites: Boolean,
+    val copyright: String?,
+    val explanation: String?,
+    val mediaType: String? = "image",
     val imageBitmapUI: Bitmap? = null,
-    val isSetWallpaperUI: Boolean = false
+    val isSetWallpaperUI: Boolean = false,
+    val noticeMessage: String?
 ) : Parcelable {
     fun toApodArchiveEntity(processFavoritesDB: Boolean = false): ApodArchiveEntity {
         return ApodArchiveEntity(
@@ -22,6 +26,22 @@ data class ApodArchive(
             title = title,
             url = link,
             isFavoriteDatabase = processFavoritesDB
+        )
+    }
+
+    fun toApod(): Apod {
+        return Apod(
+            date = date,
+            copyright = copyright,
+            explanation = explanation ?: "",
+            hdUrl = link,
+            mediaType = mediaType ?: "",
+            title = title,
+            url = link,
+            addToFavoritesUI = false,
+            imageBitmapUI = imageBitmapUI,
+            isSetWallpaperUI = isSetWallpaperUI,
+            noticeMessage = noticeMessage
         )
     }
 }

@@ -20,7 +20,8 @@ data class Apod(
     val url: String,
     val addToFavoritesUI: Boolean = false,
     val imageBitmapUI: Bitmap? = null,
-    val isSetWallpaperUI: Boolean = false
+    val isSetWallpaperUI: Boolean = false,
+    val noticeMessage: String?
 ) : Parcelable {
     // Convert domain/UI Apod component to DB entity
     fun toApodEntity(processFavoritesDB: Boolean = false): ApodEntity {

@@ -36,7 +36,8 @@ data class ApodEntity(
             copyright = copyright,
             addToFavoritesUI = addToFavoritesDB,
             imageBitmapUI = imageBitmap,
-            isSetWallpaperUI = isSetWallpaper
+            isSetWallpaperUI = isSetWallpaper,
+            noticeMessage = null
         )
     }
 }

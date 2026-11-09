@@ -120,14 +120,14 @@ class ApodRepositoryImpl(
                 if (e.code() == 400) return@flow    // Don't handle bad requests
                 if (e.code() == 404) {
                     Log.d(TAG, "404 occurred")
-                    emit(Resource.Error(message = "No data available for $date", data = Apod(date, "", "No data available for ${date.toSimpleDateFormat()}.\nPlease try for another date", "", "", "", "")))
+                    emit(Resource.Error(message = "No data available for $date", data = Apod(date, "", "No data available for ${date.toSimpleDateFormat()}.\nPlease try for another date", "", "", "", "", noticeMessage = "")))
                 }
                 else {
-                    emit(Resource.Error(message = "Oops, something went wrong!", data = Apod("", "", "", "", "", "", "")))
+                    emit(Resource.Error(message = "Oops, something went wrong!", data = Apod("", "", "", "", "", "", "", noticeMessage = "")))
                 }
 
             } catch (e: IOException) {
-                emit(Resource.Error(message = "Couldn't reach server, please try after sometime", data = Apod("", "", "", "", "", "", "")))
+                emit(Resource.Error(message = "Couldn't reach server, please try after sometime", data = Apod("", "", "", "", "", "", "", noticeMessage = "")))
             }
         }
     }
