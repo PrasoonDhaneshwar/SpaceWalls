@@ -6,7 +6,7 @@ Browse through **thousands** of NASA's archives and learn about the universe.
 **Schedule wallpaper** through these archives, your favorites or a new content everyday.
 
 ## **👇 Download** ##
-Click [here](https://github.com/PrasoonDhaneshwar/SpaceWalls/releases/download/5.0/SpaceWalls-v5.0.apk) to download **SpaceWalls.**
+Click [here](https://github.com/PrasoonDhaneshwar/SpaceWalls/releases/download/6.0/SpaceWalls-v6.0.apk) to download **SpaceWalls.**
 
 ## **✨App Features:** ##
 - Browse archives from **1995** to present day
