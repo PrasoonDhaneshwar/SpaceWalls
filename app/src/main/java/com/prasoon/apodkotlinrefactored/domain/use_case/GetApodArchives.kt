@@ -1,6 +1,7 @@
 package com.prasoon.apodkotlinrefactored.domain.use_case
 
 import com.prasoon.apodkotlinrefactored.core.common.Resource
+import com.prasoon.apodkotlinrefactored.core.utils.DateUtils
 import com.prasoon.apodkotlinrefactored.domain.model.Apod
 import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
@@ -29,7 +30,12 @@ class GetApodArchives(
 
     fun getApodArchiveFromDate(date: String):  Flow<Resource<Apod>> = flow {
         // Emit a list of apods
-        val apodArchive = archiveRepository.fetchArchiveFromDate(date).toApod()
-        emit(Resource.Success(apodArchive))
+        var apodArchive = archiveRepository.fetchArchiveFromDate(date)
+        // NASA can publish today's page late; show the latest published one meanwhile
+        if (apodArchive.title.isEmpty() && date == DateUtils.getCurrentDateForInitialization()) {
+            val previous = archiveRepository.fetchArchiveFromDate(DateUtils.getPreviousDate(date))
+            if (previous.title.isNotEmpty()) apodArchive = previous
+        }
+        emit(Resource.Success(apodArchive.toApod()))
     }
 }

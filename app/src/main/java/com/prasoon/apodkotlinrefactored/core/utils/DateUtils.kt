@@ -11,6 +11,8 @@ object DateUtils {
     private val TAG = "DateInput"
 
     var currentDate: String = String()
+    // True while Home shows the latest APOD rather than a date the user picked
+    var followLatestApod = true
     var simpleDateFormat: String? = null
     var isRefreshNeededForArchives = false
     var processHomeApodToArchiveFavorites = false
@@ -57,13 +59,25 @@ object DateUtils {
     fun createApodUrlApi(date: String): String {
         return "https://api.nasa.gov/planetary/apod?api_key=${BuildConfig.APOD_API_KEY}&date=$date"
     }
+    // APOD publishes a new page at midnight US Eastern time, so "today" is the date in New York
+    private val APOD_TIME_ZONE: TimeZone = TimeZone.getTimeZone("America/New_York")
+
+    // change format of date to "2022-01-10"
+    private fun apodDateFormat() = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply { timeZone = APOD_TIME_ZONE }
+
     fun getCurrentDateForInitialization() : String {
-        val currentCalendarDateForInitialization: Calendar = GregorianCalendar()
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd")     // change format of date to "2022-01-10"
-        val timeZone = TimeZone.getTimeZone("UTC")  // Explicit set UTC TimeZone
-        dateFormat.timeZone = timeZone
-        Log.d(TAG, "getCurrentDateForInitialization: ${dateFormat.format(currentCalendarDateForInitialization.time)}")
-        return dateFormat.format(currentCalendarDateForInitialization.time)
+        val today = apodDateFormat().format(Date())
+        Log.d(TAG, "getCurrentDateForInitialization: $today")
+        return today
+    }
+
+    // "2024-03-01" -> "2024-02-29"
+    fun getPreviousDate(date: String): String {
+        val format = apodDateFormat()
+        val calendar = Calendar.getInstance(APOD_TIME_ZONE)
+        calendar.time = format.parse(date) ?: return date
+        calendar.add(Calendar.DAY_OF_MONTH, -1)
+        return format.format(calendar.time)
     }
 
     fun getEndDate(): Date {
@@ -79,8 +93,7 @@ object DateUtils {
         val endDate = getEndDate()
         val random: Long = ThreadLocalRandom.current().nextLong(endDate.time, startDate.getTime())
         val date = Date(random)
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd")     // change format of date to "2022-01-10"
-        val dateInString = dateFormat.format(date)
+        val dateInString = apodDateFormat().format(date)
         Log.d(TAG, "generateRandomDate: Date: $date API format: $dateInString")
         return dateInString
     }

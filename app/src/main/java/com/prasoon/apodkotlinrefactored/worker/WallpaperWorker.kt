@@ -9,6 +9,7 @@ import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.prasoon.apodkotlinrefactored.BuildConfig
+import com.prasoon.apodkotlinrefactored.core.common.Constants.ALARM_PREFERENCE
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_ARCHIVE_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_DAILY_WALLPAPER
 import com.prasoon.apodkotlinrefactored.core.common.Constants.SCHEDULE_FAVORITES_WALLPAPER
@@ -25,6 +26,7 @@ import com.prasoon.apodkotlinrefactored.core.utils.VideoUtils
 import com.prasoon.apodkotlinrefactored.data.local.ApodArchiveDatabase
 import com.prasoon.apodkotlinrefactored.data.local.ApodDatabase
 import com.prasoon.apodkotlinrefactored.data.remote.ApodAPI
+import com.prasoon.apodkotlinrefactored.domain.model.ApodArchive
 import com.prasoon.apodkotlinrefactored.domain.repository.ApodArchivesRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -43,7 +45,11 @@ class WallpaperWorker @AssistedInject constructor(
     companion object {
         const val TAG = "WallpaperWorker"
         const val WORK_NAME = "WallpaperWorker"
+        // Retries wait 15, 30, 60 and 120 minutes, so the fallback runs about four hours after the first try
+        private const val MAX_DAILY_ATTEMPTS = 4
+        private const val LAST_DAILY_WALLPAPER_DATE = "LAST_DAILY_WALLPAPER_DATE"
     }
+    private val alarmPreference: SharedPreferences = appContext.getSharedPreferences(ALARM_PREFERENCE, Context.MODE_PRIVATE)
     private val settingPerf: SharedPreferences? = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val notifications = settingPerf!!.getBoolean("notifications", false)
     override suspend fun doWork(): Result {
@@ -52,11 +58,7 @@ class WallpaperWorker @AssistedInject constructor(
         val scheduleType = inputData.getInt(SCHEDULE_FOR_WORKER, SCHEDULE_DAILY_WALLPAPER)
         val screenPreference = inputData.getInt(SCREEN_PREFERENCE_FOR_WORKER, SCREEN_PREFERENCE)
         when (scheduleType) {
-            SCHEDULE_DAILY_WALLPAPER -> {
-                date = DateUtils.currentDate.ifEmpty { DateUtils.getCurrentDateForInitialization() }
-
-                return processApodArchiveForWorker(date, screenPreference)
-            }
+            SCHEDULE_DAILY_WALLPAPER -> return processDailyWallpaper(screenPreference)
 
             SCHEDULE_ARCHIVE_WALLPAPER -> {
                 date = generateRandomDate()
@@ -94,10 +96,42 @@ class WallpaperWorker @AssistedInject constructor(
         return Result.success()
     }
 
+    // Today's page can appear late. Retry with backoff, then settle for yesterday's
+    private suspend fun processDailyWallpaper(screenPreference: Int): Result {
+        val today = DateUtils.getCurrentDateForInitialization()
+        val lastSetDate = alarmPreference.getString(LAST_DAILY_WALLPAPER_DATE, null)
+        if (lastSetDate == today) return Result.success()
+
+        val todayArchive = archiveRepository.fetchArchiveFromDate(today)
+        if (todayArchive.link.isNotEmpty()) return setDailyWallpaper(todayArchive, screenPreference)
+
+        if (runAttemptCount < MAX_DAILY_ATTEMPTS) {
+            Log.d(TAG, "APOD for $today not available yet, attempt $runAttemptCount")
+            return Result.retry()
+        }
+
+        val yesterday = DateUtils.getPreviousDate(today)
+        if (lastSetDate == yesterday) return Result.success()
+        val yesterdayArchive = archiveRepository.fetchArchiveFromDate(yesterday)
+        if (yesterdayArchive.link.isEmpty()) return Result.retry()    // Likely offline
+        return setDailyWallpaper(yesterdayArchive, screenPreference)
+    }
+
+    private suspend fun setDailyWallpaper(apodArchive: ApodArchive, screenPreference: Int): Result {
+        val result = processApodArchive(apodArchive, screenPreference)
+        alarmPreference.edit().putString(LAST_DAILY_WALLPAPER_DATE, apodArchive.date).apply()
+        return result
+    }
+
     private suspend fun processApodArchiveForWorker(date: String, screenPreference: Int): Result {
         val apodArchive = archiveRepository.fetchArchiveFromDate(date)
-        // Network failure, or today's page isn't published yet
+        // Network failure, or the page couldn't be read
         if (apodArchive.link.isEmpty()) return Result.retry()
+        return processApodArchive(apodArchive, screenPreference)
+    }
+
+    private suspend fun processApodArchive(apodArchive: ApodArchive, screenPreference: Int): Result {
+        val date = apodArchive.date
         Log.d(TAG, "doWork apodArchive: $apodArchive")
         dbArchive.dao.insertApodArchive(apodArchive.toApodArchiveEntity())
         val bitmap = createBitmapFromCacheFile(apodArchive.link, appContext)

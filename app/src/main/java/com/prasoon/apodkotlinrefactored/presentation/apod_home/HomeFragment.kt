@@ -72,6 +72,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
         // Start with an actual date
         if (!dateFromPendingIntent.isNullOrEmpty()) {
             DateUtils.currentDate = dateFromPendingIntent!!
+            DateUtils.followLatestApod = false
             showNotification = false    // If Clicked from notification, no need for notifications again
         }
         else if (DateUtils.currentDate.isEmpty())  DateUtils.currentDate = getCurrentDateForInitialization()
@@ -95,6 +96,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
                     val dateApiFormat = bundle.getString(Constants.CURRENT_DATE_FOR_API)
                     if (dateApiFormat != null) {
                         DateUtils.currentDate = dateApiFormat
+                        DateUtils.followLatestApod = false
                         Log.d(TAG, "viewModel.refresh date from DatePicker: dateApiFormat: $dateApiFormat")
                         viewModel.refresh(dateApiFormat)
                         showNotification = true
@@ -368,6 +370,8 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
     override fun onResume() {
         super.onResume()
+        // Ask for today again in case it was published since the last fallback to yesterday
+        if (DateUtils.followLatestApod) DateUtils.currentDate = getCurrentDateForInitialization()
         if (actionNonImageContent) viewModel.refresh(DateUtils.currentDate)
         Log.d(TAG, "viewModel.refresh date from onResume: DateUtils.currentDate: ${DateUtils.currentDate}")
     }

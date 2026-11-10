@@ -26,6 +26,7 @@ import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils
 import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.processAlarm
 import com.prasoon.apodkotlinrefactored.core.utils.SettingUtils.scheduleAlarmForDailyWallpaper
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 class AlarmReceiver: BroadcastReceiver() {
     val TAG = "AlertReceiver"
@@ -98,6 +99,7 @@ class AlarmReceiver: BroadcastReceiver() {
         val workRequest = OneTimeWorkRequest.Builder(WallpaperWorker::class.java)
             .setInputData(data)
             .setConstraints(constraints)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.MINUTES)
             .addTag(WallpaperWorker.WORK_NAME)
             .build()
 
